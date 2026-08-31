@@ -1,0 +1,1 @@
+{"tfjsVersion":"1.7.4","tmVersion":"2.4.14","packageVersion":"0.8.4-alpha2","packageName":"@teachablemachine/image","timeStamp":"2026-08-31T05:02:51.839Z","userMetadata":{},"modelName":"tm-my-image-model","labels":["Maize_Blight","Maize_Common_Rust","Maize_Ear_Rot","Maize_Healthy","Maize_Gray_Leaf_Spot","Maize_Fall_Armyworm","Maize_Stem_Borer"],"imageSize":224}

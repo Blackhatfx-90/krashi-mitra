@@ -35,6 +35,31 @@ js/tflite/wasm/                     (~7 MB — @tensorflow/tfjs-tflite@0.0.1-alp
 
 Local copy मिलते ही app CDN को हाथ नहीं लगाती। `model.json` वाला (Tensorflow.js) export इस झंझट से मुक्त है — वो हमेशा offline चलता है और size भी बहुत कम है।
 
+**अभी कौन सी फसल तैयार है:**
+
+| फसल | Model | Classes |
+|---|---|---|
+| धान / Rice | ✅ TensorFlow.js | 17 |
+| गेहूँ / Wheat | ✅ TensorFlow.js | 14 |
+| गन्ना / Sugarcane | ✅ TensorFlow.js | 16 |
+| प्याज / Onion | ✅ TensorFlow.js | 14 |
+| मक्का / Maize | ✅ TensorFlow.js | 7 |
+| आलू / Potato | ✅ TensorFlow.js | 10 |
+| टमाटर / Tomato | ✅ TensorFlow.js | 10 |
+| सरसों / Mustard | ❌ अभी नहीं — "Coming Soon" | 5 (सिर्फ advisory तैयार) |
+
+> ⚠️ **Label का नाम बदलना मना है।** `models/<fasal>/metadata.json` में जो नाम और जो **क्रम** है, `js/script.js` के `CROPS.<fasal>.labels` में हू-ब-हू वही होना चाहिए। पाँच जगह model के नाम जान-बूझकर "गलत" रखे गए हैं, क्योंकि model वही string देता है — इन्हें ठीक करते ही advisory मिलनी बंद हो जाएगी:
+>
+> | Label | गड़बड़ी | फसल |
+> |---|---|---|
+> | `surgarcane_viral_disease` | spelling — "sugarcane" नहीं | गन्ना |
+> | `onion_botrytis_leaf_light` | "blight" नहीं, "light" | प्याज |
+> | `Potato_Blackspot_B...` | Teachable Machine ने नाम 20 अक्षर पर काटा | आलू |
+> | `Potato_Miscellaneo...` | वही — कटा हुआ नाम | आलू |
+> | `Tomato_Spider_mites Two-spotted_spider_mite` | नाम के बीच **space** है (key quotes में लिखें) | टमाटर |
+
+**फोटो का hint:** हर फसल `photoHintHi` से अपना hint दे सकती है। आलू का model **कंद (tuber)** का है, पत्ती का नहीं — इसलिए वहाँ "आलू (कंद) की साफ फोटो" लिखा आता है। नई फसल में यह field न दें तो default "पत्ती की साफ फोटो" चलता रहेगा।
+
 ### Step B — local server chalayein
 
 `file://` से app **नहीं** चलेगी (browser `model.json` fetch नहीं करने देता)।
@@ -101,7 +126,7 @@ KRASHI MITRA/
 
 ---
 
-## 4. ⭐ Nayi fasal (5th crop) kaise jodein
+## 4. ⭐ Nayi fasal (9th crop) kaise jodein
 
 **सिर्फ 2 काम** — core logic छूना नहीं है:
 

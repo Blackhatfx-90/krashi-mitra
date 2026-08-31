@@ -8,7 +8,7 @@
  * badha do (v1 -> v2). Warna purani cached file hi milti rahegi.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v8';
+const CACHE_VERSION = 'krashi-mitra-v10';
 
 /* App shell — ye files install ke time hi cache ho jaati hain. */
 const APP_SHELL = [
@@ -40,6 +40,21 @@ const APP_SHELL = [
   './models/sugarcane/model.json',
   './models/sugarcane/metadata.json',
   './models/sugarcane/weights.bin',
+
+  // Maize model
+  './models/maize/model.json',
+  './models/maize/metadata.json',
+  './models/maize/weights.bin',
+
+  // Potato model
+  './models/potato/model.json',
+  './models/potato/metadata.json',
+  './models/potato/weights.bin',
+
+  // Tomato model
+  './models/tomato/model.json',
+  './models/tomato/metadata.json',
+  './models/tomato/weights.bin',
 ];
 
 /* ---------- INSTALL: sab kuch cache karo ---------------------------------- */
