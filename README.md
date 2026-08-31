@@ -276,7 +276,7 @@ Bas — sidebar ka button ab seedha APK download karega, aur *Offline & Help* pa
 
 | Cache | Kya | Kab mitta hai |
 |---|---|---|
-| `krashi-mitra-v13` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
+| `krashi-mitra-v14` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
 | `krashi-mitra-models` | fasal ke models | **kabhi apne aap nahi** — kisan khud "हटाएँ" dabaye tabhi |
 
 Isi wajah se app update karne par kisan ke download kiye hue models dobara
@@ -396,6 +396,8 @@ Output softmax probabilities होती हैं। तीन case handle क
 
 | Problem | हल |
 |---|---|
+| **Vercel पर "This site can't be reached" / `ERR_FAILED`** | `/index.html` खोल रहे हैं। `vercel.json` में `cleanUrls: true` है, इसलिए वो `/` पर **308 redirect** करता है — और service worker से आया redirected जवाब browser navigation के लिए मना कर देता है। **हल (v14 में हो चुका है):** `manifest.json` का `start_url` अब `./` है, और `sw.js` redirect वाले जवाब की साफ़ copy बनाकर देता है। पुराना टूटा SW हटाने के लिए एक बार **`/index.html` के बिना** सिर्फ़ `https://<आपका-app>.vercel.app/` खोलें |
+| PWA install करने के बाद ऐप नहीं खुलती | ऊपर वाली ही वजह — पुराना `start_url: ./index.html`। ऐप uninstall करके, `/` खोलकर दोबारा install करें |
 | सारे crops "Coming Soon" | `models/<crop>/` में न `model.json` है न `model.tflite`, या app `file://` से चल रही है — local server use करें |
 | "मॉडल लोड नहीं हो पाया" | TFJS export में weights.bin / metadata.json missing है; `.tflite` में internet नहीं मिला (runtime CDN से आता है) |
 | `.tflite` model बिना internet नहीं चलता | `js/tflite/` वाली local copy रखें — Step A देखें |

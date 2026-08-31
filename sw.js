@@ -24,13 +24,16 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v13';
+const CACHE_VERSION = 'krashi-mitra-v14';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* App shell — install ke waqt yahi cache hota hai (models NAHI). */
 const APP_SHELL = [
   './',
-  './index.html',
+  // NOTE: './index.html' JAAN-BOOJH KAR yahan nahi hai.
+  // Vercel me cleanUrls on hai, isliye /index.html -> 308 redirect -> /
+  // Redirect wala jawab cache karke navigation me dena browser MANA karta hai
+  // (ERR_FAILED aata hai). Isliye hum sirf './' rakhte hain.
   './css/style.css',
   './js/script.js',
   './js/tf.min.js',
@@ -114,6 +117,45 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  /* --- NAVIGATION (page khulna) — redirect-safe ---------------------------
+   * Browser navigation ke liye AISA jawab kabhi nahi leta jo redirect hokar
+   * aaya ho (response.redirected === true) — wo seedha ERR_FAILED de deta hai.
+   * Vercel ka cleanUrls /index.html ko / par bhejta hai, isliye yahan hum
+   * redirect wale jawab ki ek SAAF copy bana kar dete hain.
+   * ---------------------------------------------------------------------- */
+  if (req.mode === 'navigate') {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_VERSION);
+      try {
+        const fresh = await fetch(req);
+
+        if (fresh && fresh.redirected) {
+          // Redirect ke baad wala asli page — nayi, bina-redirect wali copy banao
+          const body = await fresh.blob();
+          const copy = new Response(body, {
+            status: 200,
+            statusText: 'OK',
+            headers: fresh.headers,
+          });
+          cache.put('./', copy.clone());
+          return copy;
+        }
+
+        if (fresh && fresh.ok) cache.put('./', fresh.clone());
+        return fresh;
+      } catch (_) {
+        // Offline — cache se app shell do
+        const shell = (await cache.match('./')) || (await cache.match('./index.html'));
+        if (shell) return shell;
+        return new Response('Offline: ऐप अभी कैश में नहीं है। एक बार इंटरनेट के साथ खोलें।', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        });
+      }
+    })());
+    return;
+  }
+
   const isHeavyAsset = url.pathname.includes('/js/');
 
   event.respondWith((async () => {
@@ -137,11 +179,7 @@ self.addEventListener('fetch', (event) => {
     const fresh = await networkPromise;
     if (fresh) return fresh;
 
-    // Offline + cache me bhi nahi -> navigation ho to index.html de do
-    if (req.mode === 'navigate') {
-      const shell = await cache.match('./index.html');
-      if (shell) return shell;
-    }
+    // (navigation upar alag se handle ho chuka hai)
     return new Response('Offline: यह फ़ाइल कैश में नहीं मिली।', {
       status: 503,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },

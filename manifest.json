@@ -3,16 +3,23 @@
   "short_name": "AgriAI",
   "description": "Offline multi-crop disease detection with Hindi advisory, voice output and weather-based spray warnings.",
   "id": "/",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
   "background_color": "#eef6f0",
   "theme_color": "#1b7a3e",
   "lang": "hi",
   "dir": "ltr",
-  "categories": ["agriculture", "productivity", "utilities"],
+  "categories": [
+    "agriculture",
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "assets/icon-192.png",
