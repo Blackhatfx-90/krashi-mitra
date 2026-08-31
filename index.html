@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Offline Rice Crop Disease Detection & Advisory — dhaan ki patti ki photo se rog pehchanein" />
+
+  <title>AgriAI — फसल रोग पहचान व सलाह</title>
+
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css?v=8" />
+</head>
+
+<body>
+
+<!-- ============================================================
+     SVG ICON SPRITE — saare nav/UI icons ek hi jagah.
+     Use karne ka tarika: <svg class="ic"><use href="#i-camera"/></svg>
+     ============================================================ -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.9c.5 0 1-.3 1.3-.7l.7-1.1c.2-.4.7-.6 1.2-.6h2.8c.5 0 .9.2 1.2.6l.7 1.1c.3.4.8.7 1.3.7h1.9A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/>
+    <circle cx="12" cy="13" r="3.4"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 2"/>
+  </symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.9 1 .9 1.7V16h5.4v-.5c0-.7.4-1.3.9-1.7A6 6 0 0 0 12 3z"/>
+  </symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H19v3H6.5A2.5 2.5 0 0 1 4 18.5z"/>
+  </symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l7 3v5.5c0 4.4-3 8-7 9.5-4-1.5-7-5.1-7-9.5V6z"/><path d="m9 12 2 2 4-4"/>
+  </symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 20c0-8 5-14 16-15 0 10-5 15-12 15-2 0-4-.5-4 0z"/><path d="M9 15c2-3 5-5 8-6"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m5 12.5 4.5 4.5L19 7"/>
+  </symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 9.5h3L11.5 6v12L7 14.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/>
+  </symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+    <rect x="6" y="6" width="12" height="12" rx="2"/>
+  </symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 16V4"/><path d="m7.5 8.5 4.5-4.5 4.5 4.5"/><path d="M4 15v3.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V15"/>
+  </symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+    <path d="M4 7h16M4 12h16M4 17h16"/>
+  </symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+    <path d="M6 6l12 12M18 6L6 18"/>
+  </symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m9 6 6 6-6 6"/>
+  </symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 3l18 18"/><path d="M8.5 15.5a5 5 0 0 1 7 0"/><path d="M5 12a10 10 0 0 1 3.2-2.2"/><path d="M19 12a10 10 0 0 0-7.5-2.9"/><path d="M12 19h.01"/>
+  </symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4.5 21 20H3z"/><path d="M12 10v4M12 17h.01"/>
+  </symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>
+  </symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3.5c3 3.6 5.5 6.6 5.5 9.6a5.5 5.5 0 0 1-11 0c0-3 2.5-6 5.5-9.6z"/>
+  </symbol>
+  <symbol id="i-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 15.5a4 4 0 0 1 .6-7.96 5.5 5.5 0 0 1 10.6 1.5A3.5 3.5 0 0 1 17.5 15.5z"/>
+    <path d="M9 18.5l-.8 2M13 18.5l-.8 2M17 18.5l-.8 2"/>
+  </symbol>
+  <symbol id="i-wind" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 8h9a2.5 2.5 0 1 0-2.5-2.5"/><path d="M3 12h13a2.5 2.5 0 1 1-2.5 2.5"/><path d="M3 16h7"/>
+  </symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 11a8 8 0 1 0-.6 4"/><path d="M20 4.5V11h-6.5"/>
+  </symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 21v-8"/><path d="M12 13C12 9 9 6.5 5 6.5 5 10.5 8 13 12 13z"/><path d="M12 13c0-3.3 2.6-6 6-6 0 3.3-2.6 6-6 6z"/>
+  </symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 7h16M9 7V5h6v2M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9l.8-12"/>
+  </symbol>
+</svg>
+
+
+<div class="layout">
+
+  <!-- ==========================================================
+       SIDEBAR (desktop) / DRAWER (mobile)
+       ========================================================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img class="brand__mark" src="assets/logo.svg" alt="" width="36" height="36" />
+      <!-- TEAM: brand ka naam yahin badlein -->
+      <span class="brand__name">Agri<span class="brand__name-accent">AI</span></span>
+      <button type="button" class="icon-btn sidebar__close" id="drawerClose" aria-label="मेन्यू बंद करें">
+        <svg class="ic"><use href="#i-close"/></svg>
+      </button>
+    </div>
+
+    <!-- Abhi kaun si fasal chuni hai -->
+    <button type="button" class="crop-chip" id="changeCropBtn" data-view="crops">
+      <span id="cropChip"><span aria-hidden="true">🌱</span> फसल चुनें</span>
+      <span class="crop-chip__change">बदलें</span>
+    </button>
+
+    <nav class="nav" aria-label="मुख्य मेन्यू">
+      <p class="nav__group">DETECTION</p>
+      <button type="button" class="nav__item" data-view="crops">
+        <svg class="ic"><use href="#i-sprout"/></svg><span>फसल चुनें / Crop</span>
+      </button>
+      <button type="button" class="nav__item is-active" data-view="scan">
+        <svg class="ic"><use href="#i-camera"/></svg><span>Scan &amp; Detect</span>
+      </button>
+      <button type="button" class="nav__item" data-view="history">
+        <svg class="ic"><use href="#i-clock"/></svg><span>History</span>
+        <span class="nav__badge" id="historyBadge" hidden>0</span>
+      </button>
+
+      <p class="nav__group">ADVISORY</p>
+      <button type="button" class="nav__item" data-view="advisory">
+        <svg class="ic"><use href="#i-bulb"/></svg><span>Smart Advisory</span>
+      </button>
+      <button type="button" class="nav__item" data-view="handbook">
+        <svg class="ic"><use href="#i-book"/></svg><span>Crop Guide</span>
+      </button>
+
+      <p class="nav__group">RESOURCES</p>
+      <button type="button" class="nav__item" data-view="about">
+        <svg class="ic"><use href="#i-shield"/></svg><span>Offline &amp; Help</span>
+      </button>
+    </nav>
+
+    <div class="help-card">
+      <div class="help-card__avatar" aria-hidden="true">👨‍🌾</div>
+      <div>
+        <p class="help-card__title">Need Help?</p>
+        <p class="help-card__sub">कृषि विज्ञान केंद्र से बात करें</p>
+        <a class="help-card__btn" href="tel:18001801551">किसान कॉल सेंटर</a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim" hidden></div>
+
+
+  <!-- ==========================================================
+       MAIN
+       ========================================================== -->
+  <div class="main">
+
+    <header class="topbar">
+      <button type="button" class="icon-btn topbar__menu" id="drawerOpen" aria-label="मेन्यू खोलें">
+        <svg class="ic"><use href="#i-menu"/></svg>
+      </button>
+
+      <div class="topbar__title">
+        <h1 id="viewTitle">नमस्ते, किसान भाई <span aria-hidden="true">👋</span></h1>
+        <p id="viewSubtitle">पत्ती की फोटो से रोग पहचानें — बिना इंटरनेट के</p>
+      </div>
+
+      <div class="topbar__meta">
+        <span class="chip chip--offline" title="सारी जाँच आपके फ़ोन पर होती है">
+          <svg class="ic"><use href="#i-wifi-off"/></svg>
+          <span>Offline</span>
+        </span>
+        <span class="chip chip--loading" id="statusChip" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="statusChipText">Loading model…</span>
+        </span>
+      </div>
+    </header>
+
+
+    <div class="content">
+
+      <!-- Banners -->
+      <div id="errorBanner" class="alert alert--error" hidden>
+        <svg class="ic"><use href="#i-alert"/></svg>
+        <div class="alert__body">
+          <strong id="errorTitle">त्रुटि / Error</strong>
+          <p id="errorMessage"></p>
+          <p id="errorMessageEn" class="alert__en" hidden></p>
+        </div>
+        <button type="button" class="icon-btn" id="errorClose" aria-label="बंद करें">
+          <svg class="ic"><use href="#i-close"/></svg>
+        </button>
+      </div>
+
+      <div id="infoBanner" class="alert alert--info" hidden>
+        <svg class="ic"><use href="#i-info"/></svg>
+        <div class="alert__body">
+          <p id="infoMessage"></p>
+          <p id="infoMessageEn" class="alert__en" hidden></p>
+        </div>
+        <button type="button" class="icon-btn" id="infoClose" aria-label="बंद करें">
+          <svg class="ic"><use href="#i-close"/></svg>
+        </button>
+      </div>
+
+
+      <!-- ====================== VIEW: CROP SELECTION ====================== -->
+      <section class="view is-active" id="view-crops">
+        <article class="card">
+          <div class="card__head">
+            <h2>आपकी फसल कौन सी है?</h2>
+            <p>Which is your crop? — फसल चुनते ही सिर्फ उसी का AI मॉडल लोड होगा (तेज़ और हल्का)</p>
+          </div>
+          <div class="crop-grid" id="cropGrid"></div>
+          <p class="tip">
+            जिस फसल पर "Coming Soon" लिखा है, उसका मॉडल अभी तैयार नहीं है।
+            <code>models/&lt;fasal&gt;/</code> में फ़ाइलें डालते ही वो अपने आप चालू हो जाएगी।
+          </p>
+        </article>
+      </section>
+
+      <!-- ====================== VIEW: SCAN ====================== -->
+      <section class="view" id="view-scan">
+
+        <!-- ---------- WEATHER (ek-maatra online feature) ---------- -->
+        <article class="card weather-card" id="weatherCard">
+          <div class="card__head card__head--row">
+            <div>
+              <h2>आज का मौसम / Weather</h2>
+              <p id="weatherPlace">आपके खेत के पास</p>
+            </div>
+            <div class="weather-actions">
+              <button type="button" class="speak-btn" id="weatherSpeakBtn" data-speaking="false" disabled>
+                <svg class="ic"><use href="#i-speaker"/></svg><span>सुनो / Listen</span>
+              </button>
+              <button type="button" class="icon-btn" id="weatherRefreshBtn" aria-label="ताज़ा करें / Refresh">
+                <svg class="ic"><use href="#i-refresh"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="weatherBody"></div>
+
+          <p class="weather-foot">
+            🌐 मौसम के लिए इंटरनेट + लोकेशन चाहिए। <strong>रोग पहचान बिना इंटरनेट के काम करती है।</strong>
+          </p>
+        </article>
+
+
+        <div class="grid grid--2">
+
+          <!-- Upload / capture -->
+          <article class="card">
+            <div class="card__head">
+              <h2>Scan &amp; Detect Disease</h2>
+              <p id="scanCropHint">चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें</p>
+            </div>
+
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" class="sr-only" />
+            <input type="file" id="galleryInput" accept="image/*" class="sr-only" />
+
+            <div class="dropzone" id="dropzone" tabindex="0" role="button"
+                 aria-label="फोटो अपलोड करें">
+              <div class="dropzone__inner" id="dropzoneEmpty">
+                <span class="dropzone__badge"><svg class="ic"><use href="#i-camera"/></svg></span>
+                <p class="dropzone__title">Upload Image</p>
+                <p class="dropzone__sub">या फोटो यहाँ खींचकर छोड़ें</p>
+              </div>
+              <div class="dropzone__preview" id="previewWrap" hidden>
+                <img id="previewImg" alt="चुनी गई पत्ती की फोटो" />
+                <button type="button" class="preview-clear" id="clearBtn" aria-label="फोटो हटाएँ">
+                  <svg class="ic"><use href="#i-close"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn btn--primary" id="galleryBtn">
+                <svg class="ic"><use href="#i-upload"/></svg> Choose Image
+              </button>
+              <button type="button" class="btn btn--ghost" id="cameraBtn">
+                <svg class="ic"><use href="#i-camera"/></svg> Take Photo
+              </button>
+            </div>
+
+            <button type="button" class="btn btn--block btn--dark" id="predictBtn" disabled>
+              <svg class="ic"><use href="#i-leaf"/></svg>
+              <span>रोग जाँचें / Detect Disease</span>
+            </button>
+
+            <p class="tip">
+              टिप: एक ही पत्ती, साफ रोशनी, सादा बैकग्राउंड — तभी नतीजा सही आता है।
+            </p>
+          </article>
+
+          <!-- Recent detections -->
+          <article class="card">
+            <div class="card__head card__head--row">
+              <div>
+                <h2>Recent Detections</h2>
+                <p>पिछली जाँचें (इसी फ़ोन में सुरक्षित)</p>
+              </div>
+              <button type="button" class="link-btn" data-view="history">View All</button>
+            </div>
+            <div id="recentList" class="detect-list"></div>
+          </article>
+
+        </div>
+
+        <!-- Analysing -->
+        <div class="card card--center" id="loadingBox" hidden>
+          <span class="spinner" aria-hidden="true"></span>
+          <p id="loadingText">जाँच हो रही है… / Analysing…</p>
+        </div>
+
+        <!-- ---------- RESULT ---------- -->
+        <div id="resultWrap" hidden>
+
+          <!-- Low confidence (top score &lt; 75%) -->
+          <article class="card low-conf" id="lowConfidenceBox" hidden>
+            <div class="low-conf__head">
+              <span class="low-conf__icon"><svg class="ic"><use href="#i-alert"/></svg></span>
+              <div>
+                <h2>सही तरह identify नहीं हो पाया</h2>
+                <p>कृपया clear फोटो लें या सही crop की leaf upload करें</p>
+              </div>
+            </div>
+            <ul class="low-conf__tips">
+              <li>पत्ती को तेज़ धूप में नहीं, छाँव की साफ रोशनी में रखें</li>
+              <li>कैमरा 15–20 cm दूर रखें, पत्ती पूरी फ्रेम में हो</li>
+              <li>बैकग्राउंड सादा रखें (हाथ या कागज़ के ऊपर पत्ती)</li>
+              <li>फोटो हिली हुई (blurred) न हो</li>
+            </ul>
+            <p class="low-conf__score">
+              सर्वाधिक मिलान / Best guess: <strong id="lowConfBest">—</strong>
+            </p>
+          </article>
+
+          <!-- Smart advisory (confident) -->
+          <article class="card advisory-card" id="advisoryCard" hidden>
+            <div class="card__head">
+              <h2>AI Smart Advisory</h2>
+              <p>आपकी फसल के लिए सुझाई गई कार्रवाई</p>
+            </div>
+            <div class="advisory-body" id="advisoryHost"></div>
+          </article>
+
+          <!-- Sabhi classes ke confidence scores (ginti model se aati hai) -->
+          <article class="card">
+            <div class="card__head card__head--row">
+              <div>
+                <h2>Confidence Scores</h2>
+                <p id="scoresSub">सभी श्रेणियों की संभावना</p>
+              </div>
+              <span class="muted-sm">threshold 75%</span>
+            </div>
+            <ul class="scores" id="scoresList"></ul>
+          </article>
+
+          <button type="button" class="btn btn--ghost btn--block" id="againBtn">
+            <svg class="ic"><use href="#i-camera"/></svg> दूसरी फोटो जाँचें
+          </button>
+        </div>
+      </section>
+
+
+      <!-- ====================== VIEW: HISTORY ====================== -->
+      <section class="view" id="view-history">
+        <article class="card">
+          <div class="card__head card__head--row">
+            <div>
+              <h2>Detection History</h2>
+              <p>सभी पिछली जाँचें — सिर्फ इसी फ़ोन में सुरक्षित, कहीं अपलोड नहीं होतीं</p>
+            </div>
+            <button type="button" class="link-btn link-btn--danger" id="clearHistoryBtn">
+              <svg class="ic"><use href="#i-trash"/></svg> Clear
+            </button>
+          </div>
+          <div id="historyList" class="detect-list"></div>
+        </article>
+      </section>
+
+
+      <!-- ====================== VIEW: ADVISORY ====================== -->
+      <section class="view" id="view-advisory">
+        <article class="card">
+          <div class="card__head">
+            <h2>Smart Advisory</h2>
+            <p>आख़िरी जाँच के आधार पर सलाह</p>
+          </div>
+          <div id="advisoryMirror" class="advisory-body"></div>
+        </article>
+      </section>
+
+
+      <!-- ====================== VIEW: HANDBOOK ====================== -->
+      <section class="view" id="view-handbook">
+        <article class="card">
+          <div class="card__head">
+            <h2>Crop Guide — रोग पुस्तिका</h2>
+            <p>फसल: <strong id="handbookCropName">—</strong> · बिना फोटो के भी सभी रोगों की पूरी जानकारी (ऑफ़लाइन)</p>
+          </div>
+          <div id="libraryHost" class="library"></div>
+        </article>
+      </section>
+
+
+      <!-- ====================== VIEW: ABOUT ====================== -->
+      <section class="view" id="view-about">
+        <div class="grid grid--2">
+          <article class="card">
+            <div class="card__head"><h2>यह ऐप कैसे काम करता है</h2></div>
+            <ul class="bullets">
+              <li>फोटो आपके फ़ोन से कहीं नहीं जाती — मॉडल फ़ोन में ही चलता है (TensorFlow.js)।</li>
+              <li>पहली बार खुलने के बाद ऐप बिना इंटरनेट के भी चलता है।</li>
+              <li>75% से कम भरोसा होने पर ऐप कोई रोग नहीं बताता — दोबारा फोटो माँगता है।</li>
+              <li>सलाह हिंदी में सुनी भी जा सकती है (Speak बटन)।</li>
+              <li><strong>सिर्फ मौसम</strong> वाले हिस्से को इंटरनेट चाहिए — बाकी सब ऑफ़लाइन चलता है।</li>
+              <li>4 फसलें: धान, गेहूँ, गन्ना, सरसों — हर फसल का अलग मॉडल, बेहतर सटीकता के लिए।</li>
+            </ul>
+          </article>
+          <article class="card">
+            <div class="card__head"><h2>ज़रूरी सावधानी</h2></div>
+            <ul class="bullets">
+              <li>यह सलाह मार्गदर्शन के लिए है, अंतिम निर्णय नहीं।</li>
+              <li>कोई भी छिड़काव करने से पहले अपने KVK / कृषि अधिकारी से मात्रा की पुष्टि करें।</li>
+              <li>दवा के डिब्बे पर लिखी सावधानियाँ ज़रूर पढ़ें; छिड़काव के समय मास्क व दस्ताने पहनें।</li>
+              <li>कटाई से पहले वाले दिनों में (PHI) छिड़काव न करें।</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
+<script src="js/script.js?v=8"></script>
+</body>
+</html>

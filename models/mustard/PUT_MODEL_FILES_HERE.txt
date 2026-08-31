@@ -1,0 +1,23 @@
+Is folder me 'mustard' ka Teachable Machine (Tensorflow.js) model daalein:
+
+  model.json        <- ZAROORI
+  weights.bin       <- ZAROORI (ya group1-shard1of2.bin jaise shards)
+  metadata.json     <- labels
+
+Jab tak model.json yahan nahi hai, app is fasal ka card
+"Coming Soon" dikhayega — app crash nahi hogi.
+
+Labels ka order (metadata.json me exactly yahi hona chahiye):
+
+  0: Mustard_WhiteRust
+  1: Mustard_AlternariaBlight
+  2: Mustard_DownyMildew
+  3: Mustard_PowderyMildew
+  4: Mustard_Healthy
+
+Export kaise karein:
+  teachablemachine.withgoogle.com -> apna Image Project
+  -> Export Model -> Tensorflow.js tab -> Download my model
+  -> ZIP extract karke saari files IS folder me daal dein.
+
+Ye file delete kar sakte hain, sirf guide hai.
