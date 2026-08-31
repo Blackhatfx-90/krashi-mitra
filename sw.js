@@ -24,7 +24,7 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v12';
+const CACHE_VERSION = 'krashi-mitra-v13';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* App shell — install ke waqt yahi cache hota hai (models NAHI). */
@@ -37,6 +37,11 @@ const APP_SHELL = [
   './manifest.json',
   './icon.svg',
   './assets/logo.svg',
+
+  // PWA icons — inke bina Chrome "Install app" offer hi nahi karta
+  './assets/icon-192.png',
+  './assets/icon-512.png',
+  './assets/icon-maskable-512.png',
 ];
 
 /* ---------- INSTALL: sirf app shell ---------------------------------------- */

@@ -69,6 +69,21 @@ const CONFIG = {
   TFLITE_CDN_JS: 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/dist/tf-tflite.min.js',
   TFLITE_CDN_WASM_DIR: 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/wasm/',
 
+  /**
+   * APK ka link — "ऐप डाउनलोड करें" par seedha .apk download hoga.
+   *
+   * Khali chhod dein to app PWA install (home screen par icon) offer karti hai,
+   * jo Android par bilkul app jaisa hi chalta hai.
+   *
+   * ASLI APK kaise banayein (5 minute, bina Android Studio ke):
+   *   1. App ko Vercel par deploy karein (https zaroori hai)
+   *   2. https://pwabuilder.com kholein -> apna URL daalein -> Android package
+   *   3. Jo .apk / .aab mile use GitHub Release par chadha dein
+   *   4. Us file ka direct link neeche paste kar dein, jaise:
+   *      'https://github.com/Blackhatfx-90/krashi-mitra/releases/download/v1/agriai.apk'
+   */
+  APK_URL: '',
+
   /** Hindi awaaz. */
   SPEECH_LANG: 'hi-IN',
   SPEECH_RATE: 0.9,
@@ -5093,6 +5108,11 @@ const el = {
   aiStatusLine:  $('#aiStatusLine'),
   installCard:   $('#installCard'),
   installBtn:    $('#installBtn'),
+  apkBtn:        $('#apkBtn'),
+  installNote:   $('#installNote'),
+  installSteps:  $('#installSteps'),
+  getAppBtn:     $('#getAppBtn'),
+  getAppBadge:   $('#getAppBadge'),
 
   /* history */
   recentList:      $('#recentList'),
@@ -5266,7 +5286,7 @@ function switchView(name) {
 
   if (name === 'history')  renderHistory();
   if (name === 'advisory') renderAdvisoryMirror();
-  if (name === 'about')    renderOfflineManager();
+  if (name === 'about')  { renderOfflineManager(); renderInstallCard(); }
 
   closeDrawer();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -6712,33 +6732,140 @@ async function downloadAllModels() {
 }
 
 /* ---------------------------------------------------------------------------
- * PWA INSTALL — "ऐप की तरह इंस्टॉल करें"
- * Chrome/Android khud ek prompt deta hai; hum usse pakad kar apna button
- * dikhate hain, taaki kisan ko app icon home screen par mil jaye.
+ * APP DOWNLOAD / INSTALL — "ऐप डाउनलोड करें"
+ *
+ * Sidebar me hamesha ek button rehta hai. Dabane par kya hota hai, teen halat:
+ *
+ *   1. CONFIG.APK_URL bhara hai   -> seedha .apk download link
+ *   2. Chrome/Android/desktop     -> asli install prompt (home screen icon)
+ *   3. iPhone / baaki browser     -> haath se jodne ke steps (Share -> Add to Home Screen)
+ *
+ * Pehle install button tabhi dikhta tha jab browser khud prompt deta tha —
+ * isliye kai baar dikhta hi nahi tha. Ab button hamesha rehta hai aur ऐप
+ * bata deti hai ki is phone par kya karna hai.
  * ------------------------------------------------------------------------- */
 let deferredInstallPrompt = null;
+
+/** Ye phone iPhone/iPad hai? (Chrome iOS bhi Safari engine par chalta hai) */
+function isIosDevice() {
+  const ua = navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) ||
+         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+/** App pehle se install hokar khuli hai? */
+function isAppInstalled() {
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+         navigator.standalone === true;
+}
+
+function stepsHtml(items) {
+  return items.map((t) => '<li>' + escapeHtml(t) + '</li>').join('');
+}
+
+/** Install card ko is phone ke hisaab se banao. */
+function renderInstallCard() {
+  if (!el.installCard) return;
+
+  const apk = (CONFIG.APK_URL || '').trim();
+
+  /* 1) APK link — sabse seedha rasta */
+  if (el.apkBtn) {
+    if (apk) {
+      el.apkBtn.href = apk;
+      show(el.apkBtn);
+    } else {
+      hide(el.apkBtn);
+    }
+  }
+
+  /* 2) PWA install prompt */
+  if (el.installBtn) {
+    if (deferredInstallPrompt) show(el.installBtn);
+    else hide(el.installBtn);
+  }
+
+  if (!el.installNote || !el.installSteps) return;
+
+  /* 3) Note + haath se jodne ke steps */
+  if (isAppInstalled()) {
+    el.installNote.textContent = '✅ ऐप पहले से इंस्टॉल है — आप अभी उसी में हैं।';
+    hide(el.installSteps);
+    return;
+  }
+
+  if (deferredInstallPrompt) {
+    el.installNote.textContent =
+      'ऊपर वाला बटन दबाते ही ऐप फ़ोन में जुड़ जाएगी (कुछ भी अलग से डाउनलोड नहीं करना पड़ेगा)।';
+    hide(el.installSteps);
+    return;
+  }
+
+  if (isIosDevice()) {
+    el.installNote.textContent = 'iPhone/iPad पर Safari में ये 3 कदम करें:';
+    el.installSteps.innerHTML = stepsHtml([
+      'नीचे पट्टी में Share बटन दबाएँ (ऊपर तीर वाला चौकोर निशान)',
+      'सूची में नीचे जाकर "Add to Home Screen" चुनें',
+      '"Add" दबाएँ — होम स्क्रीन पर AgriAI का आइकॉन बन जाएगा',
+    ]);
+    show(el.installSteps);
+    return;
+  }
+
+  if (apk) {
+    el.installNote.textContent =
+      'APK डाउनलोड होने के बाद उसे खोलें। फ़ोन "Unknown sources" की अनुमति माँगे तो ' +
+      '"Allow" दबाएँ — यह ऐप आपकी अपनी है।';
+    hide(el.installSteps);
+    return;
+  }
+
+  el.installNote.textContent = 'इस ब्राउज़र में ऐप ऐसे जोड़ें:';
+  el.installSteps.innerHTML = stepsHtml([
+    'Chrome में ऊपर दाईं ओर ⋮ (तीन बिंदु) दबाएँ',
+    '"Install app" या "Add to Home screen" चुनें',
+    'पक्का करने के लिए "Install" दबाएँ',
+  ]);
+  show(el.installSteps);
+}
+
+/** Sidebar wala button — seedha install, warna about screen par le jao. */
+async function handleGetAppClick() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    try { await deferredInstallPrompt.userChoice; } catch (_) {}
+    deferredInstallPrompt = null;
+    renderInstallCard();
+    return;
+  }
+
+  const apk = (CONFIG.APK_URL || '').trim();
+  if (apk) { window.location.href = apk; return; }
+
+  switchView('about');
+  setTimeout(() => {
+    if (el.installCard) el.installCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
+}
 
 function wireInstallPrompt() {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    if (el.installCard) show(el.installCard);
+    renderInstallCard();
   });
 
   window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
-    if (el.installCard) hide(el.installCard);
+    if (el.getAppBadge) hide(el.getAppBadge);
+    renderInstallCard();
   });
 
-  if (el.installBtn) {
-    el.installBtn.addEventListener('click', async () => {
-      if (!deferredInstallPrompt) return;
-      deferredInstallPrompt.prompt();
-      try { await deferredInstallPrompt.userChoice; } catch (_) {}
-      deferredInstallPrompt = null;
-      if (el.installCard) hide(el.installCard);
-    });
-  }
+  if (el.installBtn) el.installBtn.addEventListener('click', handleGetAppClick);
+  if (el.getAppBtn)  el.getAppBtn.addEventListener('click', handleGetAppClick);
+
+  if (isAppInstalled() && el.getAppBadge) hide(el.getAppBadge);
+  renderInstallCard();
 }
 
 

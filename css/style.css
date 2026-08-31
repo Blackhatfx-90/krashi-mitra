@@ -659,3 +659,21 @@ ul{margin:0;padding:0;}
   .dl-item{flex-wrap:wrap;}
   .dl-item .btn,.dl-item .link-btn{margin-left:32px;}
 }
+
+/* ---------- 16. APP DOWNLOAD / INSTALL ----------------------------------- */
+/* Sidebar wala "ऐप डाउनलोड करें" — hamesha dikhta hai, isliye halka highlight */
+.nav__item--get{color:var(--green-700);font-weight:650;}
+.nav__item--get:hover{background:var(--green-050);}
+.nav__badge--new{
+  background:var(--green-600);color:#fff;font-size:10px;font-weight:700;
+  letter-spacing:.04em;
+}
+
+.install-card{border:1px solid var(--green-100);background:var(--green-050);}
+.install-card .btn{margin-top:10px;}
+.install-note{margin-top:12px;font-size:13px;color:var(--ink-2);line-height:1.6;}
+.install-steps{
+  margin:10px 0 0;padding-left:20px;
+  font-size:13px;color:var(--ink-2);line-height:1.7;
+}
+.install-steps li{margin-bottom:4px;}

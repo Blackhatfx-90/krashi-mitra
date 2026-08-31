@@ -235,14 +235,48 @@ Iske badle teen tarike hain:
    **"सभी डाउनलोड"** se saare model ek saath.
 3. **Hataana** — jagah kam ho to **"हटाएँ"** se koi bhi model nikal dein.
 
-Usi screen par **"ऐप की तरह इंस्टॉल करें"** bhi aata hai (Chrome/Android) —
-home screen par icon ban jata hai aur app browser ke bina khulti hai.
+---
+
+## 3D. 📲 "ऐप डाउनलोड करें" — sidebar wala button
+
+Sidebar (RESOURCES ke neeche) me **हमेशा** ek button rehta hai. Pehle install
+button sirf tab dikhta tha jab browser khud `beforeinstallprompt` deta tha —
+isliye aksar dikhta hi nahi tha. Ab button hamesha hai, aur dabane par phone ke
+hisaab se teen me se ek cheez hoti hai:
+
+| Halat | Kya hota hai |
+|---|---|
+| `CONFIG.APK_URL` bhara hai | seedha **.apk download** shuru ho jata hai |
+| Chrome / Android / desktop | asli **install prompt** khulta hai (home screen icon) |
+| iPhone ya koi aur browser | *Offline & Help* par le jata hai jahan **step-by-step** likha hai (Safari: Share → Add to Home Screen) |
+
+### Chrome install prompt kyun nahi aata tha
+
+Chrome tabhi "Install app" offer karta hai jab manifest me **PNG icons**
+(192px aur 512px) hon — sirf SVG se kaam nahi chalta. Isliye ab
+`assets/icon-192.png`, `icon-512.png` aur `icon-maskable-512.png` bana kar
+`manifest.json` me daal diye gaye hain, aur `sw.js` unhein precache bhi karta hai.
+
+### Asli .apk kaise banayein (5 minute, bina Android Studio ke)
+
+1. App ko Vercel par deploy karein (https zaroori hai)
+2. [pwabuilder.com](https://pwabuilder.com) kholein → apna URL daalein → **Android package**
+3. Jo `.apk` / `.aab` mile use **GitHub Release** par chadha dein
+4. Us file ka direct link `js/script.js` me paste kar dein:
+
+```js
+// CONFIG ke andar
+APK_URL: 'https://github.com/<user>/<repo>/releases/download/v1/agriai.apk',
+```
+
+Bas — sidebar ka button ab seedha APK download karega, aur *Offline & Help* par
+"APK डाउनलोड करें" ka bada butan bhi aa jayega.
 
 **Do alag cache** (`sw.js`):
 
 | Cache | Kya | Kab mitta hai |
 |---|---|---|
-| `krashi-mitra-v12` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
+| `krashi-mitra-v13` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
 | `krashi-mitra-models` | fasal ke models | **kabhi apne aap nahi** — kisan khud "हटाएँ" dabaye tabhi |
 
 Isi wajah se app update karne par kisan ke download kiye hue models dobara

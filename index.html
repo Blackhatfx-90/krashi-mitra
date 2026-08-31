@@ -10,7 +10,7 @@
 
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="css/style.css?v=10" />
+  <link rel="stylesheet" href="css/style.css?v=13" />
 </head>
 
 <body>
@@ -50,6 +50,9 @@
   </symbol>
   <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 16V4"/><path d="m7.5 8.5 4.5-4.5 4.5 4.5"/><path d="M4 15v3.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V15"/>
+  </symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 16v2.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V16"/>
   </symbol>
   <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
     <path d="M4 7h16M4 12h16M4 17h16"/>
@@ -136,6 +139,12 @@
       <p class="nav__group">RESOURCES</p>
       <button type="button" class="nav__item" data-view="about">
         <svg class="ic"><use href="#i-shield"/></svg><span>Offline &amp; Help</span>
+      </button>
+
+      <!-- HAMESHA dikhta hai — kisan ko app phone me lene ka seedha rasta -->
+      <button type="button" class="nav__item nav__item--get" id="getAppBtn">
+        <svg class="ic"><use href="#i-download"/></svg><span>ऐप डाउनलोड करें</span>
+        <span class="nav__badge nav__badge--new" id="getAppBadge">APP</span>
       </button>
     </nav>
 
@@ -430,15 +439,28 @@
       <!-- ====================== VIEW: ABOUT ====================== -->
       <section class="view" id="view-about">
 
-        <!-- Install (Chrome/Android khud prompt deta hai to hi dikhta hai) -->
-        <article class="card" id="installCard" hidden>
+        <!-- App download / install — HAMESHA dikhta hai (sidebar se yahin aate hain) -->
+        <article class="card install-card" id="installCard">
           <div class="card__head">
-            <h2>ऐप की तरह इंस्टॉल करें</h2>
-            <p>होम स्क्रीन पर आइकॉन बन जाएगा और ऐप बिना ब्राउज़र के खुलेगा।</p>
+            <h2>ऐप फ़ोन में लें <span aria-hidden="true">📲</span></h2>
+            <p>होम स्क्रीन पर आइकॉन बन जाएगा, ऐप बिना ब्राउज़र के खुलेगी और बिना
+               इंटरनेट भी चलेगी।</p>
           </div>
-          <button type="button" class="btn btn--primary btn--block" id="installBtn">
-            <svg class="ic"><use href="#i-sprout"/></svg> इंस्टॉल करें / Install app
+
+          <!-- APK (tabhi dikhega jab script.js me APK_URL bhara ho) -->
+          <a class="btn btn--primary btn--block" id="apkBtn" href="#" hidden download>
+            <svg class="ic"><use href="#i-download"/></svg>
+            <span>APK डाउनलोड करें / Download APK</span>
+          </a>
+
+          <!-- PWA install (Chrome/Android/desktop) -->
+          <button type="button" class="btn btn--dark btn--block" id="installBtn" hidden>
+            <svg class="ic"><use href="#i-download"/></svg>
+            <span>इंस्टॉल करें / Install app</span>
           </button>
+
+          <p class="install-note" id="installNote"></p>
+          <ol class="install-steps" id="installSteps" hidden></ol>
         </article>
 
         <!-- Offline models -->
@@ -487,6 +509,6 @@
 </div><!-- /layout -->
 
 <script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
-<script src="js/script.js?v=12"></script>
+<script src="js/script.js?v=13"></script>
 </body>
 </html>
