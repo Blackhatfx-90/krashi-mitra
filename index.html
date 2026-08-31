@@ -259,6 +259,20 @@
               <p id="scanCropHint">चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें</p>
             </div>
 
+            <!-- Jaanch ka tarika: ऑटो / ऑनलाइन AI / ऑफ़लाइन -->
+            <div class="seg" id="netMode" role="group" aria-label="जाँच का तरीका">
+              <button type="button" class="seg__btn is-on" data-mode="auto" aria-pressed="true">
+                ⚡ ऑटो
+              </button>
+              <button type="button" class="seg__btn" data-mode="online" aria-pressed="false">
+                🌐 ऑनलाइन AI
+              </button>
+              <button type="button" class="seg__btn" data-mode="offline" aria-pressed="false">
+                📴 ऑफ़लाइन
+              </button>
+            </div>
+            <p class="seg__note" id="netModeNote"></p>
+
             <input type="file" id="cameraInput" accept="image/*" capture="environment" class="sr-only" />
             <input type="file" id="galleryInput" accept="image/*" class="sr-only" />
 
@@ -318,6 +332,11 @@
 
         <!-- ---------- RESULT ---------- -->
         <div id="resultWrap" hidden>
+
+          <!-- Online AI double-check ka nateeja (sirf online mode me dikhta hai) -->
+          <article class="card ai-card" id="aiCard" hidden>
+            <div id="aiHost"></div>
+          </article>
 
           <!-- Low confidence (top score &lt; 75%) -->
           <article class="card low-conf" id="lowConfidenceBox" hidden>
@@ -410,6 +429,32 @@
 
       <!-- ====================== VIEW: ABOUT ====================== -->
       <section class="view" id="view-about">
+
+        <!-- Install (Chrome/Android khud prompt deta hai to hi dikhta hai) -->
+        <article class="card" id="installCard" hidden>
+          <div class="card__head">
+            <h2>ऐप की तरह इंस्टॉल करें</h2>
+            <p>होम स्क्रीन पर आइकॉन बन जाएगा और ऐप बिना ब्राउज़र के खुलेगा।</p>
+          </div>
+          <button type="button" class="btn btn--primary btn--block" id="installBtn">
+            <svg class="ic"><use href="#i-sprout"/></svg> इंस्टॉल करें / Install app
+          </button>
+        </article>
+
+        <!-- Offline models -->
+        <article class="card">
+          <div class="card__head card__head--row">
+            <div>
+              <h2>ऑफ़लाइन मॉडल <span aria-hidden="true">⬇️</span></h2>
+              <p>खेत जाने से पहले वाई-फ़ाई पर मॉडल डाउनलोड कर लें — फिर बिना नेटवर्क भी जाँच चलेगी।</p>
+            </div>
+            <button type="button" class="link-btn" id="downloadAllBtn">सभी डाउनलोड</button>
+          </div>
+          <ul class="dl-list" id="downloadList"></ul>
+          <p class="muted-sm" id="storageLine"></p>
+          <p class="muted-sm" id="aiStatusLine"></p>
+        </article>
+
         <div class="grid grid--2">
           <article class="card">
             <div class="card__head"><h2>यह ऐप कैसे काम करता है</h2></div>
@@ -419,7 +464,10 @@
               <li>75% से कम भरोसा होने पर ऐप कोई रोग नहीं बताता — दोबारा फोटो माँगता है।</li>
               <li>सलाह हिंदी में सुनी भी जा सकती है (Speak बटन)।</li>
               <li><strong>सिर्फ मौसम</strong> वाले हिस्से को इंटरनेट चाहिए — बाकी सब ऑफ़लाइन चलता है।</li>
-              <li>4 फसलें: धान, गेहूँ, गन्ना, सरसों — हर फसल का अलग मॉडल, बेहतर सटीकता के लिए।</li>
+              <li>हर फसल का अलग मॉडल होता है — इसलिए सटीकता बेहतर रहती है।</li>
+              <li><strong>ऑटो मोड:</strong> नेटवर्क हो तो वही फोटो एक बड़े ऑनलाइन AI से भी जँचती है
+                  और दोनों नतीजे मिलाए जाते हैं; नेटवर्क न हो तो फ़ोन का मॉडल अकेले काम करता है।</li>
+              <li>फोटो सिर्फ ऑनलाइन जाँच के समय भेजी जाती है — ऑफ़लाइन मोड में कहीं नहीं जाती।</li>
             </ul>
           </article>
           <article class="card">
@@ -439,6 +487,6 @@
 </div><!-- /layout -->
 
 <script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
-<script src="js/script.js?v=10"></script>
+<script src="js/script.js?v=11"></script>
 </body>
 </html>

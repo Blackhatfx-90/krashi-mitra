@@ -1,16 +1,33 @@
 /* ============================================================================
  * sw.js — Service Worker
  *
- * Kaam: pehli baar load hone par saari files browser ke cache me daal deta hai,
- * uske baad app bina internet ke bhi chalti hai (offline-first).
+ * Kaam: app ko OFFLINE-FIRST banata hai.
  *
- * TEAM NOTE: jab bhi HTML/CSS/JS ya model badlo, neeche CACHE_VERSION ka number
- * badha do (v1 -> v2). Warna purani cached file hi milti rahegi.
+ * DO ALAG CACHE hain — yeh design jaan-boojh kar hai:
+ *
+ *   1. CACHE_VERSION  -> app shell (html/css/js/tf.min.js). Chhota hai.
+ *      App update hone par version badalta hai aur purana cache delete ho jata hai.
+ *
+ *   2. MODELS_CACHE   -> fasal ke AI models (models/<crop>/*). Bhaari hain (~2 MB per fasal).
+ *      Iska naam KABHI nahi badalta, isliye app update hone par kisan ke
+ *      download kiye hue models dobara download nahi karne padte.
+ *
+ * MODELS PRE-CACHE NAHI HOTE. Kyun?
+ *   7 fasal x ~2.2 MB = ~15 MB. Pehli baar khulte hi itna mobile data kaat lena
+ *   theek nahi. Iske badle:
+ *     - jis fasal ko kisan actually use karta hai, wo apne aap cache ho jaati hai
+ *     - "Offline & Help" screen me har fasal ke liye "डाउनलोड करें" button hai,
+ *       taaki khet jaane se pehle (wifi par) model pehle se utaar liya jaye
+ *
+ * TEAM NOTE: HTML/CSS/JS badlo to neeche CACHE_VERSION ka number badha do.
+ * Model files badlo to kuch mat karo — unka apna cache hai aur app khud
+ * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v10';
+const CACHE_VERSION = 'krashi-mitra-v11';
+const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
-/* App shell — ye files install ke time hi cache ho jaati hain. */
+/* App shell — install ke waqt yahi cache hota hai (models NAHI). */
 const APP_SHELL = [
   './',
   './index.html',
@@ -20,50 +37,15 @@ const APP_SHELL = [
   './manifest.json',
   './icon.svg',
   './assets/logo.svg',
-
-  // Rice model — Teachable Machine / TFJS export
-  './models/rice/model.json',
-  './models/rice/metadata.json',
-  './models/rice/weights.bin',
-
-  // Wheat model
-  './models/wheat/model.json',
-  './models/wheat/metadata.json',
-  './models/wheat/weights.bin',
-
-  // Onion model
-  './models/onion/model.json',
-  './models/onion/metadata.json',
-  './models/onion/weights.bin',
-
-  // Sugarcane model
-  './models/sugarcane/model.json',
-  './models/sugarcane/metadata.json',
-  './models/sugarcane/weights.bin',
-
-  // Maize model
-  './models/maize/model.json',
-  './models/maize/metadata.json',
-  './models/maize/weights.bin',
-
-  // Potato model
-  './models/potato/model.json',
-  './models/potato/metadata.json',
-  './models/potato/weights.bin',
-
-  // Tomato model
-  './models/tomato/model.json',
-  './models/tomato/metadata.json',
-  './models/tomato/weights.bin',
 ];
 
-/* ---------- INSTALL: sab kuch cache karo ---------------------------------- */
+/* ---------- INSTALL: sirf app shell ---------------------------------------- */
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_VERSION);
 
-    // Har file alag-alag add karte hain, taaki ek file (jaise weights.bin ka naam
-    // alag ho) missing hone par poora install fail na ho jaye.
+    // Har file alag-alag add karte hain, taaki ek file missing hone par
+    // poora install fail na ho jaye.
     await Promise.all(APP_SHELL.map(async (url) => {
       try {
         await cache.add(new Request(url, { cache: 'reload' }));
@@ -76,31 +58,58 @@ self.addEventListener('install', (event) => {
   })());
 });
 
-/* ---------- ACTIVATE: purane version ke cache hatao ---------------------- */
+/* ---------- ACTIVATE: purane app-shell cache hatao ------------------------
+ * MODELS_CACHE ko HAATH NAHI LAGATE — wahi to kisan ka offline model hai.
+ * ------------------------------------------------------------------------ */
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k))
+      keys
+        .filter((k) => k !== CACHE_VERSION && k !== MODELS_CACHE)
+        .map((k) => caches.delete(k))
     );
     await self.clients.claim();
   })());
 });
 
 /* ---------- FETCH ---------------------------------------------------------
- * model/ aur js/ ki bhaari files  -> CACHE FIRST (ek baar download, hamesha ke liye)
- * baaki app files (html/css/js)   -> STALE-WHILE-REVALIDATE (turant cache se,
- *                                     background me nayi copy le aata hai)
+ * models/         -> MODELS_CACHE se cache-first; network se aaye to cache me daal do
+ * js/ ki bhaari   -> cache-first
+ * baaki app files -> stale-while-revalidate (turant cache se, peeche update)
+ * /api/           -> bilkul haath nahi lagate (online AI ka jawab cache nahi karna)
  * ------------------------------------------------------------------------ */
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;   // CDN etc. ko haath mat lagao
+  if (url.pathname.startsWith('/api/')) return;      // online AI — hamesha taaza
 
-  const isHeavyAsset = url.pathname.includes('/models/') || url.pathname.includes('/js/');
+  /* --- MODELS: apna alag, sthir cache --- */
+  if (url.pathname.includes('/models/')) {
+    event.respondWith((async () => {
+      const cache = await caches.open(MODELS_CACHE);
+      const cached = await cache.match(req, { ignoreSearch: true });
+      if (cached) return cached;
+
+      try {
+        const res = await fetch(req);
+        // Jis fasal ko kisan use kar raha hai wo apne aap offline ho jaati hai
+        if (res && res.ok && res.type === 'basic') cache.put(req, res.clone());
+        return res;
+      } catch (_) {
+        return new Response(
+          'Offline: is fasal ka model abhi download nahi hua hai.',
+          { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
+        );
+      }
+    })());
+    return;
+  }
+
+  const isHeavyAsset = url.pathname.includes('/js/');
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_VERSION);

@@ -593,3 +593,69 @@ ul{margin:0;padding:0;}
   .crop-card__text small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .crop-card__badge{order:3;margin-left:68px;}
 }
+
+/* ---------- 14. ONLINE / OFFLINE MODE + AI VERDICT ------------------------
+   Naya hissa: kisan chun sakta hai ki jaanch sirf phone se ho, ya online AI
+   se double-check bhi ho. Neeche uska segmented control aur verdict card.
+   ------------------------------------------------------------------------ */
+
+/* Segmented control — ऑटो / ऑनलाइन / ऑफ़लाइन */
+.seg{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  padding:4px;margin-bottom:8px;
+  background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-sm);
+}
+.seg__btn{
+  min-height:38px;padding:6px 4px;border:0;border-radius:8px;cursor:pointer;
+  background:transparent;color:var(--ink-2);
+  font:inherit;font-size:12.5px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:background .15s,color .15s;
+}
+.seg__btn:hover{background:var(--surface);}
+.seg__btn.is-on{background:var(--surface);color:var(--green-700);box-shadow:var(--shadow-xs);}
+.seg__btn:focus-visible{outline:2px solid var(--green-600);outline-offset:1px;}
+.seg__note{font-size:12px;color:var(--ink-3);margin:0 0 12px;line-height:1.5;}
+
+/* AI verdict card — result ke sabse upar */
+.ai-card{border-left:4px solid var(--line-strong);}
+.ai-card--pending{border-left-color:var(--amber-600);background:var(--amber-050);}
+.ai-card--agree  {border-left-color:var(--green-600);background:var(--green-050);}
+.ai-card--differ {border-left-color:var(--blue-600);background:var(--blue-050);}
+.ai-card--unclear{border-left-color:var(--amber-600);background:var(--amber-050);}
+.ai-card--fail   {border-left-color:var(--ink-3);background:var(--bg);}
+
+.ai-row{display:flex;align-items:flex-start;gap:12px;}
+.ai-emoji{font-size:22px;line-height:1.2;flex:0 0 auto;}
+.ai-title{font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.45;}
+.ai-sub{font-size:13px;color:var(--ink-2);margin-top:4px;line-height:1.55;}
+.ai-ev{
+  font-size:12.5px;color:var(--ink-2);margin-top:8px;line-height:1.5;
+  padding:8px 10px;background:var(--surface);border-radius:var(--radius-sm);
+  border:1px solid var(--line);
+}
+.ai-alt{font-size:12.5px;color:var(--ink-2);margin-top:8px;line-height:1.55;}
+.ai-model{font-size:11px;color:var(--ink-3);margin-top:10px;word-break:break-all;}
+
+/* ---------- 15. OFFLINE MODEL DOWNLOAD MANAGER --------------------------- */
+.dl-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin:0;padding:0;}
+.dl-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);
+  background:var(--surface);
+}
+.dl-icon{font-size:20px;flex:0 0 auto;}
+.dl-body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.dl-name{font-size:14px;font-weight:600;color:var(--ink);}
+.dl-name small{font-weight:500;color:var(--ink-3);font-size:12px;}
+.dl-meta{font-size:12px;color:var(--ink-2);}
+.dl-bar{display:block;height:5px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:5px;}
+.dl-bar i{display:block;height:100%;width:0;background:var(--green-600);transition:width .2s;}
+.dl-note{font-size:13px;color:var(--ink-2);line-height:1.55;}
+.btn--sm{min-height:34px;padding:0 12px;font-size:12.5px;}
+
+@media (max-width:420px){
+  .seg__btn{font-size:11.5px;}
+  .dl-item{flex-wrap:wrap;}
+  .dl-item .btn,.dl-item .link-btn{margin-left:32px;}
+}

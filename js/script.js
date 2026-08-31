@@ -118,6 +118,32 @@ const WEATHER_CONFIG = {
 };
 
 
+/* ---------------------------------------------------------------------------
+ * ONLINE AI settings — "online mode" ka double-check.
+ *
+ * Yahan koi API KEY NAHI hai aur na hi kabhi honi chahiye. Browser ka code
+ * sabko dikhta hai. Key server par rehti hai (api/diagnose.js -> Vercel env var
+ * OPENROUTER_API_KEY). App sirf apne hi server ke /api/diagnose ko call karta hai.
+ * ------------------------------------------------------------------------- */
+const AI_CONFIG = {
+  /** Apne hi server ka endpoint (Vercel serverless function). */
+  ENDPOINT: 'api/diagnose',
+
+  /** Itni der me jawab na aaye to chhod do — kisan ko intezaar nahi karana. */
+  TIMEOUT_MS: 45000,
+
+  /** Photo API ko bhejne se pehle itni chhoti kar dete hain (data bachta hai). */
+  IMAGE_MAX_SIDE: 640,
+  IMAGE_QUALITY: 0.82,
+
+  /** localStorage key — kisan ne kaunsa mode chuna tha. */
+  MODE_KEY: 'agriai.netmode.v1',
+
+  /** 'auto' = network accha ho to online, warna offline. */
+  DEFAULT_MODE: 'auto',
+};
+
+
 /* ============================================================================
  * SECTION 2 — CROPS CONFIG  ⭐ SABSE ZAROORI FILE-BLOCK ⭐
  *
@@ -5054,6 +5080,20 @@ const el = {
   scoresList:       $('#scoresList'),
   scoresSub:        $('#scoresSub'),
 
+  /* online AI */
+  netModeGroup: $('#netMode'),
+  netModeNote:  $('#netModeNote'),
+  aiCard:       $('#aiCard'),
+  aiHost:       $('#aiHost'),
+
+  /* offline model manager + install */
+  downloadList:  $('#downloadList'),
+  downloadAllBtn:$('#downloadAllBtn'),
+  storageLine:   $('#storageLine'),
+  aiStatusLine:  $('#aiStatusLine'),
+  installCard:   $('#installCard'),
+  installBtn:    $('#installBtn'),
+
   /* history */
   recentList:      $('#recentList'),
   historyList:     $('#historyList'),
@@ -5105,6 +5145,14 @@ const state = {
   /* --- weather --- */
   weather: null,         // { current, forecast, warnings, summary, fetchedAt, stale }
   weatherBusy: false,
+
+  /* --- online AI (double-check) --- */
+  netMode: 'auto',       // 'auto' | 'online' | 'offline' — kisan ka chuna hua tarika
+  aiConfigured: null,    // true = server par key lagi hai | false = nahi | null = pata nahi
+  aiReason: null,        // 'no_api' (local server) | 'no_key' | 'error'
+  aiModels: [],          // server par kaunse free models set hain
+  aiBusy: false,
+  aiResult: null,        // aakhri online jawab
 };
 
 /** Abhi chuni hui fasal ka poora config (na chuni ho to null). */
@@ -5218,6 +5266,7 @@ function switchView(name) {
 
   if (name === 'history')  renderHistory();
   if (name === 'advisory') renderAdvisoryMirror();
+  if (name === 'about')    renderOfflineManager();
 
   closeDrawer();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -5639,6 +5688,10 @@ async function runPrediction() {
 
     renderResults(results);
     saveToHistory(results[0]);
+
+    // Offline jawab dikh chuka hai. Ab (agar internet hai) bade AI se dobara
+    // jaanch karate hain — UI rukti nahi, jawab aate hi card update ho jata hai.
+    runOnlineDoubleCheck(results);
   } catch (err) {
     console.error('[predict] error:', err);
     showError(
@@ -5655,6 +5708,326 @@ async function runPrediction() {
     el.predictBtn.disabled = false;
     state.isPredicting = false;
   }
+}
+
+
+/* ============================================================================
+ * SECTION 7B — ONLINE AI DOUBLE-CHECK  🌐
+ *
+ * SOCH (yeh sabse zaroori hissa hai):
+ *   Phone wala offline model chhota hota hai — turant jawab deta hai par galti
+ *   bhi karta hai. Internet ho to hum usi photo ko ek bade AI (vision model) se
+ *   dobara jaanchte hain aur dono ke jawab milaate hain.
+ *
+ *   1. OFFLINE model pehle chalta hai  -> jawab TURANT dikh jata hai (0 sec wait)
+ *   2. Agar internet hai              -> peeche-peeche /api/diagnose call hota hai
+ *   3. AI ka jawab aate hi card update hota hai:
+ *        dono same    -> "AI ne bhi yahi bataya" (bharosa badh gaya)
+ *        alag         -> AI wali salah dikhati hai, offline wala jawab bhi saath
+ *        photo saaf nahi -> dobara photo lene ko kehta hai
+ *
+ *   Internet na ho, ya kisan "ऑफ़लाइन" mode chune -> step 2-3 hote hi nahi.
+ *   Yani app kabhi rukti nahi, sirf accha ho jati hai jab network ho.
+ *
+ * API KEY YAHAN NAHI HAI — wo server par hai (api/diagnose.js dekhein).
+ * ========================================================================= */
+
+const NET_MODES = ['auto', 'online', 'offline'];
+
+function loadNetMode() {
+  try {
+    const m = localStorage.getItem(AI_CONFIG.MODE_KEY);
+    if (NET_MODES.indexOf(m) !== -1) return m;
+  } catch (_) {}
+  return AI_CONFIG.DEFAULT_MODE;
+}
+
+function setNetMode(mode) {
+  if (NET_MODES.indexOf(mode) === -1) return;
+  state.netMode = mode;
+  try { localStorage.setItem(AI_CONFIG.MODE_KEY, mode); } catch (_) {}
+  renderNetMode();
+}
+
+/** 2G / "data bachao" mode — aise me online call karna kisan ka data barbaad karna hai. */
+function connectionIsSlow() {
+  const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!c) return false;
+  if (c.saveData) return true;
+  return ['slow-2g', '2g'].indexOf(c.effectiveType) !== -1;
+}
+
+/** Abhi online AI se poochh sakte hain ya nahi. */
+function onlineAiUsable() {
+  if (state.netMode === 'offline') return false;
+  if (!navigator.onLine) return false;
+  if (state.aiConfigured === false) return false;      // server par key nahi lagi
+  if (state.netMode === 'online') return true;
+  return !connectionIsSlow();                          // 'auto'
+}
+
+/** Segmented buttons + status line update. */
+function renderNetMode() {
+  if (el.netModeGroup) {
+    Array.from(el.netModeGroup.querySelectorAll('.seg__btn')).forEach((b) => {
+      const on = b.dataset.mode === state.netMode;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  if (!el.netModeNote) return;
+
+  let txt;
+  if (state.netMode === 'offline') {
+    txt = '📴 सिर्फ फ़ोन का मॉडल — इंटरनेट बिल्कुल नहीं लगेगा।';
+  } else if (state.aiReason === 'no_api') {
+    txt = '💻 यह लोकल सर्वर है — यहाँ ऑनलाइन AI नहीं चलता। Vercel वाले लिंक पर चलेगा।';
+  } else if (state.aiConfigured === false) {
+    txt = '⚠️ ऑनलाइन AI अभी उपलब्ध नहीं (सर्वर पर OPENROUTER_API_KEY सेट नहीं है) — ऑफ़लाइन मॉडल चलेगा।';
+  } else if (!navigator.onLine) {
+    txt = '📴 इंटरनेट नहीं है — अभी ऑफ़लाइन मॉडल से ही जाँच होगी।';
+  } else if (state.netMode === 'online') {
+    txt = '🌐 हर जाँच ऑनलाइन AI से दोबारा जाँची जाएगी (सबसे सटीक)।';
+  } else {
+    txt = '⚡ नेटवर्क अच्छा हो तो ऑनलाइन AI से डबल-चेक, वरना सीधे ऑफ़लाइन मॉडल।';
+  }
+  el.netModeNote.textContent = txt;
+}
+
+/**
+ * Photo ko API ke liye chhota JPEG bana do.
+ * Poori photo bhejte hain (square crop nahi) — bade AI ko aas-paas ka context
+ * dekhne se pehchaan behtar hoti hai. 640px kaafi hai aur data bhi kam lagta hai.
+ */
+function imageToJpegDataUrl(img, maxSide, quality) {
+  const w = img.naturalWidth, h = img.naturalHeight;
+  const scale = Math.min(1, maxSide / Math.max(w, h));
+  const cw = Math.max(1, Math.round(w * scale));
+  const ch = Math.max(1, Math.round(h * scale));
+
+  const c = document.createElement('canvas');
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, cw, ch);              // PNG transparency kaali na ho jaye
+  ctx.drawImage(img, 0, 0, cw, ch);
+  return c.toDataURL('image/jpeg', quality);
+}
+
+/**
+ * Server se poochho ki online mode chaalu hai ya nahi (key lagi hai ya nahi).
+ * Yeh sirf ek chhota GET hai — photo kahin nahi jaati.
+ */
+async function checkAiEndpoint() {
+  if (!navigator.onLine) { state.aiConfigured = null; return; }
+  try {
+    const res = await fetch(AI_CONFIG.ENDPOINT, { method: 'GET', cache: 'no-store' });
+    if (res.status === 404) {
+      // Local server (python http.server) par API function hota hi nahi
+      state.aiConfigured = false;
+      state.aiReason = 'no_api';
+      console.info('[ai] /api/diagnose nahi mila — online mode sirf Vercel par chalega');
+    } else if (res.ok) {
+      const data = await res.json();
+      state.aiConfigured = Boolean(data && data.configured);
+      state.aiModels = (data && data.models) || [];
+      state.aiReason = state.aiConfigured ? null : 'no_key';
+      console.info('[ai] online mode:', state.aiConfigured ? 'ON' : 'key missing',
+                   state.aiModels);
+    } else {
+      state.aiConfigured = false;
+      state.aiReason = 'error';
+    }
+  } catch (err) {
+    state.aiConfigured = null;                 // pata nahi — jaanch ke waqt try kar lenge
+    console.warn('[ai] health check fail:', err.message);
+  }
+  renderNetMode();
+  renderOfflineManager();
+}
+
+/** Asli call — photo + offline model ka top-3 server ko bhejta hai. */
+async function askOnlineAI(results) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), AI_CONFIG.TIMEOUT_MS);
+
+  try {
+    const image = imageToJpegDataUrl(
+      state.imageEl, AI_CONFIG.IMAGE_MAX_SIDE, AI_CONFIG.IMAGE_QUALITY
+    );
+
+    const res = await fetch(AI_CONFIG.ENDPOINT, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image: image,
+        crop: state.cropId,
+        labels: state.labels,
+        localTop: results.slice(0, 3).map((r) => ({ label: r.label, prob: r.prob })),
+      }),
+    });
+
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data || !data.ok) {
+      return { ok: false, error: (data && data.error) || ('http_' + res.status),
+               messageHi: data && data.messageHi };
+    }
+    return data;
+  } catch (err) {
+    const aborted = err && err.name === 'AbortError';
+    return { ok: false, error: aborted ? 'timeout' : 'network' };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * AI verdict card — result ke sabse upar dikhta hai.
+ * ------------------------------------------------------------------------- */
+function renderAiCard(kind, data) {
+  if (!el.aiCard || !el.aiHost) return;
+
+  if (!kind) { hide(el.aiCard); el.aiHost.innerHTML = ''; return; }
+
+  el.aiCard.className = 'card ai-card ai-card--' + kind;
+  let html = '';
+
+  if (kind === 'pending') {
+    html = [
+      '<div class="ai-row">',
+        '<span class="spinner spinner--sm" aria-hidden="true"></span>',
+        '<div><p class="ai-title">ऑनलाइन AI से दोबारा जाँच हो रही है…</p>',
+        '<p class="ai-sub">नीचे दिखा नतीजा फ़ोन के मॉडल का है — कुछ सेकंड में पक्का हो जाएगा।</p></div>',
+      '</div>',
+    ].join('');
+
+  } else if (kind === 'agree') {
+    const a = getAdvisory(data.label);
+    html = [
+      '<div class="ai-row">',
+        '<span class="ai-emoji" aria-hidden="true">✅</span>',
+        '<div>',
+          '<p class="ai-title">ऑनलाइन AI ने भी यही बताया — ', escapeHtml(a.nameHi), '</p>',
+          '<p class="ai-sub">फ़ोन का मॉडल और ऑनलाइन AI दोनों सहमत हैं, इसलिए इस नतीजे पर ज़्यादा भरोसा करें।</p>',
+          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>' : '',
+        '</div>',
+      '</div>',
+      '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
+    ].join('');
+
+  } else if (kind === 'differ') {
+    const ai = getAdvisory(data.label);
+    const loc = getAdvisory(data.localLabel);
+    html = [
+      '<div class="ai-row">',
+        '<span class="ai-emoji" aria-hidden="true">🌐</span>',
+        '<div>',
+          '<p class="ai-title">ऑनलाइन AI की राय अलग है — ', escapeHtml(ai.nameHi), '</p>',
+          '<p class="ai-sub">नीचे दी गई सलाह अब <strong>ऑनलाइन AI</strong> के नतीजे की है, ',
+            'क्योंकि वह फ़ोन के छोटे मॉडल से ज़्यादा सटीक होता है।</p>',
+          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>' : '',
+          '<p class="ai-alt">फ़ोन के मॉडल ने कहा था: <strong>', escapeHtml(loc.nameHi),
+            '</strong> — दोनों में शक हो तो पत्ती की एक और साफ फोटो लें, या KVK से पूछें।</p>',
+        '</div>',
+      '</div>',
+      '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
+    ].join('');
+
+  } else if (kind === 'unclear') {
+    html = [
+      '<div class="ai-row">',
+        '<span class="ai-emoji" aria-hidden="true">🔍</span>',
+        '<div>',
+          '<p class="ai-title">ऑनलाइन AI फोटो से पक्का नहीं बता पाया</p>',
+          '<p class="ai-sub">कृपया छाँव की साफ रोशनी में, पत्ती को पूरे फ्रेम में लेकर एक और फोटो लें।</p>',
+          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>' : '',
+        '</div>',
+      '</div>',
+    ].join('');
+
+  } else if (kind === 'fail') {
+    html = [
+      '<div class="ai-row">',
+        '<span class="ai-emoji" aria-hidden="true">📴</span>',
+        '<div>',
+          '<p class="ai-title">ऑनलाइन जाँच नहीं हो पाई</p>',
+          '<p class="ai-sub">', escapeHtml(data && data.messageHi
+            ? data.messageHi
+            : 'नेटवर्क या फ्री-मॉडल की सीमा की वजह से। नीचे फ़ोन के मॉडल का नतीजा दिखाया गया है।'),
+          '</p>',
+        '</div>',
+      '</div>',
+    ].join('');
+  }
+
+  el.aiHost.innerHTML = html;
+  show(el.aiCard);
+}
+
+/** AI ka jawab lekar result card ko update karta hai. */
+function applyAiVerdict(ai, results) {
+  state.aiResult = ai;
+
+  if (!ai || !ai.ok) { renderAiCard('fail', ai); return; }
+
+  if (ai.label === 'unclear') {
+    renderAiCard('unclear', ai);
+    return;
+  }
+
+  const localTop = results[0];
+
+  /* Dono same -> sirf bharosa badhao */
+  if (ai.label === localTop.label) {
+    renderAiCard('agree', ai);
+    // Offline model ka score kam tha par AI sehmat hai -> ab salah dikha do
+    if (!state.lastResult || !state.lastResult.confident) {
+      showAdvisoryFor(ai.label, Math.max(localTop.prob, ai.confidence), 'ai');
+    }
+    return;
+  }
+
+  /* Alag jawab -> AI ko maano (accuracy hi maqsad hai), par dono dikhao */
+  renderAiCard('differ', ai);
+  showAdvisoryFor(ai.label, ai.confidence, 'ai');
+  updateLastHistoryEntry(ai.label, ai.confidence);
+}
+
+/** Advisory card ko kisi bhi label par set karna (offline ya AI, dono ke liye). */
+function showAdvisoryFor(label, prob, source) {
+  state.lastResult = { label: label, prob: prob, confident: true, source: source || 'local' };
+  hide(el.lowConfidenceBox);
+  show(el.advisoryCard);
+  el.advisoryHost.innerHTML = buildAdvisoryHtml(label, { prob: prob, speakId: 'speakResult' });
+  wireSpeakButton($('#speakResult'), el.advisoryHost.querySelector('.adv'));
+}
+
+/** History me sabse upar wali entry ko AI ke jawab se sudhar do. */
+function updateLastHistoryEntry(label, prob) {
+  if (!state.history.length) return;
+  state.history[0].label = label;
+  state.history[0].prob = prob;
+  state.history[0].confident = true;
+  state.history[0].source = 'ai';
+  persistHistory();
+  renderRecent();
+  renderHistory();
+}
+
+/** runPrediction ke baad chalta hai — UI ko block nahi karta. */
+async function runOnlineDoubleCheck(results) {
+  if (!onlineAiUsable()) { renderAiCard(null); return; }
+  if (!state.imageEl) return;
+
+  state.aiBusy = true;
+  renderAiCard('pending');
+
+  const ai = await askOnlineAI(results);
+
+  // Beech me kisan ne nayi photo daal di ho to purana jawab mat lagao
+  if (!state.isPredicting && state.imageEl) applyAiVerdict(ai, results);
+  state.aiBusy = false;
 }
 
 
@@ -5776,7 +6149,11 @@ function renderResults(results) {
   const a = getAdvisory(top.label);
   const confident = top.prob >= CONFIG.CONFIDENCE_THRESHOLD;
 
-  state.lastResult = { label: top.label, prob: top.prob, confident: confident };
+  state.lastResult = { label: top.label, prob: top.prob, confident: confident, source: 'local' };
+
+  // Nayi jaanch shuru — purana online-AI verdict hata do
+  state.aiResult = null;
+  renderAiCard(null);
 
   renderScores(results);   // scores hamesha dikhte hain (transparency)
 
@@ -6105,6 +6482,262 @@ function updateCropChip() {
     el.scanCropHint.textContent = crop
       ? (crop.photoHintHi || (crop.nameHi + ' की पत्ती की साफ फोटो अपलोड करें'))
       : 'चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें';
+  }
+}
+
+
+/* ============================================================================
+ * SECTION 10B — OFFLINE MODEL MANAGER  ⬇️
+ *
+ * SAMASYA: app ab GitHub + Vercel par host hai. Har fasal ka model ~2.2 MB ka hai.
+ *          Agar app khulte hi saare 7 model utaar le, to kisan ka 15 MB data
+ *          ek jhatke me chala jayega — aur shayad wo sirf ek hi fasal boyega.
+ *
+ * HAL: model tabhi utarta hai jab zaroorat ho —
+ *      a) jis fasal ko kisan chunta hai wo apne aap cache ho jaati hai (sw.js)
+ *      b) yahan se wo khet jaane se PEHLE, wifi par, model download kar sakta hai
+ *
+ * Files browser ke Cache Storage me jaati hain (naam: krashi-mitra-models).
+ * App update hone par bhi ye cache nahi mitta — download dobara nahi karna padta.
+ * ========================================================================= */
+
+const MODELS_CACHE = 'krashi-mitra-models';
+
+/** Ek fasal ke model ki teeno files. */
+function cropModelFiles(cropId) {
+  const dir = cropModelDir(cropId);
+  return [dir + 'model.json', dir + 'weights.bin', dir + 'metadata.json'];
+}
+
+function cacheApiAvailable() {
+  return typeof caches !== 'undefined' && location.protocol !== 'file:';
+}
+
+/** Kya is fasal ka model pehle se utar chuka hai? */
+async function isCropDownloaded(cropId) {
+  if (!cacheApiAvailable()) return false;
+  try {
+    const cache = await caches.open(MODELS_CACHE);
+    const hits = await Promise.all(
+      cropModelFiles(cropId).map((u) => cache.match(u, { ignoreSearch: true }))
+    );
+    return hits.every(Boolean);
+  } catch (_) { return false; }
+}
+
+/**
+ * Model download karke cache me daal do.
+ * weights.bin bada hai, isliye usko stream karke % progress dikhate hain.
+ */
+async function downloadCropModel(cropId, onProgress) {
+  if (!cacheApiAvailable()) throw new Error('cache_unavailable');
+  const cache = await caches.open(MODELS_CACHE);
+  const files = cropModelFiles(cropId);
+
+  let done = 0;
+  for (const url of files) {
+    const res = await fetch(url, { cache: 'reload' });
+    if (!res.ok) throw new Error('download_failed: ' + url);
+
+    const total = Number(res.headers.get('content-length')) || 0;
+
+    if (total > 300000 && res.body && typeof ReadableStream !== 'undefined') {
+      // Badi file — byte-by-byte padhkar sahi progress dikhao
+      const reader = res.body.getReader();
+      const chunks = [];
+      let got = 0;
+      for (;;) {
+        const r = await reader.read();
+        if (r.done) break;
+        chunks.push(r.value);
+        got += r.value.length;
+        if (onProgress) onProgress(Math.min(0.99, (done + got / total) / files.length));
+      }
+      const blob = new Blob(chunks);
+      const headers = new Headers();
+      res.headers.forEach((v, k) => headers.set(k, v));
+      await cache.put(url, new Response(blob, { status: 200, headers: headers }));
+    } else {
+      await cache.put(url, res.clone());
+    }
+
+    done += 1;
+    if (onProgress) onProgress(done / files.length);
+  }
+  return true;
+}
+
+async function deleteCropModel(cropId) {
+  if (!cacheApiAvailable()) return;
+  const cache = await caches.open(MODELS_CACHE);
+  await Promise.all(cropModelFiles(cropId).map((u) => cache.delete(u, { ignoreSearch: true })));
+}
+
+/** "12.4 MB" jaisa readable size. */
+function humanBytes(n) {
+  if (!n && n !== 0) return '—';
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(0) + ' KB';
+  return (n / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+/** Phone me app ne kitni jagah li hai. */
+async function renderStorageLine() {
+  if (!el.storageLine) return;
+  if (!navigator.storage || !navigator.storage.estimate) {
+    el.storageLine.textContent = '';
+    return;
+  }
+  try {
+    const est = await navigator.storage.estimate();
+    el.storageLine.textContent =
+      'फ़ोन में ऐप ने अभी लगभग ' + humanBytes(est.usage || 0) + ' जगह ली है।';
+  } catch (_) { el.storageLine.textContent = ''; }
+}
+
+/* ---------------------------------------------------------------------------
+ * List render — har fasal ke saamne "डाउनलोड" / "✓ सेव है" / "हटाएँ".
+ * ------------------------------------------------------------------------- */
+async function renderOfflineManager() {
+  if (!el.downloadList) return;
+
+  if (!cacheApiAvailable()) {
+    el.downloadList.innerHTML =
+      '<li class="dl-note">यह ब्राउज़र ऑफ़लाइन सेव करना सपोर्ट नहीं करता, ' +
+      'या ऐप file:// से खुला है। कृपया https वाले लिंक से खोलें।</li>';
+    return;
+  }
+
+  const ids = Object.keys(CROPS).filter((id) => state.cropAvailable[id]);
+  if (!ids.length) {
+    el.downloadList.innerHTML =
+      '<li class="dl-note">अभी किसी फसल का मॉडल सर्वर पर नहीं मिला।</li>';
+    return;
+  }
+
+  const statuses = await Promise.all(ids.map(isCropDownloaded));
+
+  el.downloadList.innerHTML = ids.map((id, i) => {
+    const crop = CROPS[id];
+    const have = statuses[i];
+    const n = (crop.labels || []).length;
+    return [
+      '<li class="dl-item" data-crop="', escapeHtml(id), '">',
+        '<span class="dl-icon" aria-hidden="true">', crop.icon, '</span>',
+        '<span class="dl-body">',
+          '<span class="dl-name">', escapeHtml(crop.nameHi),
+            ' <small>', escapeHtml(crop.nameEn), '</small></span>',
+          '<span class="dl-meta" data-role="meta">',
+            have ? '✓ फ़ोन में सेव है — बिना इंटरनेट चलेगा'
+                 : ('लगभग 2.2 MB · ' + n + ' रोग'),
+          '</span>',
+          '<span class="dl-bar" data-role="bar" hidden><i></i></span>',
+        '</span>',
+        have
+          ? '<button type="button" class="link-btn link-btn--danger" data-act="del">हटाएँ</button>'
+          : '<button type="button" class="btn btn--ghost btn--sm" data-act="get">डाउनलोड</button>',
+      '</li>',
+    ].join('');
+  }).join('');
+
+  /* Online AI ki halat bhi yahin bata dete hain — debugging aasan ho jaati hai */
+  if (el.aiStatusLine) {
+    if (state.aiConfigured === true) {
+      el.aiStatusLine.textContent =
+        '🌐 ऑनलाइन AI चालू है (' + ((state.aiModels || [])[0] || 'free model') + ')।';
+    } else if (state.aiReason === 'no_api') {
+      el.aiStatusLine.textContent =
+        '🌐 ऑनलाइन AI यहाँ नहीं चलेगा — लोकल सर्वर पर /api फंक्शन नहीं होता। ' +
+        'Vercel वाले लिंक पर चलेगा।';
+    } else if (state.aiConfigured === false) {
+      el.aiStatusLine.textContent =
+        '🌐 ऑनलाइन AI बंद है — Vercel में OPENROUTER_API_KEY सेट करके redeploy करें।';
+    } else {
+      el.aiStatusLine.textContent = '🌐 ऑनलाइन AI: इंटरनेट आने पर जाँचा जाएगा।';
+    }
+  }
+
+  renderStorageLine();
+}
+
+/** Ek row ka download chalao (progress bar ke saath). */
+async function handleDownloadClick(li, action) {
+  const cropId = li.dataset.crop;
+  const meta = li.querySelector('[data-role="meta"]');
+  const bar = li.querySelector('[data-role="bar"]');
+  const btn = li.querySelector('button');
+
+  if (action === 'del') {
+    await deleteCropModel(cropId);
+    renderOfflineManager();
+    return;
+  }
+
+  btn.disabled = true;
+  show(bar);
+  meta.textContent = 'डाउनलोड हो रहा है…';
+
+  try {
+    await downloadCropModel(cropId, (p) => {
+      const fill = bar.querySelector('i');
+      if (fill) fill.style.width = Math.round(p * 100) + '%';
+      meta.textContent = 'डाउनलोड हो रहा है… ' + Math.round(p * 100) + '%';
+    });
+    meta.textContent = '✓ हो गया';
+  } catch (err) {
+    console.warn('[offline] download fail:', err.message);
+    meta.textContent = 'डाउनलोड नहीं हो पाया — इंटरनेट जाँचकर दोबारा कोशिश करें।';
+    btn.disabled = false;
+    hide(bar);
+    return;
+  }
+  renderOfflineManager();
+}
+
+async function downloadAllModels() {
+  const ids = Object.keys(CROPS).filter((id) => state.cropAvailable[id]);
+  if (!ids.length) return;
+  if (el.downloadAllBtn) el.downloadAllBtn.disabled = true;
+
+  for (const id of ids) {
+    try {
+      if (!(await isCropDownloaded(id))) await downloadCropModel(id);
+      await renderOfflineManager();
+    } catch (err) {
+      console.warn('[offline] all-download fail on', id, err.message);
+    }
+  }
+  if (el.downloadAllBtn) el.downloadAllBtn.disabled = false;
+  renderOfflineManager();
+}
+
+/* ---------------------------------------------------------------------------
+ * PWA INSTALL — "ऐप की तरह इंस्टॉल करें"
+ * Chrome/Android khud ek prompt deta hai; hum usse pakad kar apna button
+ * dikhate hain, taaki kisan ko app icon home screen par mil jaye.
+ * ------------------------------------------------------------------------- */
+let deferredInstallPrompt = null;
+
+function wireInstallPrompt() {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    if (el.installCard) show(el.installCard);
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    if (el.installCard) hide(el.installCard);
+  });
+
+  if (el.installBtn) {
+    el.installBtn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch (_) {}
+      deferredInstallPrompt = null;
+      if (el.installCard) hide(el.installCard);
+    });
   }
 }
 
@@ -6845,6 +7478,32 @@ function wireEvents() {
     });
   }
 
+  /* ---- ONLINE / OFFLINE MODE (segmented control) ---- */
+  if (el.netModeGroup) {
+    el.netModeGroup.addEventListener('click', (e) => {
+      const btn = e.target.closest('.seg__btn');
+      if (btn && btn.dataset.mode) setNetMode(btn.dataset.mode);
+    });
+  }
+
+  /* ---- OFFLINE MODEL MANAGER ---- */
+  if (el.downloadList) {
+    el.downloadList.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const li = btn.closest('.dl-item');
+      if (li) handleDownloadClick(li, btn.dataset.act);
+    });
+  }
+  if (el.downloadAllBtn) {
+    el.downloadAllBtn.addEventListener('click', downloadAllModels);
+  }
+  wireInstallPrompt();
+
+  /* Net badalte hi mode ki line update ho jaye */
+  window.addEventListener('online',  () => { renderNetMode(); checkAiEndpoint(); });
+  window.addEventListener('offline', renderNetMode);
+
   /* ---- WEATHER ---- */
   if (el.weatherRefreshBtn) {
     el.weatherRefreshBtn.addEventListener('click', () => refreshWeather({ force: true }));
@@ -6930,7 +7589,9 @@ function wireEvents() {
 }
 
 async function init() {
+  state.netMode = loadNetMode();
   wireEvents();
+  renderNetMode();
   refreshVoices();
   loadHistory();
   renderRecent();
@@ -6974,6 +7635,10 @@ async function init() {
   } else {
     setStatus('फसल चुनें / Choose crop', 'ready');
   }
+
+  // Online AI chaalu hai ya nahi — ek chhota GET. Photo kahin nahi jaati.
+  checkAiEndpoint();
+  renderOfflineManager();
 }
 
 if (document.readyState === 'loading') {
