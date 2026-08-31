@@ -114,15 +114,139 @@ KRASHI MITRA/
 ├── js/
 │   ├── tf.min.js         TensorFlow.js 4.20.0 — LOCAL copy (offline ke liye)
 │   └── script.js         CONFIG + CROPS + model + predict + weather + speech
-├── models/
-│   ├── rice/        model.tflite + labels.txt      (6 classes) ✅
-│   ├── wheat/       model.json + weights.bin + metadata.json (14 classes) ✅
-│   ├── sugarcane/   (khaali — "Coming Soon")
-│   └── mustard/     (khaali — "Coming Soon")
+├── api/
+│   └── diagnose.js       🌐 ONLINE MODE — Vercel serverless function
+│                            (OpenRouter ki API key SIRF yahan, server par)
+├── models/                  har fasal: model.json + weights.bin + metadata.json
+│   ├── rice/ (17)  wheat/ (14)  sugarcane/ (16)  onion/ (14)
+│   ├── maize/ (7)  potato/ (10)  tomato/ (10)
+│   └── mustard/  (khaali — "Coming Soon")
 ├── assets/logo.svg
-├── icon.svg, manifest.json, sw.js, serve.sh
+├── icon.svg, manifest.json, sw.js, serve.sh, vercel.json
 └── README.md
 ```
+
+> **Models git me hi rakhe gaye hain** (~2.2 MB per fasal). Vercel unhein static
+> file ki tarah serve karta hai, aur `vercel.json` unpar 1-saal ka immutable
+> cache header lagata hai — isliye dobara download nahi hote.
+
+---
+
+## 3B. 🌐 ONLINE MODE — bade AI se double-check (OpenRouter)
+
+### Yeh kyun hai
+
+Phone wala Teachable Machine model **chhota** hota hai — turant jawab deta hai,
+par galti bhi karta hai. Internet ho to hum **wahi photo** ek bade vision model
+se dobara jaanchte hain aur dono jawab milaate hain.
+
+```
+photo  →  [1] phone ka model  →  jawab TURANT dikh gaya   (0 sec, offline)
+                    ↓
+          [2] internet hai?  →  /api/diagnose  →  OpenRouter vision model
+                    ↓
+          [3] dono jawab mile:
+                same     →  "AI ne bhi yahi bataya"  (bharosa badh gaya)
+                alag     →  AI wali salah dikhati hai, phone wala jawab bhi saath
+                unclear  →  "dobara saaf photo lein"
+                fail     →  chupchaap offline jawab hi rehta hai
+```
+
+App **kabhi rukti nahi** — offline jawab pehle aata hai, online jawab usse
+sudharta hai. Isi liye 2G par bhi app utni hi tez chalti hai.
+
+### Teen mode (kisan khud chun sakta hai — Scan screen par)
+
+| Mode | Kab use karein | Kya karta hai |
+|---|---|---|
+| ⚡ **ऑटो** (default) | roz ka istemal | network accha ho to online double-check, 2G / "data bachao" par apne aap offline |
+| 🌐 **ऑनलाइन AI** | jab sabse sahi jawab chahiye | har jaanch online AI se verify hoti hai |
+| 📴 **ऑफ़लाइन** | khet me, network nahi / data bachana hai | sirf phone ka model, ek byte internet nahi |
+
+Chuna hua mode `localStorage` me yaad rehta hai.
+
+### Setup — sirf 3 step (ek hi baar)
+
+1. **Free key banayein** — [openrouter.ai](https://openrouter.ai) → Sign in → *Keys*
+   → *Create Key*. Key aisi dikhegi: `sk-or-v1-...`
+2. **Vercel me daalein** — Project → *Settings* → *Environment Variables*
+   | Name | Value |
+   |---|---|
+   | `OPENROUTER_API_KEY` | `sk-or-v1-...` |
+3. **Redeploy** karein. Bas — app khud pehchan legi ki online mode chaalu ho gaya.
+
+> ⚠️ **Key kabhi `js/script.js` me mat daalein.** Browser ka saara code public hota
+> hai — koi bhi *View Source* karke key chura sakta hai aur aapke naam par kharcha
+> kar sakta hai. Isi liye key server par (`api/diagnose.js`) rehti hai aur browser
+> sirf apne hi `/api/diagnose` ko call karta hai.
+
+### Kaunsa AI model? (sab FREE)
+
+`api/diagnose.js` me ek **model chain** hai — pehla try hota hai, rate-limit ya
+error aaye to apne aap agla:
+
+| # | Model | Kyun |
+|---|---|---|
+| 1 | `google/gemma-4-31b-it:free` | Google DeepMind ka 31B multimodal — patti ke lakshan pehchanne me sabse sthir. **Default.** |
+| 2 | `thinkingmachines/inkling:free` | 975B MoE (41B active) — sabse gehri reasoning, jab pehla busy ho |
+| 3 | `minimax/minimax-m3:free` | MiniMax M3 multimodal |
+| 4 | `google/gemma-4-26b-a4b-it:free` | halka/tez MoE variant |
+| 5 | `openrouter/free` | last resort — OpenRouter khud koi free model chun leta hai |
+
+Chain badalni ho to code chhune ki zaroorat nahi — Vercel me ek aur env var:
+
+```
+OPENROUTER_MODELS = google/gemma-4-31b-it:free,thinkingmachines/inkling:free
+```
+
+**Aaj ke free vision models kaise dekhein** (list badalti rehti hai):
+
+```bash
+curl -s https://openrouter.ai/api/v1/models | python3 -c "import json,sys;[print(m['id']) for m in json.load(sys.stdin)['data'] if 'image' in (m.get('architecture') or {}).get('input_modalities',[]) and float((m.get('pricing') or {}).get('prompt') or 0)==0]"
+```
+
+> **Free models ki seemaa:** OpenRouter free models par roz ki request limit hoti
+> hai. Limit khatam ho to app chupchaap offline jawab dikhati rehti hai — kuch
+> tootta nahi. Agar bahut zyada kisan use karne lagein, to ek sasta paid vision
+> model (jaise Claude Haiku 4.5 — lagbhag $1 / 10 lakh input token) chain me
+> pehle number par daal dena kaafi hai.
+
+### Kya photo kahin bhejhi jaati hai?
+
+- **ऑफ़लाइन mode** → nahi. Photo phone se bahar jaati hi nahi.
+- **ऑटो / ऑनलाइन mode** → photo 640px JPEG banakar aapke apne Vercel server ko
+  jaati hai, jo use OpenRouter ko forward karta hai. Kahin save nahi hoti.
+  Yeh baat app ki "Offline & Help" screen par kisan ko साफ़ likhi hai.
+
+---
+
+## 3C. ⬇️ OFFLINE MODELS — download aur storage
+
+App ab GitHub + Vercel par host hai. Har fasal ka model ~2.2 MB ka hai, aur
+7 fasal = ~15 MB. **Sab kuch pehli baar me download NAHI hota** — warna kisan ka
+mobile data ek jhatke me chala jayega.
+
+Iske badle teen tarike hain:
+
+1. **Apne aap** — jis fasal ko kisan chunta hai, uska model use hote hi
+   service worker cache kar leta hai. Agli baar wo fasal bina internet chalti hai.
+2. **Pehle se** — *Offline & Help* screen par har fasal ke saamne **"डाउनलोड करें"**
+   button hai (progress % ke saath). Khet jaane se pehle wifi par daba lein.
+   **"सभी डाउनलोड"** se saare model ek saath.
+3. **Hataana** — jagah kam ho to **"हटाएँ"** se koi bhi model nikal dein.
+
+Usi screen par **"ऐप की तरह इंस्टॉल करें"** bhi aata hai (Chrome/Android) —
+home screen par icon ban jata hai aur app browser ke bina khulti hai.
+
+**Do alag cache** (`sw.js`):
+
+| Cache | Kya | Kab mitta hai |
+|---|---|---|
+| `krashi-mitra-v12` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
+| `krashi-mitra-models` | fasal ke models | **kabhi apne aap nahi** — kisan khud "हटाएँ" dabaye tabhi |
+
+Isi wajah se app update karne par kisan ke download kiye hue models dobara
+download nahi karne padte.
 
 ---
 

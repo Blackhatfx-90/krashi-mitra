@@ -24,7 +24,7 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v11';
+const CACHE_VERSION = 'krashi-mitra-v12';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* App shell — install ke waqt yahi cache hota hai (models NAHI). */
