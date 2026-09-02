@@ -705,3 +705,34 @@ ul{margin:0;padding:0;}
   padding:8px 10px;background:var(--surface);border:1px solid var(--line);
   border-radius:var(--radius-sm);
 }
+
+/* ---------- 19. KRISHI VIBHAG KI CHETAVNI + REPORT TOGGLE ---------------- */
+.dept-alert{border-left:4px solid var(--blue-600);background:var(--blue-050);}
+.dept-alert--warning{border-left-color:var(--amber-600);background:var(--amber-050);}
+.dept-alert--critical{border-left-color:var(--red-600);background:var(--red-050);}
+.dept-alert__row{display:flex;align-items:flex-start;gap:12px;}
+.dept-alert__icon{font-size:22px;line-height:1.2;flex:0 0 auto;}
+.dept-alert__body{flex:1 1 auto;min-width:0;}
+.dept-alert__tag{
+  font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+.dept-alert__title{font-size:15px;font-weight:700;color:var(--ink);margin-top:3px;line-height:1.45;}
+.dept-alert__msg{font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.6;}
+.dept-alert__chem{
+  font-size:12.5px;color:var(--ink-2);margin-top:8px;line-height:1.55;
+  padding:8px 10px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-sm);
+}
+.dept-alert__by{font-size:12px;color:var(--ink-3);margin-top:8px;}
+.dept-alert__close{
+  flex:0 0 auto;width:30px;height:30px;border-radius:50%;cursor:pointer;
+  color:var(--ink-3);font-size:15px;line-height:1;
+}
+.dept-alert__close:hover{background:rgba(16,24,40,.06);color:var(--ink);}
+
+#reportToggle.is-on{
+  background:var(--green-050);border-color:var(--green-600);color:var(--green-700);
+  font-weight:700;
+}
+#reportNote{margin-top:10px;line-height:1.6;}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { broadcastAdvisory } from '../../lib/api';
 import { 
   Send, 
   Globe2, 
@@ -27,6 +28,7 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
   const [customText, setCustomText] = useState(ADVISORY_TEMPLATES[0].bodyHi);
   const [isSending, setIsSending] = useState(false);
   const [broadcastDone, setBroadcastDone] = useState(false);
+  const [sendResult, setSendResult] = useState(null);   // API ka asli jawab
 
   const handleTemplateChange = (tpl) => {
     setSelectedTemplate(tpl);
@@ -41,13 +43,32 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
     else setCustomText(selectedTemplate.bodyEn);
   };
 
-  const handleSend = () => {
+  /* Pehle yeh sirf 1.2 second ka nakli wait tha. Ab chetavni SACH ME
+     /api/advisories par jaati hai aur kisan ki app use upar dikha deti hai. */
+  const handleSend = async () => {
     setIsSending(true);
-    setTimeout(() => {
-      setIsSending(false);
-      setBroadcastDone(true);
-      setTimeout(() => setBroadcastDone(false), 5000);
-    }, 1200);
+    setSendResult(null);
+
+    const res = await broadcastAdvisory({
+      crop: targetCrop || 'all',
+      cropNameHi: selectedTemplate.cropNameHi || '',
+      district: targetDivision === 'all' ? 'all' : targetDivision,
+      severity: selectedTemplate.severity || 'warning',
+      titleHi: selectedTemplate.titleHi || selectedTemplate.title || 'कृषि विभाग की सलाह',
+      messageHi: langTab === 'hi' ? customText : (selectedTemplate.bodyHi || customText),
+      messageEn: langTab === 'en' ? customText : (selectedTemplate.bodyEn || ''),
+      chemical: selectedTemplate.chemical || '',
+      cibrcApproved: true,
+      issuedBy: 'Dr. A. K. Gangwar (Joint Director Agriculture)',
+    });
+
+    if (!res || !res.ok) console.warn('[advisory] kisan app tak nahi pahunchi:', res && res.error);
+    else console.info('[advisory] kisan app par bhej di:', res.id, '| storage:', res.storage);
+
+    setSendResult(res);
+    setIsSending(false);
+    setBroadcastDone(true);
+    setTimeout(() => setBroadcastDone(false), 5000);
   };
 
   return (
@@ -59,9 +80,16 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
           <div className="flex items-center gap-3">
             <CheckCircle2 className="w-6 h-6 text-green-400 shrink-0" />
             <div>
-              <p className="text-sm font-bold">Mass Advisory Broadcast Dispatched Successfully!</p>
+              <p className="text-sm font-bold">
+                {sendResult && sendResult.ok
+                  ? 'Advisory किसान ऐप पर live भेज दी गई'
+                  : 'Advisory भेजी गई — पर किसान ऐप तक नहीं पहुँची'}
+              </p>
               <p className="text-xs text-green-200">
-                Delivered via Krishi Mitra Push & SMS to 18,420 registered farmers across {selectedTemplate.targetTalukas.join(', ')}.
+                {sendResult && sendResult.ok
+                  ? sendResult.id + ' — ' + selectedTemplate.targetTalukas.join(', ') +
+                    ' के किसानों की ऐप में यह चेतावनी ऊपर दिखेगी।'
+                  : 'सर्वर तक नहीं पहुँच पाई (API बंद या नेटवर्क नहीं)। दोबारा कोशिश करें।'}
               </p>
             </div>
           </div>

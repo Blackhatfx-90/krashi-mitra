@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -16,6 +16,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { FIELD_VERIFICATION_QUEUE } from '../../data/maharashtraAgriData';
+import { fetchLiveScans, updateScanStatus, scanToQueueItem } from '../../lib/api';
 
 export default function FieldValidationQueue({ 
   onOpenBroadcastModal,
@@ -23,11 +24,43 @@ export default function FieldValidationQueue({
 }) {
   const [queue, setQueue] = useState(FIELD_VERIFICATION_QUEUE);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedItem, setSelectedItem] = useState(queue[0]);
+  const [selectedItem, setSelectedItem] = useState(FIELD_VERIFICATION_QUEUE[0]);
   const [showImageModal, setShowImageModal] = useState(false);
+
+  /* --- LIVE: kisan app se aayi jaanchein ---------------------------------
+   * Demo data waisa hi rehta hai (viva ke liye), uske UPAR live scans aati
+   * hain. API na chale to kuch nahi bigadta — demo list dikhti rehti hai.  */
+  const [liveInfo, setLiveInfo] = useState({ count: 0, storage: null, at: null });
+
+  const loadLive = useCallback(async () => {
+    const { ok, scans, storage } = await fetchLiveScans();
+    if (!ok) return;
+    const live = scans.map(scanToQueueItem);
+    setQueue([...live, ...FIELD_VERIFICATION_QUEUE]);
+    setLiveInfo({ count: live.length, storage, at: new Date() });
+  }, []);
+
+  useEffect(() => {
+    loadLive();
+    const t = setInterval(loadLive, 20000);   // har 20 sec — nayi scan apne aap
+    return () => clearInterval(t);
+  }, [loadLive]);
+
+  /* Live scan ka faisla server par bhi likhna zaroori hai — warna page
+     refresh karte hi wo dobara "pending" dikhne lagega. Demo wale items
+     server par hain hi nahi, unpar yeh chalta nahi. */
+  const pushStatus = (id, status, note) => {
+    const item = queue.find(q => q.id === id);
+    if (!item || !item.isLive) return;
+    updateScanStatus(id, status, {
+      reviewedBy: 'Dr. A. K. Gangwar (Joint Director Agri, Bareilly)',
+      officerNote: note || '',
+    });
+  };
 
   // Handle Verify action
   const handleVerify = (id) => {
+    pushStatus(id, 'verified', 'Ground-truth verified by district agronomist');
     setQueue(prev => prev.map(item => {
       if (item.id === id) {
         return {
@@ -50,6 +83,7 @@ export default function FieldValidationQueue({
   // Handle Refer to State Lab
   const handleReferLab = (id) => {
     const labName = 'Chandra Shekhar Azad (CSA) University of Agriculture & Tech, Kanpur';
+    pushStatus(id, 'lab', 'Referred to ' + labName);
     setQueue(prev => prev.map(item => {
       if (item.id === id) {
         return {

@@ -123,6 +123,15 @@ const CONFIG = {
     SKIP_IF_DAMAGE: 0.20,  // rogi patti par shakal se pehchan bharosemand nahi
   },
 
+  /**
+   * KRISHI VIBHAG se judaav — apne hi server ke do raste.
+   * Dono me se kuch bhi na chale to app par koi asar nahi padta.
+   */
+  REPORT: {
+    SCANS: 'api/scans',            // kisan -> vibhag (sirf opt-in par)
+    ADVISORIES: 'api/advisories',  // vibhag -> kisan (padhna hamesha chalu)
+  },
+
   /** Upload ke liye max file size (10 MB). */
   MAX_FILE_BYTES: 10 * 1024 * 1024,
 
@@ -5158,6 +5167,9 @@ const el = {
 
   /* result */
   resultWrap:       $('#resultWrap'),
+  advisoryAlert:    $('#advisoryAlert'),
+  reportToggle:     $('#reportToggle'),
+  reportNote:       $('#reportNote'),
   resultNotes:      $('#resultNotes'),
   notPlantBox:      $('#notPlantBox'),
   notPlantReason:   $('#notPlantReason'),
@@ -5241,6 +5253,11 @@ const state = {
   lastResult: null,      // { label, prob, confident }
   forceScan: false,      // kisan ne "फिर भी जाँचें" dabaya — leaf-gate ek baar chhodo
   imageFeatures: null,   // photo ka rang/banawat vishleshan (gate + health dono use karte hain)
+
+  /* --- krishi vibhag se judaav --- */
+  reportOptIn: false,    // kisan ne jaanch bhejna chalu kiya ya nahi (default BAND)
+  advisories: [],        // vibhag ki chetavniyan
+  lastPos: null,         // { lat, lon } — sirf tab jab mausam ke liye jagah mili ho
   healthNote: null,      // agar model ka rog-faisla badla gaya ho
 
   /* --- history --- */
@@ -6071,6 +6088,10 @@ async function runPrediction() {
     // Offline jawab dikh chuka hai. Ab (agar internet hai) bade AI se dobara
     // jaanch karate hain — UI rukti nahi, jawab aate hi card update ho jata hai.
     runOnlineDoubleCheck(results);
+
+    // Kisan ne chalu kiya ho to yeh jaanch krishi vibhag ko bhi bhej do
+    // (chup-chaap — fail ho to bhi app par koi asar nahi).
+    reportScanToDept(finalTop || results[0]);
   } catch (err) {
     console.error('[predict] error:', err);
     showError(
@@ -7084,6 +7105,9 @@ async function selectCrop(cropId) {
   // Weather sirf ek baar shuru karo (fasal badalne par dobara fetch ki zaroorat nahi)
   if (!state.weather) refreshWeather({ silent: true });
 
+  // Is fasal ke liye vibhag ki koi chetavni hai kya
+  fetchAdvisories();
+
   await loadModelForCrop(cropId);
 }
 
@@ -7914,6 +7938,10 @@ async function refreshWeather(opts) {
     const pos = manual || await getPosition();
 
     /* 5) API call */
+    // Jagah yaad rakh lo — agar kisan ne report bhejna chalu kiya ho to
+    // scan ke saath yahi coordinates jaate hain (alag se location nahi maangte).
+    state.lastPos = { lat: pos.lat, lon: pos.lon };
+
     const data = await fetchWeatherData(pos.lat, pos.lon);
     const model = buildWeatherModel(data.current, data.forecast);
 
@@ -8375,6 +8403,184 @@ function wireSpeakButton(btn, hostForNote) {
 
 
 /* ============================================================================
+ * SECTION 14 — कृषि विभाग से जुड़ाव (report + advisory)  📡
+ *
+ * DO TARAF KA RASTA:
+ *
+ *   1. KISAN -> VIBHAG  (POST /api/scans)
+ *      Jaanch ka nateeja Regional Admin dashboard ke "Field Verification Queue"
+ *      me pahunchta hai, taaki adhikari dekh sakein ki kis ilaake me kaunsa rog
+ *      failna shuru hua hai.
+ *
+ *   2. VIBHAG -> KISAN  (GET /api/advisories)
+ *      Adhikari koi chetavni bhejein to wo kisan ki app me upar dikh jaati hai.
+ *
+ * ⚠️ NIJTA — yeh sabse zaroori niyam hai:
+ *   - Bhejna DEFAULT ME BAND hai. Kisan "Offline & Help" me khud chालू kare
+ *     tabhi kuch jaata hai.
+ *   - Naam aur phone number KABHI nahi jaate.
+ *   - Location tabhi jaati hai jab kisan pehle se mausam ke liye jagah de chuka ho.
+ *   - Offline mode me kuch bhi nahi jaata (bhejne ke liye internet chahiye hi).
+ *
+ * Chetavni PADHNA hamesha chalu hai — wo sarvajanik soochna hai, usme kisan ka
+ * koi data nahi jaata.
+ * ========================================================================= */
+
+const REPORT_KEY = 'agriai.report.v1';
+const ADVISORY_SEEN_KEY = 'agriai.advisory.seen.v1';
+
+function loadReportOptIn() {
+  try { return localStorage.getItem(REPORT_KEY) === 'on'; } catch (_) { return false; }
+}
+
+function setReportOptIn(on) {
+  state.reportOptIn = !!on;
+  try { localStorage.setItem(REPORT_KEY, on ? 'on' : 'off'); } catch (_) {}
+  renderReportToggle();
+}
+
+function renderReportToggle() {
+  if (!el.reportToggle) return;
+  const on = state.reportOptIn;
+  el.reportToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+  el.reportToggle.classList.toggle('is-on', on);
+  el.reportToggle.textContent = on ? '✅ भेजना चालू है' : 'भेजना चालू करें';
+  if (el.reportNote) {
+    el.reportNote.textContent = on
+      ? 'हर जाँच का नतीजा, फसल और पत्ती का छोटा फोटो कृषि विभाग को जाता है। ' +
+        'नाम और फ़ोन नंबर नहीं जाते। कभी भी बंद कर सकते हैं।'
+      : 'अभी कुछ भी नहीं भेजा जा रहा। चालू करने पर सिर्फ़ जाँच का नतीजा, फसल और ' +
+        'पत्ती का छोटा फोटो जाएगा — नाम और फ़ोन नंबर कभी नहीं।';
+  }
+}
+
+/**
+ * Ek jaanch vibhag ko bhejo. Chup-chaap chalta hai — kisan ko intezaar nahi
+ * karana, aur fail hone par bhi app par koi asar nahi.
+ */
+async function reportScanToDept(top) {
+  if (!state.reportOptIn) return;                 // kisan ne chalu hi nahi kiya
+  if (!navigator.onLine) return;                  // offline — kuch nahi bhejte
+  if (!top || !top.confident) return;             // adhoori pehchan bhejne ka fayda nahi
+
+  const crop = activeCrop();
+  const a = getAdvisory(top.label);
+
+  const payload = {
+    crop: state.cropId,
+    cropNameHi: crop ? crop.nameHi : '',
+    label: top.label,
+    diseaseHi: a.nameHi,
+    diseaseEn: a.nameEn,
+    confidence: top.prob,
+    source: (state.lastResult && state.lastResult.source) || 'local',
+    severity: a.severity || '',
+    // Chhota thumbnail — adhikari ko patti dekhni hoti hai
+    thumb: state.imageEl ? makeThumbnail(state.imageEl, 220) : '',
+    appVersion: 'v24',
+  };
+
+  // Location SIRF tab jab kisan pehle se jagah de chuka ho (mausam ke liye)
+  if (state.lastPos && typeof state.lastPos.lat === 'number') {
+    payload.lat = state.lastPos.lat;
+    payload.lng = state.lastPos.lon;
+  }
+
+  try {
+    const res = await fetch(CONFIG.REPORT.SCANS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => null);
+    if (data && data.ok) {
+      console.info('[report] vibhag ko bhej di:', data.id, '| storage:', data.storage);
+      if (el.reportNote) {
+        el.reportNote.textContent =
+          '✅ पिछली जाँच कृषि विभाग को भेज दी गई (' + data.id + ')।';
+      }
+    } else {
+      console.warn('[report] nahi bheji ja saki:', data && data.error);
+    }
+  } catch (err) {
+    console.warn('[report] network fail:', err.message);   // chup-chaap chhod do
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * VIBHAG KI CHETAVNI — kisan ki fasal ke hisaab se
+ * ------------------------------------------------------------------------- */
+function loadSeenAdvisories() {
+  try { return JSON.parse(localStorage.getItem(ADVISORY_SEEN_KEY) || '[]'); }
+  catch (_) { return []; }
+}
+function markAdvisorySeen(id) {
+  const seen = loadSeenAdvisories();
+  if (seen.indexOf(id) === -1) seen.unshift(id);
+  seen.length = Math.min(seen.length, 40);
+  try { localStorage.setItem(ADVISORY_SEEN_KEY, JSON.stringify(seen)); } catch (_) {}
+}
+
+async function fetchAdvisories() {
+  if (!navigator.onLine || !state.cropId) return;
+
+  try {
+    const url = CONFIG.REPORT.ADVISORIES + '?crop=' + encodeURIComponent(state.cropId);
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || !data.ok) return;
+
+    state.advisories = data.advisories || [];
+    renderAdvisoryAlert();
+  } catch (err) {
+    console.warn('[advisory] nahi mili:', err.message);
+  }
+}
+
+function renderAdvisoryAlert() {
+  if (!el.advisoryAlert) return;
+
+  const seen = loadSeenAdvisories();
+  const list = (state.advisories || []).filter((a) => seen.indexOf(a.id) === -1);
+
+  if (!list.length) { hide(el.advisoryAlert); return; }
+
+  const a = list[0];                                  // sabse nayi
+  const cls = a.severity === 'critical' ? 'critical'
+            : a.severity === 'warning' ? 'warning' : 'info';
+  const icon = a.severity === 'critical' ? '🚨' : a.severity === 'warning' ? '⚠️' : '📢';
+
+  el.advisoryAlert.className = 'card dept-alert dept-alert--' + cls;
+  el.advisoryAlert.innerHTML = [
+    '<div class="dept-alert__row">',
+      '<span class="dept-alert__icon" aria-hidden="true">', icon, '</span>',
+      '<div class="dept-alert__body">',
+        '<p class="dept-alert__tag">कृषि विभाग की चेतावनी',
+          a.district && a.district !== 'all' ? ' · ' + escapeHtml(a.district) : '', '</p>',
+        '<p class="dept-alert__title">', escapeHtml(a.titleHi || ''), '</p>',
+        '<p class="dept-alert__msg">', escapeHtml(a.messageHi || ''), '</p>',
+        a.chemical ? '<p class="dept-alert__chem">💊 ' + escapeHtml(a.chemical) +
+          (a.cibrcApproved ? ' <strong>(CIBRC अनुमोदित)</strong>' : '') + '</p>' : '',
+        a.issuedBy ? '<p class="dept-alert__by">— ' + escapeHtml(a.issuedBy) + '</p>' : '',
+      '</div>',
+      '<button type="button" class="dept-alert__close" id="advisoryDismiss" ',
+        'aria-label="चेतावनी बंद करें">✕</button>',
+    '</div>',
+  ].join('');
+
+  const close = $('#advisoryDismiss');
+  if (close) {
+    close.addEventListener('click', () => {
+      markAdvisorySeen(a.id);
+      renderAdvisoryAlert();          // agli chetavni ho to wo dikha do
+    });
+  }
+  show(el.advisoryAlert);
+}
+
+
+/* ============================================================================
  * SECTION 13 — INIT (events + service worker)
  * ========================================================================= */
 
@@ -8430,6 +8636,9 @@ function wireEvents() {
   }
   if (el.downloadAllBtn) {
     el.downloadAllBtn.addEventListener('click', downloadAllModels);
+  }
+  if (el.reportToggle) {
+    el.reportToggle.addEventListener('click', () => setReportOptIn(!state.reportOptIn));
   }
   if (el.voiceTestBtn) {
     el.voiceTestBtn.addEventListener('click', () => {
@@ -8553,7 +8762,9 @@ function wireEvents() {
 
 async function init() {
   state.netMode = loadNetMode();
+  state.reportOptIn = loadReportOptIn();
   wireEvents();
+  renderReportToggle();
   renderNetMode();
   refreshVoices();
   loadHistory();
@@ -8601,6 +8812,7 @@ async function init() {
 
   // Online AI chaalu hai ya nahi — ek chhota GET. Photo kahin nahi jaati.
   checkAiEndpoint();
+  fetchAdvisories();
   renderOfflineManager();
 }
 

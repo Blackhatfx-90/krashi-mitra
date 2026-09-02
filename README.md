@@ -466,6 +466,58 @@ par cache hote hain, kisan ka shell chhua bhi nahi jata.
 
 ---
 
+## 3H. 📡 KISAN APP ⇄ ADMIN DASHBOARD — live judaav
+
+Do taraf ka rasta, dono apne hi server par (koi teesri service nahi):
+
+```
+KISAN                                         ADHIKARI
+  scan  ──POST /api/scans──────────────────▶  Field Verification Queue
+                                              (har 20 sec apne aap refresh)
+  app   ◀──GET /api/advisories──────────────  Advisory Broadcast
+  (chetavni upar dikhti hai)                  (POST /api/advisories)
+```
+
+### 🔒 Nijta — sabse zaroori niyam
+
+| | |
+|---|---|
+| Bhejna default me | **BAND** — kisan "Offline & Help" me khud chalu kare tabhi |
+| Kya jata hai | jaanch ka nateeja, fasal, patti ka chhota thumbnail |
+| Kya **kabhi nahi** jata | **naam aur phone number** |
+| Location | sirf tab jab kisan pehle se mausam ke liye jagah de chuka ho |
+| Offline mode | kuch bhi nahi jata |
+
+Chetavni **padhna** hamesha chalu hai — usme kisan ka koi data nahi jata.
+
+### Storage — do haalat
+
+`api/_store.js` khud tay kar leta hai:
+
+| Haalat | Kab | Kya hota hai |
+|---|---|---|
+| **KV (asli)** | `KV_REST_API_URL` + `KV_REST_API_TOKEN` set hon | data sach me save, sab officers ko dikhta hai |
+| **memory (demo)** | kuch set na ho | serverless instance ki memory — restart par mit jata hai |
+
+Asli storage chalu karne ke liye: **Vercel → Storage → KV → Create**. Wo dono
+env vars apne aap jod deta hai, code me kuch badalna nahi padta. Har API jawab
+me `"storage":"kv"` ya `"memory"` aata hai, taaki bharam na rahe.
+
+### Endpoints
+
+| Rasta | Kaun | Kaam |
+|---|---|---|
+| `POST /api/scans` | kisan app | nayi jaanch bhejna |
+| `GET /api/scans` | dashboard | poori list |
+| `PATCH /api/scans` | dashboard | status: `verified` / `rejected` / `lab` |
+| `POST /api/advisories` | dashboard | chetavni bhejna |
+| `GET /api/advisories?crop=&district=` | kisan app | apni fasal ki chetavni |
+
+Chetavni **fasal aur zile se filter** hoti hai — dhaan wali chetavni gehu wale
+kisan ko nahi jaati (`crop: "all"` daalein to sabko jaayegi).
+
+---
+
 ## 4. ⭐ Nayi fasal (9th crop) kaise jodein
 
 **सिर्फ 2 काम** — core logic छूना नहीं है:
