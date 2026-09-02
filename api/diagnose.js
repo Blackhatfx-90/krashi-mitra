@@ -80,12 +80,14 @@ function buildPrompt(crop, labels, localTop) {
     `- Look at real visual evidence: lesion shape, colour, margins, halo, distribution,`,
     `  powder/pustules, insects, wilting, position on the leaf.`,
     `- If the plant looks healthy, choose the "healthy" label from the list.`,
-    `- If the photo is blurry, too dark, not a ${crop} plant, or you genuinely cannot`,
-    `  tell, set "label" to "unclear" and explain why.`,
+    `- IMPORTANT: if the photo does not show a plant at all (a person, an animal, a room,`,
+    `  the sky, a wall, food, a screenshot, text, an object), set "label" to "not_plant".`,
+    `  Never guess a disease for such a photo - a wrong answer can cost the farmer a crop.`,
+    `- If it IS a plant but blurry, too dark, or not a ${crop} plant, set "label" to "unclear".`,
     `- Never invent a label that is not in the list above.`,
     ``,
     `Reply with ONLY this JSON object, no markdown, no extra text:`,
-    `{"label":"<exact label from list, or unclear>",`,
+    `{"label":"<exact label from list, or unclear, or not_plant>",`,
     ` "confidence":<0.0-1.0>,`,
     ` "second":"<second most likely label from list, or empty>",`,
     ` "evidence":"<one short English sentence naming what you actually see>",`,
@@ -121,6 +123,7 @@ function matchLabel(guess, labels) {
   const g = String(guess).trim();
   if (!g) return null;
   if (/^unclear$/i.test(g)) return 'unclear';
+  if (/^not[_\s-]?plant$/i.test(g)) return 'not_plant';
 
   const exact = labels.find((l) => l === g);
   if (exact) return exact;

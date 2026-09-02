@@ -24,7 +24,7 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v15';
+const CACHE_VERSION = 'krashi-mitra-v18';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* App shell — install ke waqt yahi cache hota hai (models NAHI). */
@@ -156,7 +156,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  const isHeavyAsset = url.pathname.includes('/js/');
+  /* Cache-first SIRF vendor library ke liye (tf.min.js — 1.5 MB, kabhi badalti
+   * nahi). App ka apna script.js/style.css cache-first NAHI hona chahiye, warna
+   * naya code deploy karne par bhi purana hi chalta rehta hai jab tak
+   * CACHE_VERSION na badle — team ka aadha din isi me nikal jata hai. */
+  const isHeavyAsset = url.pathname.indexOf('tf.min.js') !== -1;
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_VERSION);

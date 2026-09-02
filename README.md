@@ -276,11 +276,75 @@ Bas — sidebar ka button ab seedha APK download karega, aur *Offline & Help* pa
 
 | Cache | Kya | Kab mitta hai |
 |---|---|---|
-| `krashi-mitra-v15` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
+| `krashi-mitra-v18` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
 | `krashi-mitra-models` | fasal ke models | **kabhi apne aap nahi** — kisan khud "हटाएँ" dabaye tabhi |
 
 Isi wajah se app update karne par kisan ke download kiye hue models dobara
 download nahi karne padte.
+
+---
+
+## 3E. 🌿🚫 LEAF GATE — sirf paudhe/patti par hi jaanch
+
+### Samasya
+
+Teachable Machine ka model **closed-set** hai. Usne sirf 14 rog dekhe hain,
+isliye wo **HAR photo ko unhi 14 me se kisi ek me daal deta hai**. Selfie daalo
+to bhi poore confidence ke saath "पीला रतुआ 82%" bata dega. Kisan us par bhरोsa
+karke chhidkav kar de — to nuksan uska hota hai.
+
+### Hal
+
+Model chalane se **PEHLE** photo ka rang aur bunawat jaanchi jaati hai
+(`checkIsPlantPhoto()` — SECTION 6B). Poori tarah offline, koi extra model
+download nahi — bas 96x96 par pixel ginti.
+
+| Kya dekhte hain | Kaise |
+|---|---|
+| **Hara paudha** | ExG (Excess Green) index — kheti me maana hua tarika |
+| **Rogi/sookhi patti** | peela–narangi–bhoora rang. **Yeh sabse zaroori hai** — rog wali patti hari hoti hi nahi |
+| **Aadmi ki chamdi** | selfie sabse aam galat photo hai |
+| **Aasman / paani** | neela |
+| **Deewar / kaagaz / screenshot** | bilkul feeka rang (kam saturation) |
+| **Bunawat (texture)** | patti par nasein aur dhabbe hote hain; chamdi aur deewar chikni hoti hai |
+
+**Sabse chalak hissa:** bhoori sookhi patti aur aadmi ki chamdi ka RANG lagbhag
+ek jaisa hota hai — sirf rang se pehchanna namumkin hai. Isliye faisla
+**bunawat se** hota hai: texture zyada (`edges >= LEAF_TEXTURE`) → patti;
+chikna → chamdi.
+
+### Kisan ko rokta nahi
+
+Card par **"फिर भी जाँचें"** ka button rehta hai — ek baar ke liye gate chhod
+deta hai (agli photo par phir jaanch hoti hai). Kabhi asli patti bhi reject ho
+sakti hai, tab kisan khud aage badh sakta hai.
+
+### Doosri parat — online AI
+
+`api/diagnose.js` ka prompt ab साफ़ kehta hai: photo me paudha na ho to
+`"label": "not_plant"` lauta do. To offline gate chook jaye to bhi online AI
+pakad leta hai (aur ulta bhi — dono milkar zyada pakka).
+
+### Tuning (agar zaroorat pade)
+
+`js/script.js` -> `CONFIG.LEAF_GATE`:
+
+```js
+LEAF_GATE: {
+  ENABLED: true,
+  MIN_SCORE: 0.16,     // asli photos reject ho rahi hain? -> 0.10 kar dein
+  MAX_SKIN: 0.30,
+  MAX_SKY: 0.45,
+  MAX_DULL: 0.72,
+  MAX_DARK: 0.55,
+  MIN_EDGES: 0.045,    // bilkul saadi satah (kapda/deewar)
+  LEAF_TEXTURE: 0.22,  // isse zyada bunawat -> garm rang = patti, chamdi nahi
+},
+```
+
+Browser console me har jaanch par `[leaf-gate]` wali line aati hai — usme saare
+number dikhte hain, isliye tuning aasan hai. Bilkul band karna ho to
+`ENABLED: false`.
 
 ---
 
@@ -407,10 +471,15 @@ Output softmax probabilities होती हैं। तीन case handle क
 | फ़ोन पर LAN IP से location कभी नहीं मिलती | यह browser की पाबंदी है, bug नहीं — PIN कोड वाला box इस्तेमाल करें, या app को HTTPS पर host करें |
 | "यह जगह नहीं मिली" | पास के बड़े शहर का नाम, या 6 अंक का PIN कोड डालें। बहुत छोटे गाँव geocoding में नहीं होते |
 | Camera नहीं खुलता | `capture` सिर्फ HTTPS/localhost पर। "Choose Image" से gallery use करें |
-| हिंदी आवाज़ नहीं आती | Phone: Settings → Language & input → Text-to-speech → Hindi voice download करें |
+| हिंदी आवाज़ नहीं आती | Phone: Settings → Language & input → Text-to-speech → Hindi voice download करें। *Offline & Help* स्क्रीन पर **"ऑफ़लाइन आवाज़"** कार्ड बता देता है कि फ़ोन में आवाज़ है या नहीं |
+| **बिना इंटरनेट आवाज़ नहीं आती** | Chrome `getVoices()` में **network** आवाज़ें भी देता है (जैसे "Google हिन्दी") जो ऑफ़लाइन चुप रहती हैं। v16 से app ऑफ़लाइन होने पर सिर्फ़ **phone के अंदर वाली** (`localService`) आवाज़ चुनती है, और network आवाज़ फेल हो तो अपने आप local से दोबारा कोशिश करती है |
+| **आवाज़ आधी बोलकर रुक जाती है** | Chrome का पुराना bug — `SpeechSynthesisUtterance` का reference न रहे तो garbage collector उसे बीच में उठा लेता है (न `end` आता है, न `error`), और पुराना `pause()`/`resume()` वाला उपाय टुकड़ा काट देता था। v16 में utterance `speech.current` में पकड़ कर रखा जाता है, `pause()` खुद से कभी नहीं होता, और एक **watchdog** हर सेकंड देखता है — आवाज़ चुपचाप रुके तो 2 सेकंड में अगला टुकड़ा शुरू कर देता है |
 | पुरानी file दिख रही है | `sw.js` में `CACHE_VERSION` बढ़ाएँ, या DevTools → Application → Unregister SW |
 | नया model डाला पर पुराना चल रहा है | Model files cache-first cached हैं — `CACHE_VERSION` बढ़ाएँ |
 | iPhone HEIC photo error | Camera settings → "Most Compatible" (JPEG) |
+| **किसी भी फोटो पर रोग बता देता है** | v18 से **leaf gate** लगा है — पौधा/पत्ती न दिखे तो मॉडल चलता ही नहीं। देखें section 3E |
+| असली पत्ती की फोटो भी reject हो रही है | `CONFIG.LEAF_GATE.MIN_SCORE` घटाएँ (0.16 → 0.10), या कार्ड पर **"फिर भी जाँचें"** दबाएँ। console की `[leaf-gate]` लाइन में सारे नंबर दिखते हैं |
+| **नया code deploy किया पर पुराना चल रहा है** | v18 से `script.js`/`style.css` अब cache-first नहीं हैं (सिर्फ़ `tf.min.js` है), इसलिए redeploy अपने आप पहुँचता है। फिर भी अटके तो `CACHE_VERSION` बढ़ाएँ |
 
 ---
 

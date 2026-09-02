@@ -10,7 +10,7 @@
 
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="css/style.css?v=15" />
+  <link rel="stylesheet" href="css/style.css?v=18" />
 </head>
 
 <body>
@@ -342,6 +342,30 @@
         <!-- ---------- RESULT ---------- -->
         <div id="resultWrap" hidden>
 
+          <!-- Photo patti/paudhe ki nahi lagi — model chalaya hi nahi gaya -->
+          <article class="card not-plant" id="notPlantBox" hidden>
+            <div class="low-conf__head">
+              <span class="low-conf__icon"><svg class="ic"><use href="#i-alert"/></svg></span>
+              <div>
+                <h2>यह पत्ती की फोटो नहीं लग रही</h2>
+                <p id="notPlantReason">इस फोटो में पौधे जैसा कुछ नहीं मिला।</p>
+              </div>
+            </div>
+            <ul class="low-conf__tips" id="notPlantTips"></ul>
+            <p class="not-plant__why">
+              ऐसी फोटो पर जाँच जान-बूझकर रोकी गई है, क्योंकि AI मॉडल हर फोटो को किसी न किसी
+              रोग में डाल देता है — और गलत सलाह से फसल को नुकसान हो सकता है।
+            </p>
+            <div class="btn-row">
+              <button type="button" class="btn btn--primary" id="retakeBtn">
+                <svg class="ic"><use href="#i-camera"/></svg> दूसरी फोटो लें
+              </button>
+              <button type="button" class="btn btn--ghost" id="forceScanBtn">
+                फिर भी जाँचें
+              </button>
+            </div>
+          </article>
+
           <!-- Online AI double-check ka nateeja (sirf online mode me dikhta hai) -->
           <article class="card ai-card" id="aiCard" hidden>
             <div id="aiHost"></div>
@@ -524,6 +548,6 @@
 </div><!-- /layout -->
 
 <script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
-<script src="js/script.js?v=15"></script>
+<script src="js/script.js?v=18"></script>
 </body>
 </html>

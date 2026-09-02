@@ -52,6 +52,28 @@ const CONFIG = {
    */
   CONFIDENCE_THRESHOLD: 0.75,
 
+  /**
+   * LEAF GATE — "yeh photo patti ki hai ya nahi?"
+   *
+   * Teachable Machine ka model closed-set hai: wo HAR photo ko kisi na kisi rog
+   * me daal deta hai (selfie par bhi "रतुआ 82%"). Isliye model chalane se pehle
+   * hum photo ka rang aur texture jaanchte hain.
+   *
+   * Kisan ko ROKA nahi jata — chetavni ke saath "फिर भी जाँचें" ka button milta
+   * hai. Agar aapke khet ki asli photos galat reject ho rahi hon to MIN_SCORE
+   * ghata dein (jaise 0.10), aur bilkul band karna ho to ENABLED: false.
+   */
+  LEAF_GATE: {
+    ENABLED: true,
+    MIN_SCORE: 0.16,     // isse kam plant-score = shayad patti nahi hai
+    MAX_SKIN: 0.30,      // itni chamdi dikhi to selfie maan lo
+    MAX_SKY: 0.45,       // itna aasman dikha to patti nahi hai
+    MAX_DULL: 0.72,      // itna feeka rang = deewar / kaagaz / screenshot
+    MAX_DARK: 0.55,      // itna andhera = kuch dikh hi nahi raha
+    MIN_EDGES: 0.045,    // isse kam bunawat = bilkul saadi satah (kapda/deewar)
+    LEAF_TEXTURE: 0.22,  // isse zyada bunawat ho to garm rang = patti, chamdi nahi
+  },
+
   /** Upload ke liye max file size (10 MB). */
   MAX_FILE_BYTES: 10 * 1024 * 1024,
 
@@ -5087,6 +5109,11 @@ const el = {
 
   /* result */
   resultWrap:       $('#resultWrap'),
+  notPlantBox:      $('#notPlantBox'),
+  notPlantReason:   $('#notPlantReason'),
+  notPlantTips:     $('#notPlantTips'),
+  forceScanBtn:     $('#forceScanBtn'),
+  retakeBtn:        $('#retakeBtn'),
   lowConfidenceBox: $('#lowConfidenceBox'),
   lowConfBest:      $('#lowConfBest'),
   advisoryCard:     $('#advisoryCard'),
@@ -5161,6 +5188,7 @@ const state = {
   objectUrl: null,
   isPredicting: false,
   lastResult: null,      // { label, prob, confident }
+  forceScan: false,      // kisan ne "फिर भी जाँचें" dabaya — leaf-gate ek baar chhodo
 
   /* --- history --- */
   history: [],           // localStorage se aata hai
@@ -5616,6 +5644,206 @@ function clearImage() {
 
 
 /* ============================================================================
+ * SECTION 6B — "YEH PHOTO PATTI KI HAI YA NAHI?"  🌿🚫
+ *
+ * SAMASYA: Teachable Machine ka model CLOSED-SET hota hai — usne sirf 14 rog
+ *          dekhe hain, isliye wo HAR photo ko unhi 14 me se kisi ek me daal
+ *          deta hai. Selfie daalo to bhi "पीला रतुआ 82%" bata dega. Kisan ko
+ *          galat salah mil jayegi.
+ *
+ * HAL: model chalane se PEHLE photo ko dekhte hain — kya isme sach me
+ *      paudha/patti jaisa kuch hai?
+ *
+ * YEH KAISE KAAM KARTA HAI (bina kisi extra model ke, poori tarah offline):
+ *   1. Photo ko 96x96 par chhota karte hain (tez chale)
+ *   2. Har pixel ka rang dekhte hain aur ginte hain —
+ *        hara paudha        : ExG (Excess Green) index, kheti me maana hua tarika
+ *        rogi patti         : peela / narangi / bhoora — kyunki rog wali patti
+ *                             hari hoti hi nahi! (yeh bhool sabse badi galti hoti)
+ *        aadmi ki chamdi    : selfie sabse aam galat photo hai
+ *        aasman             : neela
+ *        deewar / screenshot: bilkul feeka (kam saturation)
+ *   3. Texture bhi dekhte hain — patti me nasein aur khurdurapan hota hai,
+ *      chamdi aur deewar chikni hoti hai
+ *   4. Sab milakar ek "plant score" banta hai
+ *
+ * ZAROORI: yeh kisan ko ROKTA nahi — sirf chetavni deta hai aur
+ *          "फिर भी जाँचें" ka button bhi deta hai. Kabhi-kabhi asli patti bhi
+ *          reject ho sakti hai (jaise poori sookhi bhoori patti), tab kisan
+ *          khud aage badh sakta hai.
+ * ========================================================================= */
+
+/** RGB -> HSV (h 0-360, s 0-1, v 0-1) */
+function rgbToHsv(r, g, b) {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === rn)      h = 60 * (((gn - bn) / d) % 6);
+    else if (max === gn) h = 60 * (((bn - rn) / d) + 2);
+    else                 h = 60 * (((rn - gn) / d) + 4);
+  }
+  if (h < 0) h += 360;
+  return { h: h, s: max === 0 ? 0 : d / max, v: max };
+}
+
+/**
+ * Photo ka rang aur texture jaanchta hai.
+ * @returns {object} har cheez ka anupaat (0 se 1 ke beech) + plantScore
+ */
+function analyzeImageContent(sourceCanvas) {
+  const N = 96;                                   // itne par jaanch kaafi hai
+  const c = document.createElement('canvas');
+  c.width = N; c.height = N;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(sourceCanvas, 0, 0, N, N);
+
+  let data;
+  try { data = ctx.getImageData(0, 0, N, N).data; }
+  catch (_) { return null; }                      // canvas "tainted" ho to chhod do
+
+  const total = N * N;
+  let veg = 0, warmish = 0, skinLike = 0, sky = 0, dull = 0, dark = 0;
+  const lum = new Float32Array(total);
+
+  for (let i = 0, p = 0; i < data.length; i += 4, p++) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    lum[p] = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    const sum = r + g + b;
+    if (sum < 60) { dark++; continue; }           // bahut andhera pixel
+
+    /* --- 1. HARA PAUDHA: Excess Green index (kheti ka maana hua tarika) --- */
+    const rn = r / sum, gn = g / sum, bn = b / sum;
+    const exg = 2 * gn - rn - bn;
+    if (exg > 0.06) { veg++; continue; }
+
+    const hsv = rgbToHsv(r, g, b);
+
+    /* --- 2. GARM RANG: peela / narangi / bhoora --------------------------
+     * Yahan DO cheezein ek jaisi dikhti hain:
+     *   - rogi ya sookhi PATTI (rust narangi, blight bhoori)
+     *   - aadmi ki CHAMDI (selfie)
+     * Rang se inhe alag karna namumkin hai. Isliye hum dono ginte hain aur
+     * faisla NEECHE texture se karte hain — patti par nasein aur dhabbe hote
+     * hain, chamdi chikni hoti hai.
+     *
+     * (Pehle yahan chamdi ka check pehle tha, isliye SOOKHI BHOORI PATTI
+     *  "selfie" maani jaati thi aur kisan ki sahi photo reject ho jaati thi.) */
+    if (hsv.h >= 12 && hsv.h <= 78 && hsv.s > 0.18 && hsv.v > 0.16) {
+      warmish++;
+      const looksSkin = r > 95 && g > 40 && b > 20 &&
+                        (Math.max(r, g, b) - Math.min(r, g, b)) > 15 &&
+                        Math.abs(r - g) > 15 && r > g && r > b &&
+                        hsv.s > 0.15 && hsv.s < 0.62;
+      if (looksSkin) skinLike++;
+      continue;
+    }
+
+    /* --- 3. AASMAN / PAANI ----------------------------------------------- */
+    if (hsv.h >= 175 && hsv.h <= 265 && hsv.s > 0.15) { sky++; continue; }
+
+    /* --- 4. DEEWAR / KAAGAZ / SCREENSHOT (feeka rang) -------------------- */
+    if (hsv.s < 0.13) { dull++; continue; }
+  }
+
+  /* --- 6. TEXTURE: patti me nasein hoti hain, chamdi/deewar chikni hoti hai */
+  let edgeCount = 0, edgeTotal = 0;
+  for (let y = 1; y < N - 1; y++) {
+    for (let x = 1; x < N - 1; x++) {
+      const p = y * N + x;
+      const gx = Math.abs(lum[p - 1] - lum[p + 1]);
+      const gy = Math.abs(lum[p - N] - lum[p + N]);
+      if (gx + gy > 22) edgeCount++;
+      edgeTotal++;
+    }
+  }
+
+  const edges = edgeTotal ? edgeCount / edgeTotal : 0;
+
+  /* --- 7. TEXTURE se faisla: garm rang wale pixel patti hain ya chamdi? ----
+   * Patti par nasein, dhabbe, kinare hote hain -> edges zyada.
+   * Chehra chikna hota hai -> edges bahut kam.                               */
+  const textured = edges >= CONFIG.LEAF_GATE.LEAF_TEXTURE;
+  const warmVeg = textured ? warmish / total : Math.max(0, (warmish - skinLike) / total);
+  const skin    = textured ? 0 : skinLike / total;
+
+  const f = {
+    vegetation: veg / total,
+    warmVeg:    warmVeg,
+    warmish:    warmish / total,
+    skin:       skin,
+    sky:        sky / total,
+    dull:       dull / total,
+    dark:       dark / total,
+    edges:      edges,
+    textured:   textured,
+  };
+
+  f.plantScore = (f.vegetation + 0.8 * f.warmVeg)
+               - 1.5 * f.skin
+               - 0.9 * f.sky
+               - 0.45 * f.dull
+               - 0.4 * f.dark;
+
+  /* --- 8. Bilkul saadi satah (kapda, rangi deewar, plain background) -------
+   * Rang se yeh patti jaisi lag sakti hai, par patti par HAMESHA kuch na kuch
+   * bunawat hoti hai. Bilkul chapti tasveer patti nahi ho sakti.             */
+  f.flat = edges < CONFIG.LEAF_GATE.MIN_EDGES;
+
+  return f;
+}
+
+/**
+ * Faisla: photo aage bhejein ya kisan ko roken.
+ * @returns {object} { ok, reasonHi, tipsHi, features }
+ */
+function checkIsPlantPhoto(canvas) {
+  if (!CONFIG.LEAF_GATE.ENABLED) return { ok: true, skipped: true };
+
+  const f = analyzeImageContent(canvas);
+  if (!f) return { ok: true, skipped: true };        // jaanch hi na ho paye to rokna nahi
+
+  console.info('[leaf-gate]', {
+    plantScore: f.plantScore.toFixed(3), veg: f.vegetation.toFixed(2),
+    warm: f.warmVeg.toFixed(2), skin: f.skin.toFixed(2), sky: f.sky.toFixed(2),
+    dull: f.dull.toFixed(2), dark: f.dark.toFixed(2), edges: f.edges.toFixed(2),
+    textured: f.textured, flat: f.flat,
+  });
+
+  const G = CONFIG.LEAF_GATE;
+  let reasonHi = null, tipsHi = [];
+
+  if (f.dark > G.MAX_DARK) {
+    reasonHi = 'फोटो बहुत अँधेरी है — पत्ती साफ़ दिख ही नहीं रही।';
+    tipsHi = ['दिन की रोशनी में, छाँव में फोटो लें', 'फ्लैश की जगह प्राकृतिक रोशनी बेहतर है'];
+  } else if (f.skin > G.MAX_SKIN && f.edges < 0.30) {
+    reasonHi = 'यह किसी व्यक्ति की फोटो लग रही है, पत्ती की नहीं।';
+    tipsHi = ['कैमरा पत्ती की तरफ करें', 'पत्ती को हाथ या सादे कागज़ पर रखकर फोटो लें'];
+  } else if (f.sky > G.MAX_SKY) {
+    reasonHi = 'फोटो में ज़्यादातर आसमान या पानी दिख रहा है।';
+    tipsHi = ['कैमरा नीचे करके सीधे पत्ती पर लाएँ', 'पत्ती 15–20 सें.मी. दूर से लें'];
+  } else if (f.dull > G.MAX_DULL) {
+    reasonHi = 'फोटो में पत्ती जैसा कुछ नहीं मिला (दीवार, कागज़ या स्क्रीनशॉट लग रहा है)।';
+    tipsHi = ['असली पत्ती की फोटो लें, स्क्रीन से खींची हुई नहीं', 'बैकग्राउंड सादा रखें पर पत्ती पूरी फ्रेम में हो'];
+  } else if (f.flat) {
+    reasonHi = 'फोटो में कोई बनावट नहीं दिखी — यह सादी सतह (कपड़ा, दीवार या रंग) लग रही है।';
+    tipsHi = ['असली पत्ती की फोटो लें', 'पत्ती की नसें और धब्बे साफ़ दिखने चाहिए', 'फोटो हिली हुई न हो'];
+  } else if (f.plantScore < G.MIN_SCORE) {
+    reasonHi = 'इस फोटो में पौधे या पत्ती जैसा कुछ नहीं दिखा।';
+    tipsHi = [
+      'एक ही पत्ती को फ्रेम में भरकर लें',
+      'छाँव की साफ़ रोशनी में, कैमरा 15–20 सें.मी. दूर',
+      'फोटो हिली हुई न हो',
+    ];
+  }
+
+  return { ok: !reasonHi, reasonHi: reasonHi, tipsHi: tipsHi, features: f };
+}
+
+
+/* ============================================================================
  * SECTION 7 — PREPROCESSING + PREDICTION
  *
  * Teachable Machine (MobileNet) jo expect karta hai:
@@ -5693,6 +5921,19 @@ async function runPrediction() {
 
   try {
     const canvas = cropToSquareCanvas(state.imageEl, state.inputSize);
+
+    /* ---- PEHLE: kya yeh photo patti/paudhe ki hai? ----------------------
+     * Model closed-set hai — bina is jaanch ke wo deewar par bhi "rog" bata
+     * dega. Kisan ne "फिर भी जाँचें" dabaya ho to yeh jaanch chhod dete hain. */
+    if (!state.forceScan) {
+      const gate = checkIsPlantPhoto(canvas);
+      if (!gate.ok) {
+        showNotPlant(gate);
+        return;                                  // finally saaf-safai kar dega
+      }
+    }
+    state.forceScan = false;                     // ek baar ka chhoot, agli photo par phir jaanch
+
     inputTensor = preprocess(canvas);
 
     output = state.model.predict(inputTensor);
@@ -5994,6 +6235,21 @@ function applyAiVerdict(ai, results) {
 
   if (!ai || !ai.ok) { renderAiCard('fail', ai); return; }
 
+  /* Online AI ne kaha yeh paudha hai hi nahi -> offline model ka jawab hata do.
+     Yeh leaf-gate ki doosri, zyada pakki parat hai. */
+  if (ai.label === 'not_plant') {
+    showNotPlant({
+      reasonHi: 'ऑनलाइन AI ने भी कहा कि इस फोटो में पौधा या पत्ती नहीं है' +
+                (ai.evidenceHi ? ' — ' + ai.evidenceHi : '.'),
+      tipsHi: [
+        'सिर्फ पत्ती या पौधे की फोटो लें',
+        'पत्ती को फ्रेम में पूरा भरें, 15–20 सें.मी. दूर से',
+        'छाँव की साफ़ रोशनी में फोटो लें',
+      ],
+    });
+    return;
+  }
+
   if (ai.label === 'unclear') {
     renderAiCard('unclear', ai);
     return;
@@ -6166,8 +6422,34 @@ function renderScores(results) {
   }).join('');
 }
 
+/** "Yeh patti ki photo nahi lagi" wala card. Model chalaya hi nahi gaya. */
+function showNotPlant(gate) {
+  state.lastResult = null;
+  state.aiResult = null;
+  renderAiCard(null);
+
+  hide(el.advisoryCard);
+  hide(el.lowConfidenceBox);
+  el.advisoryHost.innerHTML = '';
+  if (el.scoresList) el.scoresList.innerHTML = '';
+  const scoresCard = el.scoresList && el.scoresList.closest('.card');
+  if (scoresCard) scoresCard.hidden = true;
+
+  if (el.notPlantReason) el.notPlantReason.textContent = gate.reasonHi || '';
+  if (el.notPlantTips) {
+    el.notPlantTips.innerHTML = (gate.tipsHi || [])
+      .map((t) => '<li>' + escapeHtml(t) + '</li>').join('');
+  }
+  show(el.notPlantBox);
+  show(el.resultWrap);
+  el.resultWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 /** Threshold logic yahin lagta hai. */
 function renderResults(results) {
+  hide(el.notPlantBox);
+  const scoresCard0 = el.scoresList && el.scoresList.closest('.card');
+  if (scoresCard0) scoresCard0.hidden = false;
   const top = results[0];
   const a = getAdvisory(top.label);
   const confident = top.prob >= CONFIG.CONFIDENCE_THRESHOLD;
@@ -7430,6 +7712,11 @@ const speech = {
              typeof window.SpeechSynthesisUtterance !== 'undefined',
   voices: [], activeBtn: null, keepAlive: null,
 
+  /* current: chal raha utterance — ISKA REFERENCE ZAROORI HAI, warna Chrome ka
+     garbage collector use beech me utha leta hai aur awaaz aadhi kat jaati hai.
+     advance: watchdog ise bulakar agle tukde par le jaata hai. */
+  current: null, advance: null,
+
   /* Har baar bolne par yeh number badhta hai. Purane utterance ke callbacks
      apna number check karte hain — isse "pehle wala Speak abhi band kiya aur
      turant doosra Speak dabaya" wali race condition nahi hoti. */
@@ -7513,9 +7800,16 @@ function chunkText(text, maxLen) {
     } else {
       if (current) chunks.push(current);
       current = s.trim();
-      while (current.length > limit) {         // ek hi vaakya bahut lamba ho to
-        chunks.push(current.slice(0, limit));
-        current = current.slice(limit);
+
+      // Ek hi vaakya limit se bada ho — pehle comma par todo, phir space par.
+      // (Pehle yahan seedha slice() tha, jo Hindi shabd ke BEECH me kaat deta tha
+      //  aur "गे-हूँ" jaisa tuta hua uchcharan aata tha.)
+      while (current.length > limit) {
+        let cut = current.lastIndexOf(',', limit);
+        if (cut < limit * 0.5) cut = current.lastIndexOf(' ', limit);
+        if (cut < limit * 0.5) cut = limit;      // koi jagah hi na mile tabhi
+        chunks.push(current.slice(0, cut).trim());
+        current = current.slice(cut).trim();
       }
     }
   });
@@ -7538,6 +7832,8 @@ function stopSpeaking() {
   speech.session++;                       // purane callbacks ab invalid ho gaye
   try { window.speechSynthesis.cancel(); } catch (_) {}
   if (speech.keepAlive) { clearInterval(speech.keepAlive); speech.keepAlive = null; }
+  speech.current = null;                  // ab GC le jaye to koi harj nahi
+  speech.advance = null;
   if (speech.activeBtn) setSpeakBtnState(speech.activeBtn, false);
   speech.activeBtn = null;
 }
@@ -7590,6 +7886,7 @@ function speakText(text, btn, hostForNote) {
   const chunks = chunkText(text);
   let index = 0;
   let triedLocalFallback = false;         // network voice fail hone par ek retry
+  let quietTicks = 0;                     // kitni der se kuch bola hi nahi gaya
 
   const speakNext = () => {
     if (mySession !== speech.session) return;      // beech me kuch aur shuru ho gaya
@@ -7599,7 +7896,23 @@ function speakText(text, btn, hostForNote) {
     u.lang = CONFIG.SPEECH_LANG;
     if (voice) u.voice = voice;
     u.rate = CONFIG.SPEECH_RATE; u.pitch = 1; u.volume = 1;
-    u.onend = speakNext;
+
+    /* Ek tukda sirf EK BAAR aage badhna chahiye — chahe 'end' aaye, 'error'
+       aaye, ya watchdog use mara hua ghoshit kare. */
+    let moved = false;
+    const advance = (reason) => {
+      if (moved || mySession !== speech.session) return;
+      moved = true;
+      quietTicks = 0;
+      if (reason) {
+        console.warn('[speech] aage badhe kyunki:', reason,
+                     '| tukda', index, '/', chunks.length);
+      }
+      speakNext();
+    };
+    speech.advance = advance;             // watchdog isi ko bulata hai
+
+    u.onend = () => advance(null);
     u.onerror = (e) => {
       if (mySession !== speech.session) return;    // purana utterance — ignore
       console.warn('[speech] error:', e.error);
@@ -7612,29 +7925,57 @@ function speakText(text, btn, hostForNote) {
           triedLocalFallback = true;
           voice = localVoice;
           index = Math.max(0, index - 1);          // wahi tukda dobara bolo
+          moved = true;                            // is utterance ka kaam khatam
           console.info('[speech] network voice fail — phone wali awaaz se retry:', localVoice.name);
           setTimeout(speakNext, 60);
           return;
         }
       }
 
-      if (e.error !== 'interrupted' && e.error !== 'canceled') {
-        showInfo('आवाज़ चलाने में समस्या आई। कृपया फ़ोन का वॉल्यूम और silent mode जाँचें।',
-                 'Something went wrong while playing the audio. Please check your phone\'s ' +
-                 'volume and silent mode.');
-      }
+      if (e.error === 'interrupted' || e.error === 'canceled') { moved = true; return; }
+
+      // Baaki galtiyon par bhi RUKTE NAHI — agla tukda bolne ki koshish karte hain,
+      // taaki kisan ko aadhi salah na mile.
+      if (index < chunks.length) { advance('error: ' + e.error); return; }
+
+      showInfo('आवाज़ चलाने में समस्या आई। कृपया फ़ोन का वॉल्यूम और silent mode जाँचें।',
+               'Something went wrong while playing the audio. Please check your phone\'s ' +
+               'volume and silent mode.');
       stopSpeaking();
     };
+
+    /* ⚠️ CHROME KA SABSE BADA BUG — YEH LINE HATANA MAT ⚠️
+       Utterance ka reference kahin na kahin rakhna PADTA hai. Agar sirf local
+       variable me rahe, to Chrome ka garbage collector use beech me utha leta
+       hai aur awaaz chupchaap band ho jaati hai — na 'end' aata hai, na 'error'.
+       Kisan ko aadhi salah sunai deti hai. Isi liye hum use yahan pakad kar
+       rakhte hain. */
+    speech.current = u;
+
     window.speechSynthesis.speak(u);
   };
 
-  // Chrome kabhi-kabhi ~15 sec baad khud pause ho jaata hai — resume karte rahenge
+  /* ---- WATCHDOG (har 1 sec) ------------------------------------------------
+   * Do kaam karta hai:
+   *   1. Chrome kabhi khud pause kar deta hai -> use resume kar do.
+   *      (Purana code har 9 sec par KHUD pause()+resume() karta tha — wahi
+   *       Android par tukda beech me kaat deta tha. Ab hum sirf tab resume
+   *       karte hain jab sach me pause hua ho.)
+   *   2. Agar utterance chupchaap mar gaya (na bol raha, na queue me kuch) to
+   *      2 second baad agle tukde par khud aage badh jao — poori salah sunani hai.
+   * ------------------------------------------------------------------------ */
   speech.keepAlive = setInterval(() => {
-    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.resume();
+    if (mySession !== speech.session) return;
+    const ss = window.speechSynthesis;
+
+    if (ss.paused) { try { ss.resume(); } catch (_) {} quietTicks = 0; return; }
+    if (ss.speaking || ss.pending) { quietTicks = 0; return; }
+
+    quietTicks++;
+    if (quietTicks >= 2 && typeof speech.advance === 'function') {
+      speech.advance('awaaz chupchaap ruk gayi thi');
     }
-  }, 9000);
+  }, 1000);
 
   // Chrome me cancel() ko settle hone me ek tick lagta hai — turant speak()
   // karne par naya utterance "interrupted" hokar mar jaata hai.
@@ -7835,6 +8176,21 @@ function wireEvents() {
     const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
     if (f) acceptFile(f);
   });
+
+  /* "फिर भी जाँचें" — kisan ki apni marzi, leaf-gate ek baar chhod do */
+  if (el.forceScanBtn) {
+    el.forceScanBtn.addEventListener('click', () => {
+      state.forceScan = true;
+      hide(el.notPlantBox);
+      runPrediction();
+    });
+  }
+  if (el.retakeBtn) {
+    el.retakeBtn.addEventListener('click', () => {
+      clearImage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
   el.clearBtn.addEventListener('click', (e) => { e.stopPropagation(); clearImage(); });
   el.predictBtn.addEventListener('click', runPrediction);
