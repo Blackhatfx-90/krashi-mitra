@@ -23,3 +23,7 @@ build/
 .env
 .env*.local
 !.env.example
+
+# Regional admin dashboard — sirf source aur build committed hain
+admin/node_modules/
+admin/dist/

@@ -431,6 +431,41 @@ hain — tuning aasan hai.
 
 ---
 
+## 3G. 🏛️ REGIONAL ADMIN DASHBOARD — `/regional-admin`
+
+Sarkari **Regional Agriculture Officer** ka command center ab isi site par hai:
+
+```
+https://krashi-mitrasih.vercel.app/regional-admin
+```
+
+Kisan wali public app (`/`) **bilkul nahi badli** — dashboard ek alag rasta hai.
+
+| | Kisan app (`/`) | Admin dashboard (`/regional-admin`) |
+|---|---|---|
+| Tech | vanilla JS, koi build nahi | React 19 + Vite + Tailwind v4 |
+| Source | `index.html`, `js/`, `css/` | `admin/` |
+| Serve hota hai | seedha (static) | `regional-admin/` (build ka output) |
+| Offline | poori tarah chalti hai | internet chahiye |
+
+**Badlav ke baad build zaroori hai:**
+
+```bash
+cd admin && npm install && npm run build
+```
+
+Poori jaankari: [`admin/README.md`](admin/README.md)
+
+### Ek zaroori suraksha (sw.js)
+
+Service worker har navigation ka jawab kisan ke app-shell (`'./'`) me likhta
+tha. Bina guard ke `/regional-admin` kholte hi wo shell admin ke page se badal
+jata — aur **kisan offline app kholta to use apni app ki jagah admin dashboard
+dikhta**. Isliye `sw.js` me `ADMIN_PATH` guard hai: admin ke page apne hi URL
+par cache hote hain, kisan ka shell chhua bhi nahi jata.
+
+---
+
 ## 4. ⭐ Nayi fasal (9th crop) kaise jodein
 
 **सिर्फ 2 काम** — core logic छूना नहीं है:
