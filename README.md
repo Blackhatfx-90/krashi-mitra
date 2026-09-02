@@ -276,7 +276,7 @@ Bas — sidebar ka button ab seedha APK download karega, aur *Offline & Help* pa
 
 | Cache | Kya | Kab mitta hai |
 |---|---|---|
-| `krashi-mitra-v18` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
+| `krashi-mitra-v23` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
 | `krashi-mitra-models` | fasal ke models | **kabhi apne aap nahi** — kisan khud "हटाएँ" dabaye tabhi |
 
 Isi wajah se app update karne par kisan ke download kiye hue models dobara
@@ -345,6 +345,89 @@ LEAF_GATE: {
 Browser console me har jaanch par `[leaf-gate]` wali line aati hai — usme saare
 number dikhte hain, isliye tuning aasan hai. Bilkul band karna ho to
 `ENABLED: false`.
+
+---
+
+## 3F. ✅ SAHI FASAL KO SAHI BATAO — health check + crop match
+
+### Samasya 1 — sehatmand fasal ko bhi "rogi" batata tha
+
+Teachable Machine ka model **over-confident** hota hai. Uske paas "kuch nahi
+mila" kehne ka koi rasta hi nahi — isliye bilkul sehatmand patti par bhi wo
+82% par koi rog bata deta hai.
+
+### Hal — model ke jawab ko PHOTO ke suboot se milao
+
+`analyzeImageContent()` har photo ka **damage score** nikalta hai:
+
+| Naapa jata hai | Kaise |
+|---|---|
+| **Rang badla hissa** | patti ka kitna % peela / bhoora / kaala ho chuka hai |
+| **Daagon ka jamaav** | 12x12 khaanon me kitne khaane "rogi" hain (bikhre daag vs ek-samaan peelapan) |
+
+`damage = 0.7 x rang-badla + 0.3 x daag-jamaav`
+
+Phir `applyHealthCheck()` do halat me model ka rog-faisla **nahi maanta**:
+
+1. `damage < 0.14` (patti lagbhag poori ek-samaan hari) **aur** model ka bharosa
+   92% se kam
+2. `healthy` class top se 0.22 ke andar hai **aur** nuksan saaf nahi dikh raha
+
+Aise me kisan ko **"आपकी फसल स्वस्थ लग रही है"** dikhta hai, saath me healthy
+class ki poori salah (kya karein, sinchai ka samay, kab dobara jaanchein) —
+yani **behtar rakhne** ki salah, dawa ki nahi.
+
+**Pardarshita:** Confidence Scores me model ka ASLI jawab waisa hi dikhta hai
+(jaise "पीला रतुआ 79.6%"), aur note me saaf likha hota hai ki model ne kya kaha
+tha aur kyun nahi maana gaya. Kuch chhupaya nahi jata.
+
+### Samasya 2 — "ganne me sirf ganna"
+
+`checkCropFamily()` patti ki **disha (coherence)** naapta hai (structure tensor):
+
+| Fasal-parivaar | Coherence | Fasal |
+|---|---|---|
+| Ghaas-kul — lambi patli patti | zyada (> 0.55) | dhaan, gehu, ganna, makka |
+| Chaudi patti | kam (< 0.08) | tamatar, aalu, sarson |
+
+Mismatch par halki chetavni: *"यह फोटो चौड़ी पत्ती की लग रही है, जबकि आपने गन्ना
+चुना है"* — jaanch rokti nahi, sirf poochti hai.
+
+> ⚠️ **Iski seema saaf samajh lein:** yeh sirf PARIVAAR alag karta hai.
+> **Gehu aur dhaan me farq karna is tarike se sambhav nahi** — dono lambi-patli
+> pattiyan hain. Uske liye online AI hai (neeche).
+>
+> Test me pata chala ki **rogi patti par daag uski disha mita dete hain**
+> (coherence 0.03), isliye `damage > 0.20` hone par yeh jaanch chalti hi nahi —
+> warna har rogi ghaas-patti par jhoothi chetavni aati.
+
+### Teesri parat — online AI
+
+`api/diagnose.js` ka prompt ab `wrong_crop` bhi laut sakta hai. Internet ho to
+vision model saaf pehchan leta hai ki photo dhaan ki hai ya gehu ki — offline
+jo sambhav nahi. Aisa hone par salah rok di jaati hai aur history se wo entry
+hata di jaati hai.
+
+### Tuning
+
+```js
+HEALTH: {
+  ENABLED: true,
+  HEALTHY_MAX_DAMAGE: 0.14,     // rogi patti ko swasth bata raha hai? -> ghatayein
+  DISEASE_OVERRIDE_CONF: 0.92,
+  HEALTHY_MARGIN: 0.22,
+  CLEAR_DAMAGE: 0.30,
+},
+CROP_MATCH: {
+  ENABLED: true,
+  GRASS_MIN: 0.55,
+  BROAD_MAX: 0.08,
+  SKIP_IF_DAMAGE: 0.20,
+},
+```
+
+Console me `[health]` aur `[leaf-gate]` lines har jaanch par saare number dikhati
+hain — tuning aasan hai.
 
 ---
 
@@ -477,6 +560,8 @@ Output softmax probabilities होती हैं। तीन case handle क
 | पुरानी file दिख रही है | `sw.js` में `CACHE_VERSION` बढ़ाएँ, या DevTools → Application → Unregister SW |
 | नया model डाला पर पुराना चल रहा है | Model files cache-first cached हैं — `CACHE_VERSION` बढ़ाएँ |
 | iPhone HEIC photo error | Camera settings → "Most Compatible" (JPEG) |
+| **स्वस्थ फसल को भी रोगी बताता है** | v23 से **health check** लगा है — फोटो में नुकसान न दिखे तो मॉडल का रोग-फ़ैसला नहीं माना जाता, "फसल स्वस्थ है" + बेहतरी की सलाह मिलती है। देखें section 3F |
+| **दूसरी फसल की फोटो पर भी रोग बताता है** | leaf-family चेतावनी (घास बनाम चौड़ी पत्ती) + online AI का `wrong_crop`। गेहूँ-धान का फ़र्क सिर्फ़ online AI कर सकता है — section 3F |
 | **किसी भी फोटो पर रोग बता देता है** | v18 से **leaf gate** लगा है — पौधा/पत्ती न दिखे तो मॉडल चलता ही नहीं। देखें section 3E |
 | असली पत्ती की फोटो भी reject हो रही है | `CONFIG.LEAF_GATE.MIN_SCORE` घटाएँ (0.16 → 0.10), या कार्ड पर **"फिर भी जाँचें"** दबाएँ। console की `[leaf-gate]` लाइन में सारे नंबर दिखते हैं |
 | **नया code deploy किया पर पुराना चल रहा है** | v18 से `script.js`/`style.css` अब cache-first नहीं हैं (सिर्फ़ `tf.min.js` है), इसलिए redeploy अपने आप पहुँचता है। फिर भी अटके तो `CACHE_VERSION` बढ़ाएँ |

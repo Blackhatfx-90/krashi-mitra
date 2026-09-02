@@ -10,7 +10,7 @@
 
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="css/style.css?v=18" />
+  <link rel="stylesheet" href="css/style.css?v=23" />
 </head>
 
 <body>
@@ -366,6 +366,9 @@
             </div>
           </article>
 
+          <!-- Chhoti soochnaayein: "fasal swasth hai" / "shayad galat fasal" -->
+          <div id="resultNotes" hidden></div>
+
           <!-- Online AI double-check ka nateeja (sirf online mode me dikhta hai) -->
           <article class="card ai-card" id="aiCard" hidden>
             <div id="aiHost"></div>
@@ -499,6 +502,7 @@
           <ul class="dl-list" id="downloadList"></ul>
           <p class="muted-sm" id="storageLine"></p>
           <p class="muted-sm" id="aiStatusLine"></p>
+          <p class="muted-sm" id="gateStatusLine"></p>
         </article>
 
         <!-- Bina internet awaaz chalegi ya nahi — khet jaane se pehle jaanch lein -->
@@ -548,6 +552,6 @@
 </div><!-- /layout -->
 
 <script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
-<script src="js/script.js?v=18"></script>
+<script src="js/script.js?v=23"></script>
 </body>
 </html>

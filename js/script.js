@@ -70,8 +70,57 @@ const CONFIG = {
     MAX_SKY: 0.45,       // itna aasman dikha to patti nahi hai
     MAX_DULL: 0.72,      // itna feeka rang = deewar / kaagaz / screenshot
     MAX_DARK: 0.55,      // itna andhera = kuch dikh hi nahi raha
-    MIN_EDGES: 0.045,    // isse kam bunawat = bilkul saadi satah (kapda/deewar)
+    /* Bilkul chapti satah (kapda/deewar/aasman) me edges 0.00 aate hain, jabki
+       ek-samaan hari SEHATMAND patti me bhi ~0.04 aa jate hain. Pehle yeh 0.045
+       tha aur sehatmand patti hi reject ho rahi thi — isliye ab 0.02, jisme
+       dono ke beech achha faasla hai. */
+    MIN_EDGES: 0.02,     // isse kam bunawat = bilkul saadi satah (kapda/deewar)
     LEAF_TEXTURE: 0.22,  // isse zyada bunawat ho to garm rang = patti, chamdi nahi
+  },
+
+  /**
+   * HEALTH CHECK — "sahi fasal ko sahi batao".
+   *
+   * SAMASYA: Teachable Machine ka model over-confident hota hai. Bilkul
+   * sehatmand patti par bhi wo 80% par koi rog bata deta hai, kyunki uske
+   * paas "kuch nahi mila" kehne ka koi rasta hi nahi hai.
+   *
+   * HAL: model ke jawab ko photo ke SUBOOT se milaate hain. Agar patti poori
+   * ek-samaan hari hai, uspar na daag hain na peelapan (damage bahut kam),
+   * to hum rog ka faisla nahi maante — fasal ko SWASTH batate hain aur usse
+   * behtar rakhne ki salah dete hain.
+   */
+  HEALTH: {
+    ENABLED: true,
+    /** Isse kam nuksan dikhe to patti sehatmand maani jayegi. */
+    HEALTHY_MAX_DAMAGE: 0.14,
+    /** Utna hi pakka rog tabhi maanenge jab model ka bharosa isse zyada ho. */
+    DISEASE_OVERRIDE_CONF: 0.92,
+    /** healthy class top se itne ke andar ho to healthy ko chunenge. */
+    HEALTHY_MARGIN: 0.22,
+    /** Nuksan itna zyada dikhe to "sehatmand" ka daawa nahi karenge. */
+    CLEAR_DAMAGE: 0.30,
+  },
+
+  /**
+   * CROP MATCH — "ganne me sirf ganna".
+   * Patti ki banawat se fasal-parivaar ka andaza: ghaas-kul (dhaan/gehu/ganna/
+   * makka) ki pattiyan lambi-patli aur ek disha me hoti hain; chaudi pattiyan
+   * (tamatar/aalu/sarson) har taraf faili hoti hain.
+   *
+   * NOTE: yeh sirf PARIVAAR alag karta hai. Gehu aur dhaan ki patti me farq
+   * karna is tarike se sambhav nahi — uske liye online AI (wrong_crop) hai.
+   */
+  CROP_MATCH: {
+    ENABLED: true,
+    /* Jaan-boojh kar BAHUT conservative — jhoothi chetavni dena galat salah
+       jitna hi bura hai. Test me pata chala ki rogi ghaas-patti (dhabbon wali)
+       ki disha khatm ho jaati hai (coherence 0.03), isliye:
+         - nuksan zyada ho to yeh jaanch chalti hi nahi
+         - dono taraf ke thresholds door-door rakhe gaye hain              */
+    GRASS_MIN: 0.55,       // isse zyada = pakka lambi-patli patti
+    BROAD_MAX: 0.08,       // isse kam  = pakka chaudi patti
+    SKIP_IF_DAMAGE: 0.20,  // rogi patti par shakal se pehchan bharosemand nahi
   },
 
   /** Upload ke liye max file size (10 MB). */
@@ -5109,6 +5158,7 @@ const el = {
 
   /* result */
   resultWrap:       $('#resultWrap'),
+  resultNotes:      $('#resultNotes'),
   notPlantBox:      $('#notPlantBox'),
   notPlantReason:   $('#notPlantReason'),
   notPlantTips:     $('#notPlantTips'),
@@ -5133,6 +5183,7 @@ const el = {
   downloadAllBtn:$('#downloadAllBtn'),
   storageLine:   $('#storageLine'),
   aiStatusLine:  $('#aiStatusLine'),
+  gateStatusLine:$('#gateStatusLine'),
   voiceStatusLine: $('#voiceStatusLine'),
   voiceTestBtn:    $('#voiceTestBtn'),
   voiceSteps:      $('#voiceSteps'),
@@ -5189,6 +5240,8 @@ const state = {
   isPredicting: false,
   lastResult: null,      // { label, prob, confident }
   forceScan: false,      // kisan ne "फिर भी जाँचें" dabaya — leaf-gate ek baar chhodo
+  imageFeatures: null,   // photo ka rang/banawat vishleshan (gate + health dono use karte hain)
+  healthNote: null,      // agar model ka rog-faisla badla gaya ho
 
   /* --- history --- */
   history: [],           // localStorage se aata hai
@@ -5707,17 +5760,27 @@ function analyzeImageContent(sourceCanvas) {
   let veg = 0, warmish = 0, skinLike = 0, sky = 0, dull = 0, dark = 0;
   const lum = new Float32Array(total);
 
+  /* Nuksan (lesion) ka naksha — patti ka kitna hissa rang badal chuka hai.
+     Har pixel: 1 = daag/peelapan/sadan, 0 = sehatmand hara.               */
+  const lesionMap = new Uint8Array(total);
+  let lesion = 0;
+
   for (let i = 0, p = 0; i < data.length; i += 4, p++) {
     const r = data[i], g = data[i + 1], b = data[i + 2];
     lum[p] = 0.299 * r + 0.587 * g + 0.114 * b;
 
     const sum = r + g + b;
-    if (sum < 60) { dark++; continue; }           // bahut andhera pixel
+    if (sum < 60) { dark++; lesionMap[p] = 1; lesion++; continue; }   // kaala daag / andhera
 
     /* --- 1. HARA PAUDHA: Excess Green index (kheti ka maana hua tarika) --- */
     const rn = r / sum, gn = g / sum, bn = b / sum;
     const exg = 2 * gn - rn - bn;
-    if (exg > 0.06) { veg++; continue; }
+    if (exg > 0.06) {
+      veg++;
+      // Halka-peela hara bhi shuruaati rog ka ishara hai
+      if (exg < 0.10 && r > g * 0.92) { lesionMap[p] = 1; lesion++; }
+      continue;
+    }
 
     const hsv = rgbToHsv(r, g, b);
 
@@ -5733,6 +5796,7 @@ function analyzeImageContent(sourceCanvas) {
      *  "selfie" maani jaati thi aur kisan ki sahi photo reject ho jaati thi.) */
     if (hsv.h >= 12 && hsv.h <= 78 && hsv.s > 0.18 && hsv.v > 0.16) {
       warmish++;
+      lesionMap[p] = 1; lesion++;              // peela/narangi/bhoora = nuksan
       const looksSkin = r > 95 && g > 40 && b > 20 &&
                         (Math.max(r, g, b) - Math.min(r, g, b)) > 15 &&
                         Math.abs(r - g) > 15 && r > g && r > b &&
@@ -5760,6 +5824,40 @@ function analyzeImageContent(sourceCanvas) {
     }
   }
 
+  /* --- Patti ki DISHA (anisotropy) -------------------------------------
+   * Ghaas-kul ki pattiyan (dhaan, gehu, ganna, makka) lambi aur patli hoti
+   * hain — unke kinare ek hi disha me chalte hain. Chaudi pattiyan (tamatar,
+   * aalu) har taraf faili hoti hain. Structure tensor se yeh naapte hain.
+   * 1 ke paas = ek hi disha (ghaas), 0 ke paas = har taraf (chaudi patti).  */
+  let Jxx = 0, Jyy = 0, Jxy = 0;
+  for (let y = 1; y < N - 1; y++) {
+    for (let x = 1; x < N - 1; x++) {
+      const q = y * N + x;
+      const gx = (lum[q + 1] - lum[q - 1]) * 0.5;
+      const gy = (lum[q + N] - lum[q - N]) * 0.5;
+      Jxx += gx * gx; Jyy += gy * gy; Jxy += gx * gy;
+    }
+  }
+  const trace = Jxx + Jyy;
+  const coherence = trace > 1
+    ? Math.sqrt((Jxx - Jyy) * (Jxx - Jyy) + 4 * Jxy * Jxy) / trace
+    : 0;
+
+  /* --- Daagon ka jamaav: 12x12 khaanon me kitne khaane "rogi" hain -------
+   * Bikhre hue daag (blight, spot) aur ek-samaan peelapan me farq karta hai. */
+  const CELL = 8, GRID = N / CELL;
+  let spotCells = 0;
+  for (let cy = 0; cy < GRID; cy++) {
+    for (let cx = 0; cx < GRID; cx++) {
+      let hit = 0;
+      for (let y = 0; y < CELL; y++) {
+        const row = (cy * CELL + y) * N + cx * CELL;
+        for (let x = 0; x < CELL; x++) if (lesionMap[row + x]) hit++;
+      }
+      if (hit / (CELL * CELL) > 0.35) spotCells++;
+    }
+  }
+
   const edges = edgeTotal ? edgeCount / edgeTotal : 0;
 
   /* --- 7. TEXTURE se faisla: garm rang wale pixel patti hain ya chamdi? ----
@@ -5781,6 +5879,16 @@ function analyzeImageContent(sourceCanvas) {
     textured:   textured,
   };
 
+  /* --- NUKSAN KA SCORE ---------------------------------------------------
+   * Patti ka kitna hissa rang badal chuka hai + daag kitne jamey hue hain.
+   * Sehatmand patti: lagbhag poori ek-samaan hari -> damage ~0
+   * Rogi patti: peele/bhoore hisse aur daag -> damage zyada                */
+  const leafPixels = veg + warmish;
+  f.discoloured = leafPixels > 0 ? lesion / Math.max(leafPixels, total * 0.15) : 0;
+  f.spotCells   = spotCells / (GRID * GRID);
+  f.coherence   = coherence;
+  f.damage      = Math.min(1, 0.7 * f.discoloured + 0.3 * f.spotCells);
+
   f.plantScore = (f.vegetation + 0.8 * f.warmVeg)
                - 1.5 * f.skin
                - 0.9 * f.sky
@@ -5799,10 +5907,10 @@ function analyzeImageContent(sourceCanvas) {
  * Faisla: photo aage bhejein ya kisan ko roken.
  * @returns {object} { ok, reasonHi, tipsHi, features }
  */
-function checkIsPlantPhoto(canvas) {
+function checkIsPlantPhoto(canvas, precomputed) {
   if (!CONFIG.LEAF_GATE.ENABLED) return { ok: true, skipped: true };
 
-  const f = analyzeImageContent(canvas);
+  const f = precomputed || analyzeImageContent(canvas);
   if (!f) return { ok: true, skipped: true };        // jaanch hi na ho paye to rokna nahi
 
   console.info('[leaf-gate]', {
@@ -5810,6 +5918,7 @@ function checkIsPlantPhoto(canvas) {
     warm: f.warmVeg.toFixed(2), skin: f.skin.toFixed(2), sky: f.sky.toFixed(2),
     dull: f.dull.toFixed(2), dark: f.dark.toFixed(2), edges: f.edges.toFixed(2),
     textured: f.textured, flat: f.flat,
+    damage: f.damage.toFixed(3), coherence: f.coherence.toFixed(2),
   });
 
   const G = CONFIG.LEAF_GATE;
@@ -5922,11 +6031,15 @@ async function runPrediction() {
   try {
     const canvas = cropToSquareCanvas(state.imageEl, state.inputSize);
 
+    /* Photo ka vishleshan EK HI BAAR — leaf-gate, health-check aur crop-match
+       teeno isi ka istemal karte hain. */
+    state.imageFeatures = analyzeImageContent(canvas);
+
     /* ---- PEHLE: kya yeh photo patti/paudhe ki hai? ----------------------
      * Model closed-set hai — bina is jaanch ke wo deewar par bhi "rog" bata
      * dega. Kisan ne "फिर भी जाँचें" dabaya ho to yeh jaanch chhod dete hain. */
     if (!state.forceScan) {
-      const gate = checkIsPlantPhoto(canvas);
+      const gate = checkIsPlantPhoto(canvas, state.imageFeatures);
       if (!gate.ok) {
         showNotPlant(gate);
         return;                                  // finally saaf-safai kar dega
@@ -5950,8 +6063,10 @@ async function runPrediction() {
 
     console.table(results.map((r) => ({ label: r.label, confidence: pct(r.prob, 2) })));
 
-    renderResults(results);
-    saveToHistory(results[0]);
+    // History me wahi jaye jo kisan ko dikhaya gaya (health-check ke baad wala),
+    // warna "swasth" dikhakar history me "रतुआ" likh dena galat hoga.
+    const finalTop = renderResults(results);
+    saveToHistory(finalTop || results[0]);
 
     // Offline jawab dikh chuka hai. Ab (agar internet hai) bade AI se dobara
     // jaanch karate hain — UI rukti nahi, jawab aate hi card update ho jata hai.
@@ -6198,6 +6313,25 @@ function renderAiCard(kind, data) {
       '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
     ].join('');
 
+  } else if (kind === 'wrongcrop') {
+    html = [
+      '<div class="ai-row">',
+        '<span class="ai-emoji" aria-hidden="true">🌱</span>',
+        '<div>',
+          '<p class="ai-title">यह ', escapeHtml(data.cropHi || 'चुनी हुई फसल'),
+            ' की फोटो नहीं है</p>',
+          '<p class="ai-sub">ऑनलाइन AI ने पहचाना कि फोटो में कोई दूसरी फसल है। ',
+            'इसलिए ', escapeHtml(data.cropHi || ''), ' का रोग बताना गलत होता — ',
+            'सलाह रोक दी गई है।</p>',
+          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>'
+            : (data.evidence ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidence) + '</p>' : ''),
+          '<p class="ai-alt">साइडबार में <strong>"फसल चुनें"</strong> से सही फसल चुनकर ',
+            'दोबारा जाँचें।</p>',
+        '</div>',
+      '</div>',
+      '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
+    ].join('');
+
   } else if (kind === 'unclear') {
     html = [
       '<div class="ai-row">',
@@ -6247,6 +6381,25 @@ function applyAiVerdict(ai, results) {
         'छाँव की साफ़ रोशनी में फोटो लें',
       ],
     });
+    return;
+  }
+
+  /* Online AI ne kaha yeh dusri fasal hai — ganne ki jagah dhaan wagairah.
+     Yeh "ganne me sirf ganna" wali maang ka sabse pakka jawab hai, kyunki
+     shakal-rang se dhaan aur gehu me farq karna offline sambhav nahi. */
+  if (ai.label === 'wrong_crop') {
+    const crop = activeCrop();
+    renderAiCard('wrongcrop', Object.assign({}, ai, { cropHi: crop ? crop.nameHi : '' }));
+    hide(el.advisoryCard);
+    hide(el.lowConfidenceBox);
+    el.advisoryHost.innerHTML = '';
+    const sc = el.scoresList && el.scoresList.closest('.card');
+    if (sc) sc.hidden = true;
+    state.lastResult = null;
+    if (state.history.length) {          // galat fasal ki entry history me na rahe
+      state.history.shift();
+      persistHistory(); renderRecent(); renderHistory(); updateHistoryBadge();
+    }
     return;
   }
 
@@ -6445,16 +6598,135 @@ function showNotPlant(gate) {
   el.resultWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+/* ---------------------------------------------------------------------------
+ * Har fasal ka "healthy" label khud dhoond lo (labels model se aate hain,
+ * isliye hardcode karna theek nahi — rice me 'rice_healthy_leafs' hai,
+ * wheat me 'wheat_healthy', maize me 'Maize_Healthy'...).
+ * ------------------------------------------------------------------------- */
+function healthyLabelOf(labels) {
+  return (labels || []).find((l) => /healthy/i.test(l)) || null;
+}
+
+/** Ghaas-kul (lambi patli patti) ya chaudi patti — fasal ke hisaab se. */
+const CROP_LEAF_FAMILY = {
+  rice: 'grass', wheat: 'grass', sugarcane: 'grass', maize: 'grass',
+  tomato: 'broad', potato: 'broad', mustard: 'broad',
+  onion: 'tubular',
+};
+
+/**
+ * "Ganne me sirf ganna" — photo ki patti chuni hui fasal se milti hai ya nahi.
+ * Sirf PARIVAAR ka farq pakadta hai (ghaas bनाम chaudi patti), isliye halki
+ * chetavni deta hai, jaanch rokta nahi.
+ */
+function checkCropFamily(features) {
+  if (!CONFIG.CROP_MATCH.ENABLED || !features || !state.cropId) return null;
+  const want = CROP_LEAF_FAMILY[state.cropId];
+  if (!want) return null;
+
+  const M = CONFIG.CROP_MATCH;
+
+  /* Rogi patti par daag aur dhabbe patti ki shakal bigaad dete hain —
+     tab shakal se fasal pehchanna bharosemand nahi rehta, isliye chup rahenge. */
+  if (features.damage > M.SKIP_IF_DAMAGE) return null;
+
+  const co = features.coherence;
+  const crop = CROPS[state.cropId];
+
+  if ((want === 'grass' || want === 'tubular') && co < M.BROAD_MAX) {
+    return 'यह फोटो चौड़ी पत्ती की लग रही है, जबकि आपने ' + crop.nameHi +
+           ' चुना है (' + crop.nameHi + ' की पत्ती लंबी-पतली होती है)। ' +
+           'फसल सही चुनी है? — साइडबार में "फसल चुनें" से बदल सकते हैं।';
+  }
+  if (want === 'broad' && co > M.GRASS_MIN) {
+    return 'यह फोटो लंबी-पतली (घास जैसी) पत्ती की लग रही है, जबकि आपने ' +
+           crop.nameHi + ' चुना है (' + crop.nameHi + ' की पत्ती चौड़ी होती है)। ' +
+           'फसल सही चुनी है? — साइडबार में "फसल चुनें" से बदल सकते हैं।';
+  }
+  return null;
+}
+
+/**
+ * Model ke jawab ko photo ke suboot se milao.
+ * @returns {object} { results, switchedToHealthy, reason }
+ */
+function applyHealthCheck(results, features) {
+  if (!CONFIG.HEALTH.ENABLED || !features) return { results: results };
+
+  const H = CONFIG.HEALTH;
+  const healthy = healthyLabelOf(state.labels);
+  if (!healthy) return { results: results };
+
+  const top = results[0];
+  if (top.label === healthy) return { results: results };   // model khud healthy keh raha hai
+
+  const healthyRow = results.find((r) => r.label === healthy);
+  const pHealthy = healthyRow ? healthyRow.prob : 0;
+  const damage = features.damage;
+
+  let reason = null;
+
+  /* 1. Photo me nuksan dikh hi nahi raha, aur model bhi poori tarah pakka nahi */
+  if (damage < H.HEALTHY_MAX_DAMAGE && top.prob < H.DISEASE_OVERRIDE_CONF) {
+    reason = 'पत्ती लगभग पूरी एक-सा हरी है — न धब्बे, न पीलापन, न सूखे किनारे।';
+  }
+  /* 2. healthy bhi lagbhag utna hi paas hai, aur nuksan साफ़ nahi dikh raha */
+  else if (pHealthy > 0 && (top.prob - pHealthy) < H.HEALTHY_MARGIN &&
+           damage < H.CLEAR_DAMAGE) {
+    reason = 'मॉडल खुद दुविधा में है और पत्ती पर नुकसान साफ़ नहीं दिख रहा।';
+  }
+
+  if (!reason) return { results: results };
+
+  console.info('[health] rog ka faisla badla ->', healthy,
+               '| damage', damage.toFixed(3), '| top', top.label, top.prob.toFixed(2),
+               '| pHealthy', pHealthy.toFixed(2));
+
+  /* Score bars ka kram NAHI badalte — wahan model ka asli jawab dikhna chahiye
+     (pardarshita). Sirf FAISLA badalte hain, aur note me saaf likh dete hain. */
+  return {
+    results: results,
+    switchedToHealthy: true,
+    healthyLabel: healthy,
+    modelSaid: top.label,
+    modelProb: top.prob,
+    reason: reason,
+  };
+}
+
 /** Threshold logic yahin lagta hai. */
-function renderResults(results) {
+function renderResults(rawResults) {
   hide(el.notPlantBox);
   const scoresCard0 = el.scoresList && el.scoresList.closest('.card');
   if (scoresCard0) scoresCard0.hidden = false;
-  const top = results[0];
-  const a = getAdvisory(top.label);
-  const confident = top.prob >= CONFIG.CONFIDENCE_THRESHOLD;
 
-  state.lastResult = { label: top.label, prob: top.prob, confident: confident, source: 'local' };
+  /* --- Model ka jawab photo ke suboot se milao ---------------------------
+   * Sehatmand patti par bhi model rog bata deta hai — yahan wo theek hota hai. */
+  const checked = applyHealthCheck(rawResults, state.imageFeatures);
+  const results = checked.results;
+  state.healthNote = checked.switchedToHealthy ? checked : null;
+
+  renderResultNotes(checked);
+
+  const modelTop = results[0];
+
+  /* Health-check ne faisla badla ho to WAHI aage chalega. Uska bharosa model ki
+     probability se nahi, photo ke suboot se aata hai (patti par nuksan hai hi
+     nahi) — isliye use confident maanते hain, warna neeche wala threshold use
+     "pehchan nahi hui" bana deta aur kisan ko kuch salah hi na milti. */
+  const top = checked.switchedToHealthy
+    /* 0.92 par cap — yeh faisla photo ke suboot se aaya hai, model ki
+       probability se nahi. "100% CONFIDENCE" dikhana jhootha bharosa dega,
+       jabki yeh ek anuman hai. */
+    ? { label: checked.healthyLabel,
+        prob: Math.min(0.92, Math.max(1 - state.imageFeatures.damage, 0.80)),
+        index: -1 }
+    : modelTop;
+  const a = getAdvisory(top.label);
+  const confident = checked.switchedToHealthy || top.prob >= CONFIG.CONFIDENCE_THRESHOLD;
+
+  state.lastResult = { label: top.label, prob: top.prob, confident: confident,
+                       source: checked.switchedToHealthy ? 'health' : 'local' };
 
   // Nayi jaanch shuru — purana online-AI verdict hata do
   state.aiResult = null;
@@ -6481,6 +6753,52 @@ function renderResults(results) {
 
   show(el.resultWrap);
   el.resultWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  return { label: top.label, prob: top.prob, confident: confident };
+}
+
+/**
+ * Result ke upar ki chhoti soochnaayein:
+ *   - "fasal swasth hai" (jab model ka rog-faisla badla gaya)
+ *   - "shayad galat fasal chuni hai" (patti ka parivaar match nahi kar raha)
+ */
+function renderResultNotes(checked) {
+  if (!el.resultNotes) return;
+  const parts = [];
+
+  if (checked && checked.switchedToHealthy) {
+    const said = getAdvisory(checked.modelSaid);
+    parts.push([
+      '<div class="rnote rnote--ok">',
+        '<span class="rnote__icon" aria-hidden="true">✅</span>',
+        '<div>',
+          '<p class="rnote__title">आपकी फसल स्वस्थ लग रही है</p>',
+          '<p class="rnote__sub">', escapeHtml(checked.reason),
+            ' नीचे दी गई सलाह इसे और बेहतर रखने के लिए है।</p>',
+          '<p class="rnote__small">मॉडल का पहला अनुमान <strong>',
+            escapeHtml(said.nameHi), '</strong> (', pct(checked.modelProb, 0),
+            ') था, पर फोटो में उसका कोई निशान नहीं मिला — इसलिए वह नहीं माना गया। ',
+            'अगर आपको पत्ती पर सच में धब्बे दिख रहे हों तो उस हिस्से की नज़दीक से फोटो लें।</p>',
+        '</div>',
+      '</div>',
+    ].join(''));
+  }
+
+  const cropWarn = checkCropFamily(state.imageFeatures);
+  if (cropWarn) {
+    parts.push([
+      '<div class="rnote rnote--warn">',
+        '<span class="rnote__icon" aria-hidden="true">🌱</span>',
+        '<div>',
+          '<p class="rnote__title">फसल शायद अलग है</p>',
+          '<p class="rnote__sub">', escapeHtml(cropWarn), '</p>',
+        '</div>',
+      '</div>',
+    ].join(''));
+  }
+
+  el.resultNotes.innerHTML = parts.join('');
+  el.resultNotes.hidden = parts.length === 0;
 }
 
 /** "Smart Advisory" view — aakhri result ka mirror. */
@@ -6581,7 +6899,9 @@ function makeThumbnail(img, size) {
 }
 
 function saveToHistory(top) {
-  const confident = top.prob >= CONFIG.CONFIDENCE_THRESHOLD;
+  const confident = (typeof top.confident === 'boolean')
+    ? top.confident
+    : top.prob >= CONFIG.CONFIDENCE_THRESHOLD;
   state.history.unshift({
     ts: Date.now(),
     cropId: state.cropId,          // kaunsi fasal thi — history me dikhane ke liye
@@ -6960,6 +7280,14 @@ async function renderOfflineManager() {
     } else {
       el.aiStatusLine.textContent = '🌐 ऑनलाइन AI: इंटरनेट आने पर जाँचा जाएगा।';
     }
+  }
+
+  /* Leaf gate poori tarah offline chalta hai — kisan ko bata dena chahiye ki
+     yeh suraksha bina internet bhi lagi hui hai. */
+  if (el.gateStatusLine) {
+    el.gateStatusLine.textContent = CONFIG.LEAF_GATE.ENABLED
+      ? '🌿 पत्ती-जाँच चालू है — बिना इंटरनेट भी काम करती है। पौधे/पत्ती के अलावा किसी फोटो पर रोग नहीं बताया जाएगा।'
+      : '⚠️ पत्ती-जाँच बंद है — किसी भी फोटो पर रोग बताया जा सकता है (script.js में LEAF_GATE.ENABLED देखें)।';
   }
 
   renderStorageLine();

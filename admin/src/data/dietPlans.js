@@ -1,0 +1,168 @@
+export const dietPlans = {
+  diabetes: {
+    condition: 'Diabetes Type 2',
+    calories: 1800,
+    protein: '75g',
+    carbs: '200g',
+    fat: '60g',
+    fiber: '30g',
+    weekly: {
+      Monday: {
+        breakfast: ['Oatmeal with nuts & seeds', 'Green tea', 'Boiled egg whites (2)'],
+        lunch: ['Brown rice (1 cup)', 'Dal tadka', 'Mixed vegetable sabzi', 'Cucumber raita'],
+        dinner: ['Multigrain roti (2)', 'Palak paneer', 'Salad with olive oil dressing'],
+        snacks: ['Handful of almonds', 'Apple slices with peanut butter'],
+      },
+      Tuesday: {
+        breakfast: ['Moong dal chilla', 'Mint chutney', 'Buttermilk'],
+        lunch: ['Quinoa pulao', 'Rajma curry', 'Mixed salad'],
+        dinner: ['Grilled chicken/tofu', 'Sautéed vegetables', 'Soup'],
+        snacks: ['Roasted chana', 'Orange'],
+      },
+      Wednesday: {
+        breakfast: ['Vegetable upma', 'Coconut chutney', 'Green tea'],
+        lunch: ['Whole wheat pasta', 'Grilled vegetables', 'Clear soup'],
+        dinner: ['Bajra roti (2)', 'Methi dal', 'Bottle gourd sabzi'],
+        snacks: ['Walnuts', 'Guava'],
+      },
+      Thursday: {
+        breakfast: ['Idli (3) with sambar', 'Coconut chutney'],
+        lunch: ['Brown rice', 'Fish curry/Soy chunks', 'Beans poriyal'],
+        dinner: ['Jowar roti (2)', 'Chicken/Paneer tikka', 'Salad'],
+        snacks: ['Sprouts chaat', 'Pear'],
+      },
+      Friday: {
+        breakfast: ['Besan chilla', 'Tomato chutney', 'Green tea'],
+        lunch: ['Millet khichdi', 'Curd', 'Spinach salad'],
+        dinner: ['Roti (2)', 'Egg curry/Mushroom curry', 'Cucumber salad'],
+        snacks: ['Mixed seeds', 'Papaya slices'],
+      },
+      Saturday: {
+        breakfast: ['Poha with peanuts & veggies', 'Lemon water'],
+        lunch: ['Whole wheat roti (2)', 'Chole (chickpea curry)', 'Onion salad'],
+        dinner: ['Grilled fish/paneer', 'Stir-fried broccoli', 'Multigrain bread'],
+        snacks: ['Yogurt with chia seeds', 'Berries'],
+      },
+      Sunday: {
+        breakfast: ['Rava dosa', 'Coconut chutney', 'Filter coffee (no sugar)'],
+        lunch: ['Brown rice biryani', 'Raita', 'Mixed salad'],
+        dinner: ['Soup', 'Grilled veggies', 'Multigrain bread slice'],
+        snacks: ['Trail mix', 'Pomegranate'],
+      },
+    },
+    avoid: ['White sugar', 'White rice', 'Maida products', 'Fried foods', 'Sugary drinks', 'Packaged juices', 'White bread', 'Potatoes (excess)'],
+  },
+  hypertension: {
+    condition: 'Hypertension',
+    calories: 2000,
+    protein: '70g',
+    carbs: '250g',
+    fat: '55g',
+    fiber: '35g',
+    weekly: {
+      Monday: {
+        breakfast: ['Oats porridge with banana', 'Low-fat milk', 'Flax seeds'],
+        lunch: ['Brown rice', 'Lauki dal', 'Steamed broccoli', 'Buttermilk'],
+        dinner: ['Roti (2)', 'Grilled chicken/tofu', 'Mixed salad'],
+        snacks: ['Unsalted nuts', 'Coconut water'],
+      },
+      Tuesday: {
+        breakfast: ['Whole wheat toast', 'Avocado spread', 'Herbal tea'],
+        lunch: ['Quinoa bowl', 'Kidney beans', 'Leafy greens'],
+        dinner: ['Multigrain roti', 'Fish curry', 'Cucumber raita'],
+        snacks: ['Banana', 'Dark chocolate (1 square)'],
+      },
+      Wednesday: {
+        breakfast: ['Smoothie (spinach, banana, yogurt)', 'Almonds'],
+        lunch: ['Millet rice', 'Sambar', 'Beans poriyal'],
+        dinner: ['Khichdi', 'Papad (baked)', 'Salad'],
+        snacks: ['Carrot sticks', 'Hummus'],
+      },
+      Thursday: {
+        breakfast: ['Idli (3)', 'Sambar', 'Coconut chutney'],
+        lunch: ['Roti (2)', 'Palak paneer', 'Tomato soup'],
+        dinner: ['Grilled vegetables', 'Brown rice (half cup)', 'Dal'],
+        snacks: ['Watermelon', 'Pumpkin seeds'],
+      },
+      Friday: {
+        breakfast: ['Poha', 'Green tea', 'Boiled egg'],
+        lunch: ['Whole wheat pasta', 'Olive oil sauce', 'Steamed veggies'],
+        dinner: ['Bajra roti', 'Methi chicken/paneer', 'Salad'],
+        snacks: ['Apple', 'Walnuts'],
+      },
+      Saturday: {
+        breakfast: ['Dalia porridge', 'Nuts', 'Honey (1 tsp)'],
+        lunch: ['Brown rice', 'Rajma', 'Beet salad'],
+        dinner: ['Soup', 'Grilled fish/cottage cheese', 'Roti (1)'],
+        snacks: ['Yogurt', 'Berries'],
+      },
+      Sunday: {
+        breakfast: ['Vegetable paratha (whole wheat)', 'Curd'],
+        lunch: ['Pulao (brown rice)', 'Raita', 'Salad'],
+        dinner: ['Light khichdi', 'Pickle (low salt)', 'Papad'],
+        snacks: ['Muskmelon', 'Sunflower seeds'],
+      },
+    },
+    avoid: ['Excess salt', 'Pickles', 'Papad (fried)', 'Processed meats', 'Canned foods', 'Fast food', 'Alcohol', 'Caffeinated drinks (excess)'],
+  },
+  general: {
+    condition: 'General Wellness',
+    calories: 2200,
+    protein: '80g',
+    carbs: '280g',
+    fat: '65g',
+    fiber: '30g',
+    weekly: {
+      Monday: {
+        breakfast: ['Whole wheat paratha', 'Curd', 'Fruit'],
+        lunch: ['Rice', 'Dal', 'Sabzi', 'Salad', 'Buttermilk'],
+        dinner: ['Roti (2)', 'Paneer/Chicken curry', 'Soup'],
+        snacks: ['Mixed nuts', 'Green tea', 'Fruit'],
+      },
+      Tuesday: {
+        breakfast: ['Poha with peanuts', 'Juice', 'Boiled egg'],
+        lunch: ['Jeera rice', 'Rajma', 'Raita', 'Salad'],
+        dinner: ['Roti (2)', 'Mixed veg', 'Dal shorba'],
+        snacks: ['Sprouts', 'Coconut water'],
+      },
+      Wednesday: {
+        breakfast: ['Idli sambar', 'Coconut chutney', 'Coffee'],
+        lunch: ['Brown rice', 'Fish/Soy curry', 'Beans', 'Curd'],
+        dinner: ['Roti', 'Egg bhurji/Paneer bhurji', 'Salad'],
+        snacks: ['Banana', 'Almonds'],
+      },
+      Thursday: {
+        breakfast: ['Upma', 'Chutney', 'Tea'],
+        lunch: ['Roti (2)', 'Chole', 'Rice', 'Salad'],
+        dinner: ['Dosa', 'Sambar', 'Chutney'],
+        snacks: ['Apple', 'Peanuts'],
+      },
+      Friday: {
+        breakfast: ['Oats smoothie', 'Toast', 'Egg'],
+        lunch: ['Pulao', 'Raita', 'Dal', 'Papad'],
+        dinner: ['Roti', 'Keema/Mushroom curry', 'Salad'],
+        snacks: ['Yogurt', 'Mango'],
+      },
+      Saturday: {
+        breakfast: ['Aloo paratha', 'Curd', 'Pickle'],
+        lunch: ['Biryani', 'Raita', 'Salad'],
+        dinner: ['Soup', 'Grilled sandwich (whole wheat)'],
+        snacks: ['Chaat', 'Lemonade'],
+      },
+      Sunday: {
+        breakfast: ['Pancakes/Cheela', 'Honey', 'Fruit bowl'],
+        lunch: ['Special meal - your choice!', 'Light buttermilk'],
+        dinner: ['Khichdi', 'Papad', 'Pickle'],
+        snacks: ['Ice cream (small)', 'Nuts'],
+      },
+    },
+    avoid: ['Excessive junk food', 'Sugary sodas', 'Deep fried snacks', 'Excess processed foods'],
+  },
+};
+
+export const conditions = [
+  'Diabetes Type 2', 'Hypertension', 'Heart Disease', 'Obesity',
+  'PCOS', 'Thyroid', 'Kidney Disease', 'Liver Disease',
+  'Asthma', 'Arthritis', 'General Wellness', 'Weight Loss',
+  'Muscle Building', 'Pregnancy', 'Post Surgery Recovery',
+];

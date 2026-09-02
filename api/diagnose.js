@@ -83,11 +83,14 @@ function buildPrompt(crop, labels, localTop) {
     `- IMPORTANT: if the photo does not show a plant at all (a person, an animal, a room,`,
     `  the sky, a wall, food, a screenshot, text, an object), set "label" to "not_plant".`,
     `  Never guess a disease for such a photo - a wrong answer can cost the farmer a crop.`,
-    `- If it IS a plant but blurry, too dark, or not a ${crop} plant, set "label" to "unclear".`,
+    `- If it IS clearly a plant but a DIFFERENT crop than ${crop}, set "label" to "wrong_crop"`,
+    `  and name the crop you actually see in "evidence". The farmer picked ${crop}, so a`,
+    `  ${crop} disease name would be wrong advice.`,
+    `- If it IS a ${crop} plant but blurry or too dark to judge, set "label" to "unclear".`,
     `- Never invent a label that is not in the list above.`,
     ``,
     `Reply with ONLY this JSON object, no markdown, no extra text:`,
-    `{"label":"<exact label from list, or unclear, or not_plant>",`,
+    `{"label":"<exact label from list, or unclear, or not_plant, or wrong_crop>",`,
     ` "confidence":<0.0-1.0>,`,
     ` "second":"<second most likely label from list, or empty>",`,
     ` "evidence":"<one short English sentence naming what you actually see>",`,
@@ -124,6 +127,7 @@ function matchLabel(guess, labels) {
   if (!g) return null;
   if (/^unclear$/i.test(g)) return 'unclear';
   if (/^not[_\s-]?plant$/i.test(g)) return 'not_plant';
+  if (/^wrong[_\s-]?crop$/i.test(g)) return 'wrong_crop';
 
   const exact = labels.find((l) => l === g);
   if (exact) return exact;

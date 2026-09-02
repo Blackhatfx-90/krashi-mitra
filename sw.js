@@ -24,8 +24,13 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v18';
+const CACHE_VERSION = 'krashi-mitra-v24';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
+
+/* Sarkari officer ka Regional Admin dashboard (alag React app) yahan rehta hai.
+   Yeh KISAN wali app se poori tarah alag hai — na iske page kisan ke shell me
+   jaate hain, na yeh pre-cache hota hai (usme internet hamesha rehta hai). */
+const ADMIN_PATH = 'regional-admin';
 
 /* App shell — install ke waqt yahi cache hota hai (models NAHI). */
 const APP_SHELL = [
@@ -124,6 +129,13 @@ self.addEventListener('fetch', (event) => {
    * redirect wale jawab ki ek SAAF copy bana kar dete hain.
    * ---------------------------------------------------------------------- */
   if (req.mode === 'navigate') {
+    /* ⚠️ /regional-admin ek ALAG app hai (sarkari officer ka dashboard).
+     * Uske page ko kisan wali app ke shell ('./') me likh dena bahut bada
+     * bug hota: offline kholne par kisan ko apni app ki jagah admin dashboard
+     * dikhne lagta. Isliye admin ke page apne hi URL par cache hote hain.  */
+    const isAdmin = url.pathname.indexOf('/' + ADMIN_PATH) === 0;
+    const shellKey = isAdmin ? req : './';
+
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_VERSION);
       try {
@@ -137,16 +149,24 @@ self.addEventListener('fetch', (event) => {
             statusText: 'OK',
             headers: fresh.headers,
           });
-          cache.put('./', copy.clone());
+          cache.put(shellKey, copy.clone());
           return copy;
         }
 
-        if (fresh && fresh.ok) cache.put('./', fresh.clone());
+        if (fresh && fresh.ok) cache.put(shellKey, fresh.clone());
         return fresh;
       } catch (_) {
-        // Offline — cache se app shell do
-        const shell = (await cache.match('./')) || (await cache.match('./index.html'));
+        // Offline — cache se wahi shell do jo is app ka hai
+        const shell = isAdmin
+          ? await cache.match(req, { ignoreSearch: true })
+          : ((await cache.match('./')) || (await cache.match('./index.html')));
         if (shell) return shell;
+        if (isAdmin) {
+          return new Response(
+            'Offline: Regional Admin dashboard ke liye internet chahiye.',
+            { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
+          );
+        }
         return new Response('Offline: ऐप अभी कैश में नहीं है। एक बार इंटरनेट के साथ खोलें।', {
           status: 503,
           headers: { 'Content-Type': 'text/plain; charset=utf-8' },
