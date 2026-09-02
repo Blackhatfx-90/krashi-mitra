@@ -5106,6 +5106,9 @@ const el = {
   downloadAllBtn:$('#downloadAllBtn'),
   storageLine:   $('#storageLine'),
   aiStatusLine:  $('#aiStatusLine'),
+  voiceStatusLine: $('#voiceStatusLine'),
+  voiceTestBtn:    $('#voiceTestBtn'),
+  voiceSteps:      $('#voiceSteps'),
   installCard:   $('#installCard'),
   installBtn:    $('#installBtn'),
   apkBtn:        $('#apkBtn'),
@@ -6678,6 +6681,7 @@ async function renderOfflineManager() {
   }
 
   renderStorageLine();
+  renderVoiceStatus();
 }
 
 /** Ek row ka download chalao (progress bar ke saath). */
@@ -7438,14 +7442,63 @@ function refreshVoices() {
   catch (_) { speech.voices = []; }
 }
 
-/** Best voice: pehle hi-IN, phir koi bhi Hindi, phir Indian English. */
-function pickVoice() {
+/**
+ * Voice DO tarah ki hoti hai — aur yahi offline ka poora khel hai:
+ *
+ *   localService === true   -> phone ke andar wali awaaz (Google TTS engine).
+ *                              BINA INTERNET chalti hai.
+ *   localService === false  -> Google ke server se aane wali awaaz
+ *                              (jaise "Google हिन्दी"). Internet ke bina CHUP.
+ *
+ * Chrome aksar network wali awaaz ko list me PEHLE rakhta hai. Pehle wala code
+ * seedha pehli hi-IN awaaz utha leta tha — isliye offline me Speak dabane par
+ * kuch sunai hi nahi deta tha. Ab hum offline hone par sirf phone wali awaazein
+ * dekhte hain.
+ */
+function isLocalVoice(v) {
+  return !!v && v.localService !== false;      // undefined ho to local maan lo
+}
+
+/**
+ * @param {object} [opts] { localOnly: true } -> sirf phone ke andar wali awaaz
+ * Bhasha ka kram: hi-IN -> koi bhi Hindi -> en-IN -> koi bhi English.
+ * Har bhasha ke andar phone wali awaaz ko preference milti hai.
+ */
+function pickVoice(opts) {
   if (!speech.voices.length) refreshVoices();
-  const v = speech.voices;
-  return v.find((x) => x.lang && x.lang.toLowerCase() === 'hi-in')
-      || v.find((x) => x.lang && x.lang.toLowerCase().startsWith('hi'))
-      || v.find((x) => x.lang && x.lang.toLowerCase() === 'en-in')
-      || null;
+  const localOnly = !!(opts && opts.localOnly);
+  const pool = localOnly ? speech.voices.filter(isLocalVoice) : speech.voices;
+
+  const tiers = [
+    (l) => l === 'hi-in',
+    (l) => l.indexOf('hi') === 0,
+    (l) => l === 'en-in',
+    (l) => l.indexOf('en') === 0,
+  ];
+
+  for (let i = 0; i < tiers.length; i++) {
+    const match = pool.filter((v) => v.lang && tiers[i]((v.lang || '').toLowerCase()));
+    if (!match.length) continue;
+    return match.find(isLocalVoice) || match[0];   // tier ke andar local pehle
+  }
+  return null;
+}
+
+/** Bina internet ke bhi bol payegi? (Offline & Help screen ispar status dikhati hai) */
+function offlineVoiceInfo() {
+  if (!speech.supported) return { ok: false, reason: 'unsupported' };
+  if (!speech.voices.length) refreshVoices();
+
+  const localHindi = speech.voices.filter(
+    (v) => isLocalVoice(v) && (v.lang || '').toLowerCase().indexOf('hi') === 0
+  );
+  if (localHindi.length) return { ok: true, reason: 'hindi', voice: localHindi[0] };
+
+  const anyLocal = speech.voices.filter(isLocalVoice);
+  if (anyLocal.length) return { ok: true, reason: 'other-lang', voice: anyLocal[0] };
+
+  if (speech.voices.length) return { ok: false, reason: 'network-only' };
+  return { ok: false, reason: 'none' };
 }
 
 /** Lambe text ko chhote tukdon me todo (Chrome ki 15-second bug ka ilaj). */
@@ -7473,9 +7526,11 @@ function chunkText(text, maxLen) {
 function setSpeakBtnState(btn, speaking) {
   if (!btn) return;
   btn.dataset.speaking = speaking ? 'true' : 'false';
+  // Kuch button ka apna naam hota hai (jaise "आवाज़ जाँचें") — wo wapas aana chahiye
+  const idle = btn.dataset.idleLabel || 'सुनें / Speak';
   btn.innerHTML = speaking
     ? icon('stop') + '<span>रोकें / Stop</span>'
-    : icon('speaker') + '<span>सुनें / Speak</span>';
+    : icon('speaker') + '<span>' + escapeHtml(idle) + '</span>';
 }
 
 function stopSpeaking() {
@@ -7497,8 +7552,24 @@ function speakText(text, btn, hostForNote) {
   stopSpeaking();
   refreshVoices();
 
-  const voice = pickVoice();
+  // Internet nahi hai -> sirf phone ke andar wali awaaz kaam karegi.
+  // (Online bhi local awaaz behtar hai — turant shuru hoti hai aur data nahi lagta.)
+  const offline = !navigator.onLine;
+  let voice = pickVoice({ localOnly: offline });
+  if (!voice) voice = pickVoice({});             // kuch bhi na mile to jo mile wahi
+
   const hindiAvailable = !!(voice && voice.lang && voice.lang.toLowerCase().startsWith('hi'));
+
+  // Offline hain aur phone me koi awaaz hai hi nahi -> saaf-saaf bata do
+  if (offline && !isLocalVoice(voice)) {
+    showInfo(
+      'बिना इंटरनेट आवाज़ के लिए फ़ोन में हिंदी वॉइस डाउनलोड होनी चाहिए। ' +
+      'Settings → Language & input → Text-to-speech → हिंदी चुनकर डाउनलोड करें। ' +
+      'तब यह सलाह बिना नेटवर्क भी सुनाई देगी।',
+      'Offline speech needs an on-device Hindi voice. Go to Settings → Language & input → ' +
+      'Text-to-speech and download the Hindi voice.'
+    );
+  }
 
   // Hindi voice na ho to ek chhota note (per card sirf ek baar)
   if (!hindiAvailable && hostForNote && !hostForNote.querySelector('.voice-note')) {
@@ -7518,6 +7589,7 @@ function speakText(text, btn, hostForNote) {
   const mySession = ++speech.session;     // is baar ka apna number
   const chunks = chunkText(text);
   let index = 0;
+  let triedLocalFallback = false;         // network voice fail hone par ek retry
 
   const speakNext = () => {
     if (mySession !== speech.session) return;      // beech me kuch aur shuru ho gaya
@@ -7531,6 +7603,21 @@ function speakText(text, btn, hostForNote) {
     u.onerror = (e) => {
       if (mySession !== speech.session) return;    // purana utterance — ignore
       console.warn('[speech] error:', e.error);
+
+      // Network wali awaaz thi aur internet nahi mila -> phone wali awaaz se
+      // ek baar dobara koshish karo (yeh offline ka sabse aam case hai).
+      if ((e.error === 'network' || e.error === 'synthesis-failed') && !triedLocalFallback) {
+        const localVoice = pickVoice({ localOnly: true });
+        if (localVoice && localVoice !== voice) {
+          triedLocalFallback = true;
+          voice = localVoice;
+          index = Math.max(0, index - 1);          // wahi tukda dobara bolo
+          console.info('[speech] network voice fail — phone wali awaaz se retry:', localVoice.name);
+          setTimeout(speakNext, 60);
+          return;
+        }
+      }
+
       if (e.error !== 'interrupted' && e.error !== 'canceled') {
         showInfo('आवाज़ चलाने में समस्या आई। कृपया फ़ोन का वॉल्यूम और silent mode जाँचें।',
                  'Something went wrong while playing the audio. Please check your phone\'s ' +
@@ -7552,6 +7639,56 @@ function speakText(text, btn, hostForNote) {
   // Chrome me cancel() ko settle hone me ek tick lagta hai — turant speak()
   // karne par naya utterance "interrupted" hokar mar jaata hai.
   setTimeout(speakNext, 80);
+}
+
+/* ---------------------------------------------------------------------------
+ * "Offline & Help" par awaaz ki halat — kisan khet jaane se pehle jaanch le.
+ * ------------------------------------------------------------------------- */
+function renderVoiceStatus() {
+  if (!el.voiceStatusLine) return;
+  refreshVoices();
+  const info = offlineVoiceInfo();
+
+  const steps = [
+    'फ़ोन की Settings खोलें',
+    'Language & input → Text-to-speech output में जाएँ',
+    'Google Text-to-Speech चुनें → Install voice data → हिंदी डाउनलोड करें',
+  ];
+  const showSteps = (on) => {
+    if (!el.voiceSteps) return;
+    if (on) {
+      el.voiceSteps.innerHTML = steps.map((t) => '<li>' + escapeHtml(t) + '</li>').join('');
+      show(el.voiceSteps);
+    } else { hide(el.voiceSteps); }
+  };
+
+  if (info.reason === 'unsupported') {
+    el.voiceStatusLine.textContent =
+      '⚠️ इस ब्राउज़र में आवाज़ की सुविधा नहीं है। Chrome इस्तेमाल करें।';
+    if (el.voiceTestBtn) el.voiceTestBtn.disabled = true;
+    showSteps(false);
+    return;
+  }
+
+  if (info.reason === 'hindi') {
+    el.voiceStatusLine.textContent =
+      '✅ हिंदी आवाज़ फ़ोन में मौजूद है (' + info.voice.name + ') — बिना इंटरनेट भी बोलेगी।';
+    showSteps(false);
+  } else if (info.reason === 'other-lang') {
+    el.voiceStatusLine.textContent =
+      'ℹ️ फ़ोन में आवाज़ तो है (' + info.voice.name + ') पर हिंदी नहीं। बिना इंटरनेट बोलेगी, ' +
+      'लेकिन उच्चारण साफ़ नहीं होगा। हिंदी वॉइस ऐसे डाउनलोड करें:';
+    showSteps(true);
+  } else if (info.reason === 'network-only') {
+    el.voiceStatusLine.textContent =
+      '⚠️ इस फ़ोन में सिर्फ़ इंटरनेट वाली आवाज़ मिली — बिना नेटवर्क कुछ सुनाई नहीं देगा। ' +
+      'हिंदी वॉइस ऐसे डाउनलोड करें:';
+    showSteps(true);
+  } else {
+    el.voiceStatusLine.textContent =
+      'आवाज़ें अभी लोड हो रही हैं… "आवाज़ जाँचें" दबाकर देखें।';
+    showSteps(false);
+  }
 }
 
 function wireSpeakButton(btn, hostForNote) {
@@ -7624,6 +7761,17 @@ function wireEvents() {
   }
   if (el.downloadAllBtn) {
     el.downloadAllBtn.addEventListener('click', downloadAllModels);
+  }
+  if (el.voiceTestBtn) {
+    el.voiceTestBtn.addEventListener('click', () => {
+      if (el.voiceTestBtn.dataset.speaking === 'true') { stopSpeaking(); return; }
+      renderVoiceStatus();
+      speakText(
+        'नमस्ते किसान भाई। अगर आपको यह आवाज़ साफ सुनाई दे रही है, ' +
+        'तो सलाह बिना इंटरनेट के भी सुनी जा सकेगी।',
+        el.voiceTestBtn, null
+      );
+    });
   }
   wireInstallPrompt();
 
@@ -7711,7 +7859,11 @@ function wireEvents() {
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeaking(); });
 
   if (speech.supported && typeof window.speechSynthesis.addEventListener === 'function') {
-    window.speechSynthesis.addEventListener('voiceschanged', refreshVoices);
+    // Voices der se aati hain — aane par status line dobara banao
+    window.speechSynthesis.addEventListener('voiceschanged', () => {
+      refreshVoices();
+      renderVoiceStatus();
+    });
   }
 }
 

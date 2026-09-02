@@ -10,7 +10,7 @@
 
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="css/style.css?v=14" />
+  <link rel="stylesheet" href="css/style.css?v=15" />
 </head>
 
 <body>
@@ -477,6 +477,21 @@
           <p class="muted-sm" id="aiStatusLine"></p>
         </article>
 
+        <!-- Bina internet awaaz chalegi ya nahi — khet jaane se pehle jaanch lein -->
+        <article class="card">
+          <div class="card__head">
+            <h2>ऑफ़लाइन आवाज़ <span aria-hidden="true">🔊</span></h2>
+            <p>सलाह सुनने के लिए फ़ोन में हिंदी वॉइस होनी चाहिए — तभी बिना नेटवर्क भी बोलेगी।</p>
+          </div>
+          <p class="muted-sm" id="voiceStatusLine"></p>
+          <button type="button" class="btn btn--ghost btn--block" id="voiceTestBtn"
+                  data-idle-label="आवाज़ जाँचें / Test voice">
+            <svg class="ic"><use href="#i-speaker"/></svg>
+            <span>आवाज़ जाँचें / Test voice</span>
+          </button>
+          <ol class="install-steps" id="voiceSteps" hidden></ol>
+        </article>
+
         <div class="grid grid--2">
           <article class="card">
             <div class="card__head"><h2>यह ऐप कैसे काम करता है</h2></div>
@@ -509,6 +524,6 @@
 </div><!-- /layout -->
 
 <script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
-<script src="js/script.js?v=14"></script>
+<script src="js/script.js?v=15"></script>
 </body>
 </html>

@@ -276,7 +276,7 @@ Bas — sidebar ka button ab seedha APK download karega, aur *Offline & Help* pa
 
 | Cache | Kya | Kab mitta hai |
 |---|---|---|
-| `krashi-mitra-v14` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
+| `krashi-mitra-v15` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
 | `krashi-mitra-models` | fasal ke models | **kabhi apne aap nahi** — kisan khud "हटाएँ" dabaye tabhi |
 
 Isi wajah se app update karne par kisan ke download kiye hue models dobara
