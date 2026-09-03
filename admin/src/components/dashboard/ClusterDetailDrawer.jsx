@@ -32,7 +32,7 @@ export default function ClusterDetailDrawer({
       <div className="p-4 border-b border-gray-200 bg-gray-50/70 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xl">
-            {cluster.crop === 'rice' ? '🌾' : cluster.crop === 'sugarcane' ? '🎋' : cluster.crop === 'mustard' ? '🌼' : cluster.crop === 'potato' ? '🥔' : '🌽'}
+            {cluster.crop === 'rice' ? '🌾' : cluster.crop === 'sugarcane' ? '🎋' : cluster.crop === 'cotton' ? '🪴' : cluster.crop === 'potato' ? '🥔' : '🌽'}
           </span>
           <div>
             <span className="text-xs font-bold text-gray-500 uppercase">

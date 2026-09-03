@@ -46,9 +46,9 @@ Local copy मिलते ही app CDN को हाथ नहीं लग�
 | मक्का / Maize | ✅ TensorFlow.js | 7 |
 | आलू / Potato | ✅ TensorFlow.js | 10 |
 | टमाटर / Tomato | ✅ TensorFlow.js | 10 |
-| सरसों / Mustard | ❌ अभी नहीं — "Coming Soon" | 5 (सिर्फ advisory तैयार) |
+| कपास / Cotton | ✅ TensorFlow.js | 12 |
 
-> ⚠️ **Label का नाम बदलना मना है।** `models/<fasal>/metadata.json` में जो नाम और जो **क्रम** है, `js/script.js` के `CROPS.<fasal>.labels` में हू-ब-हू वही होना चाहिए। पाँच जगह model के नाम जान-बूझकर "गलत" रखे गए हैं, क्योंकि model वही string देता है — इन्हें ठीक करते ही advisory मिलनी बंद हो जाएगी:
+> ⚠️ **Label का नाम बदलना मना है।** `models/<fasal>/metadata.json` में जो नाम और जो **क्रम** है, `js/script.js` के `CROPS.<fasal>.labels` में हू-ब-हू वही होना चाहिए। कई जगह model के नाम जान-बूझकर "गलत" रखे गए हैं, क्योंकि model वही string देता है — इन्हें ठीक करते ही advisory मिलनी बंद हो जाएगी:
 >
 > | Label | गड़बड़ी | फसल |
 > |---|---|---|
@@ -57,6 +57,9 @@ Local copy मिलते ही app CDN को हाथ नहीं लग�
 > | `Potato_Blackspot_B...` | Teachable Machine ने नाम 20 अक्षर पर काटा | आलू |
 > | `Potato_Miscellaneo...` | वही — कटा हुआ नाम | आलू |
 > | `Tomato_Spider_mites Two-spotted_spider_mite` | नाम के बीच **space** है (key quotes में लिखें) | टमाटर |
+> | `Cotton_bollrot ` · `Cotton_Bollworm ` · `Cotton_Thirps ` | नाम के **आगे space** है | कपास |
+> | `Cotton_Mealy _Bug` | बीच में **space** है | कपास |
+> | `Cotton_Thirps ` | spelling — "Thrips" नहीं | कपास |
 
 **फोटो का hint:** हर फसल `photoHintHi` से अपना hint दे सकती है। आलू का model **कंद (tuber)** का है, पत्ती का नहीं — इसलिए वहाँ "आलू (कंद) की साफ फोटो" लिखा आता है। नई फसल में यह field न दें तो default "पत्ती की साफ फोटो" चलता रहेगा।
 
@@ -119,8 +122,7 @@ KRASHI MITRA/
 │                            (OpenRouter ki API key SIRF yahan, server par)
 ├── models/                  har fasal: model.json + weights.bin + metadata.json
 │   ├── rice/ (17)  wheat/ (14)  sugarcane/ (16)  onion/ (14)
-│   ├── maize/ (7)  potato/ (10)  tomato/ (10)
-│   └── mustard/  (khaali — "Coming Soon")
+│   └── maize/ (7)  potato/ (10)  tomato/ (10)  cotton/ (12)
 ├── assets/logo.svg
 ├── icon.svg, manifest.json, sw.js, serve.sh, vercel.json
 └── README.md

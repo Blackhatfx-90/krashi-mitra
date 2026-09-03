@@ -6,7 +6,7 @@ export const WEBSITE_CROPS = [
   { id: 'rice', nameEn: 'Rice / Paddy', nameHi: 'धान', icon: '🌾', color: '#22c55e' },
   { id: 'sugarcane', nameEn: 'Sugarcane', nameHi: 'गन्ना', icon: '🎋', color: '#16a34a' },
   { id: 'wheat', nameEn: 'Wheat', nameHi: 'गेहूं', icon: '🌾', color: '#eab308' },
-  { id: 'mustard', nameEn: 'Mustard', nameHi: 'सरसों', icon: '🌼', color: '#f59e0b' },
+  { id: 'cotton', nameEn: 'Cotton', nameHi: 'कपास', icon: '🪴', color: '#f59e0b' },
   { id: 'potato', nameEn: 'Potato', nameHi: 'आलू', icon: '🥔', color: '#d97706' },
   { id: 'maize', nameEn: 'Maize / Corn', nameHi: 'मक्का', icon: '🌽', color: '#ea580c' },
   { id: 'onion', nameEn: 'Onion', nameHi: 'प्याज', icon: '🧅', color: '#9333ea' }
@@ -109,7 +109,7 @@ export const STATES_CONFIG = {
         division: 'rohilkhand',
         areaAcres: 1.8,
         areaHa: 0.73,
-        crop: 'mustard',
+        crop: 'cotton',
         cropName: 'Mustard / सरसों (वरुणा)',
         sowingDate: '2026-08-12',
         healthScore: 0.41,

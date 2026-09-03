@@ -21,7 +21,7 @@ export const CROPS_CONFIG = [
   { id: 'rice', nameEn: 'Rice / Paddy', nameHi: 'धान', icon: '🌾', majorDistricts: ['Bareilly', 'Pilibhit', 'Lakhimpur Kheri', 'Gorakhpur', 'Varanasi', 'Shahjahanpur'] },
   { id: 'wheat', nameEn: 'Wheat', nameHi: 'गेहूं', icon: '🌾', majorDistricts: ['Meerut', 'Bareilly', 'Aligarh', 'Agra', 'Kanpur', 'Hardoi'] },
   { id: 'sugarcane', nameEn: 'Sugarcane', nameHi: 'गन्ना', icon: '🎋', majorDistricts: ['Lakhimpur Kheri', 'Muzaffarnagar', 'Bareilly', 'Pilibhit', 'Meerut', 'Bijnor'] },
-  { id: 'mustard', nameEn: 'Mustard', nameHi: 'सरसों (राई/लाही)', icon: '🌼', majorDistricts: ['Agra', 'Mathura', 'Bareilly', 'Aligarh', 'Badaun', 'Etawah'] },
+  { id: 'cotton', nameEn: 'Cotton', nameHi: 'कपास (नरमा)', icon: '🪴', majorDistricts: ['Agra', 'Mathura', 'Bareilly', 'Aligarh', 'Badaun', 'Etawah'] },
   { id: 'potato', nameEn: 'Potato', nameHi: 'आलू', icon: '🥔', majorDistricts: ['Agra', 'Farrukhabad', 'Kannauj', 'Aligarh', 'Bareilly', 'Firozabad'] },
   { id: 'onion', nameEn: 'Onion', nameHi: 'प्याज', icon: '🧅', majorDistricts: ['Varanasi', 'Ghazipur', 'Jaunpur', 'Kanpur', 'Bareilly'] },
   { id: 'maize', nameEn: 'Maize / Corn', nameHi: 'मक्का', icon: '🌽', majorDistricts: ['Farrukhabad', 'Kannauj', 'Bahraich', 'Gonda', 'Bulandshahr'] }
@@ -127,7 +127,7 @@ export const OUTBREAK_HOTSPOTS = [
     district: 'Mathura & Aligarh',
     taluka: 'Chhata & Iglas',
     division: 'agra',
-    crop: 'mustard',
+    crop: 'cotton',
     cropName: 'Mustard (सरसों)',
     disease: 'White Rust / सफेद रोली (Albugo candida) & Staghead',
     pathogenType: 'fungal',
@@ -559,7 +559,7 @@ export const ADVISORY_TEMPLATES = [
     titleHi: 'सरसों में सफेद रोली (व्हाइट रस्ट) व झुलसा रोग प्रबंधन',
     titleEn: 'Mustard White Rust & Alternaria Blight Management Protocol',
     titleUr: 'سرسوں میں سفید رولی اور جھلسہ کا علاج',
-    crop: 'mustard',
+    crop: 'cotton',
     cropName: 'Mustard (सरसों)',
     severity: 'high',
     bodyHi: `• पत्तियों के नीचे सफेद उभरे फफोले दिखने पर मेटालैक्सिल 8% + मैंकोजेब 64% WP (रिडोमिल) @ 2.5 ग्राम/लीटर छिड़कें।

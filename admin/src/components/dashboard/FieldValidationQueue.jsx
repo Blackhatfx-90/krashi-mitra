@@ -167,7 +167,7 @@ export default function FieldValidationQueue({
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">
-                      {item.crop === 'rice' ? '🌾' : item.crop === 'sugarcane' ? '🎋' : item.crop === 'potato' ? '🥔' : item.crop === 'mustard' ? '🌼' : item.crop === 'onion' ? '🧅' : '🌽'}
+                      {item.crop === 'rice' ? '🌾' : item.crop === 'sugarcane' ? '🎋' : item.crop === 'potato' ? '🥔' : item.crop === 'cotton' ? '🪴' : item.crop === 'onion' ? '🧅' : '🌽'}
                     </span>
                     <div>
                       <h4 className="text-xs font-bold text-gray-900 leading-tight">
