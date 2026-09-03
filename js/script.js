@@ -111,16 +111,32 @@ const CONFIG = {
    * NOTE: yeh sirf PARIVAAR alag karta hai. Gehu aur dhaan ki patti me farq
    * karna is tarike se sambhav nahi — uske liye online AI (wrong_crop) hai.
    */
+  /**
+   * CROP MATCH — "jo fasal chuni hai, uski hi photo par jaanch ho".
+   *
+   * SAMASYA: har fasal ka model CLOSED-SET hai. Seb chunkar ganne ki photo
+   * daalo to seb ka model use bhi kisi seb ke rog me daal dega — 90% bharose
+   * ke saath. Kisan ko bilkul galat salah milegi.
+   *
+   * HAL: model chalane se PEHLE patti ki BANAWAT se fasal-parivaar pehchante
+   * hain (grassScore = nason ki disha ka zor + coherence):
+   *
+   *     ghaas-kul  : dhaan, gehu, ganna, makka, pyaz  — nasein samanantar
+   *     chaudi     : seb, aam, tamatar, aalu, kapas   — beech ki nas se shaakhaein
+   *
+   * Naape gaye asli number: ghaas 0.39–0.55 | chaudi patti 0.19–0.20.
+   * Beech ka hissa (0.24–0.32) "pakka nahi" maana jata hai — wahan hum rokte
+   * NAHI, kyunki jhoothi rukawat bhi utni hi buri hai.
+   *
+   * ⚠️ SEEMA: yeh sirf PARIVAAR alag karta hai. Seb aur aam (dono chaudi) me
+   * farq karna is tarike se sambhav NAHI. Uske liye online AI (wrong_crop) hai.
+   */
   CROP_MATCH: {
     ENABLED: true,
-    /* Jaan-boojh kar BAHUT conservative — jhoothi chetavni dena galat salah
-       jitna hi bura hai. Test me pata chala ki rogi ghaas-patti (dhabbon wali)
-       ki disha khatm ho jaati hai (coherence 0.03), isliye:
-         - nuksan zyada ho to yeh jaanch chalti hi nahi
-         - dono taraf ke thresholds door-door rakhe gaye hain              */
-    GRASS_MIN: 0.55,       // isse zyada = pakka lambi-patli patti
-    BROAD_MAX: 0.08,       // isse kam  = pakka chaudi patti
-    SKIP_IF_DAMAGE: 0.20,  // rogi patti par shakal se pehchan bharosemand nahi
+    BLOCK: true,           // mismatch par jaanch rok do (kisan "फिर भी जाँचें" daba sakta hai)
+    GRASS_MIN: 0.32,       // isse zyada = ghaas-kul ki patti
+    BROAD_MAX: 0.24,       // isse kam  = chaudi patti
+    SKIP_IF_DAMAGE: 0.55,  // patti itni kharab ho ki shakal hi na bache to chup raho
   },
 
   /**
@@ -7284,6 +7300,42 @@ function analyzeImageContent(sourceCanvas) {
     ? Math.sqrt((Jxx - Jyy) * (Jxx - Jyy) + 4 * Jxy * Jxy) / trace
     : 0;
 
+  /* --- Nason ki DISHA ka naksha (orientation histogram) ------------------
+   * Ghaas-kul (dhaan, gehu, ganna, makka, pyaz) ki pattiyan lambi-patli hoti
+   * hain aur unki saari nasein EK HI disha me samanantar chalti hain.
+   * Chaudi patti (seb, aam, tamatar, aalu, kapas) me beech ki mote nas se
+   * shaakhaein har taraf nikalti hain — disha bikhri hui hoti hai.
+   *
+   * Yeh coherence se ZYADA BHAROSEMAND hai: rogi patti par daag pad jayein to
+   * coherence gir jaata hai (0.54 -> 0.34), par yeh tikta hai (0.56 -> 0.42).
+   * Isi liye faisla iske aadhar par liya jata hai.                          */
+  const BINS = 18;
+  const oh = new Float64Array(BINS);
+  let ohTotal = 0;
+  for (let y = 1; y < N - 1; y++) {
+    for (let x = 1; x < N - 1; x++) {
+      const q = y * N + x;
+      const gx = (lum[q + 1] - lum[q - 1]) * 0.5;
+      const gy = (lum[q + N] - lum[q - N]) * 0.5;
+      const mag = Math.sqrt(gx * gx + gy * gy);
+      if (mag < 8) continue;                       // halke shor ko chhod do
+      let ang = Math.atan2(gy, gx) * 180 / Math.PI;
+      if (ang < 0) ang += 180;
+      if (ang >= 180) ang -= 180;
+      oh[Math.min(BINS - 1, Math.floor(ang / (180 / BINS)))] += mag;
+      ohTotal += mag;
+    }
+  }
+  let orientConc = 0;
+  if (ohTotal > 1) {
+    for (let i = 0; i < BINS; i++) oh[i] /= ohTotal;
+    // Sabse bhaari 3 lagatar bin — ek hi disha me kitna zor hai
+    for (let i = 0; i < BINS; i++) {
+      const sum3 = oh[i] + oh[(i + 1) % BINS] + oh[(i + 2) % BINS];
+      if (sum3 > orientConc) orientConc = sum3;
+    }
+  }
+
   /* --- Daagon ka jamaav: 12x12 khaanon me kitne khaane "rogi" hain -------
    * Bikhre hue daag (blight, spot) aur ek-samaan peelapan me farq karta hai. */
   const CELL = 8, GRID = N / CELL;
@@ -7325,6 +7377,11 @@ function analyzeImageContent(sourceCanvas) {
    * Sehatmand patti: lagbhag poori ek-samaan hari -> damage ~0
    * Rogi patti: peele/bhoore hisse aur daag -> damage zyada                */
   const leafPixels = veg + warmish;
+  f.orientConc  = orientConc;
+  /* Dono milakar: 0.6 x disha ka zor + 0.4 x coherence.
+     Naape gaye: ghaas 0.39–0.55 | chaudi patti 0.19–0.20 — beech me achha faasla. */
+  f.grassScore  = 0.6 * orientConc + 0.4 * coherence;
+
   f.discoloured = leafPixels > 0 ? lesion / Math.max(leafPixels, total * 0.15) : 0;
   f.spotCells   = spotCells / (GRID * GRID);
   f.coherence   = coherence;
@@ -7484,6 +7541,21 @@ async function runPrediction() {
       if (!gate.ok) {
         showNotPlant(gate);
         return;                                  // finally saaf-safai kar dega
+      }
+
+      /* ---- DOOSRI JAANCH: kya yeh USI fasal ki patti hai jo chuni gayi? ----
+       * Har model closed-set hai — seb chunkar ganne ki photo daalo to seb ka
+       * model use bhi kisi seb ke rog me daal dega, 90% bharose ke saath.
+       * Isliye model chalane se PEHLE hi rok dete hain.                     */
+      if (CONFIG.CROP_MATCH.BLOCK) {
+        const cropGate = checkCropFamily(state.imageFeatures);
+        if (cropGate) {
+          console.info('[crop-match] roka —', 'grassScore',
+                       state.imageFeatures.grassScore.toFixed(3),
+                       '| chuni fasal', state.cropId);
+          showNotPlant(cropGate);
+          return;
+        }
       }
     }
     state.forceScan = false;                     // ek baar ka chhoot, agli photo par phir jaanch
@@ -8033,6 +8105,9 @@ function showNotPlant(gate) {
   const scoresCard = el.scoresList && el.scoresList.closest('.card');
   if (scoresCard) scoresCard.hidden = true;
 
+  // Title alag ho sakta hai — "patti nahi hai" ya "is fasal ki nahi hai"
+  const titleEl = el.notPlantBox && el.notPlantBox.querySelector('h2');
+  if (titleEl) titleEl.textContent = gate.titleHi || 'यह पत्ती की फोटो नहीं लग रही';
   if (el.notPlantReason) el.notPlantReason.textContent = gate.reasonHi || '';
   if (el.notPlantTips) {
     el.notPlantTips.innerHTML = (gate.tipsHi || [])
@@ -8052,44 +8127,60 @@ function healthyLabelOf(labels) {
   return (labels || []).find((l) => /healthy/i.test(l)) || null;
 }
 
-/** Ghaas-kul (lambi patli patti) ya chaudi patti — fasal ke hisaab se. */
+/* Har fasal kis parivaar ki hai. 'grass' me pyaz bhi rakha hai — uski patti
+   bhi lambi-patli aur ek disha wali hoti hai, isliye banawat se wo ghaas jaisi
+   hi padhi jaati hai. (Pyaz aur dhaan me farq banawat se nahi ho sakta —
+   uske liye online AI hai.) */
 const CROP_LEAF_FAMILY = {
   rice: 'grass', wheat: 'grass', sugarcane: 'grass', maize: 'grass',
+  onion: 'grass',
   tomato: 'broad', potato: 'broad', cotton: 'broad',
-  mango: 'broad', apple: 'broad',        // dono ped hain — chaudi patti
-  onion: 'tubular',
+  mango: 'broad', apple: 'broad',
 };
 
+const FAMILY_NAME_HI = { grass: 'लंबी-पतली (घास जैसी)', broad: 'चौड़ी' };
+
 /**
- * "Ganne me sirf ganna" — photo ki patti chuni hui fasal se milti hai ya nahi.
- * Sirf PARIVAAR ka farq pakadta hai (ghaas bनाम chaudi patti), isliye halki
- * chetavni deta hai, jaanch rokta nahi.
+ * "Jo fasal chuni hai, uski hi photo par jaanch ho."
+ *
+ * @returns {object|null} null = sab theek / pakka nahi keh sakte,
+ *   warna { ok:false, reasonHi, tipsHi } — jaanch rok di jaye.
  */
 function checkCropFamily(features) {
   if (!CONFIG.CROP_MATCH.ENABLED || !features || !state.cropId) return null;
+
   const want = CROP_LEAF_FAMILY[state.cropId];
   if (!want) return null;
 
   const M = CONFIG.CROP_MATCH;
 
-  /* Rogi patti par daag aur dhabbe patti ki shakal bigaad dete hain —
-     tab shakal se fasal pehchanna bharosemand nahi rehta, isliye chup rahenge. */
+  /* Patti itni kharab ho ki uski shakal hi na bache — tab shakal se fasal
+     pehchanna bharosemand nahi. Aise me chup rehna behtar hai. */
   if (features.damage > M.SKIP_IF_DAMAGE) return null;
 
-  const co = features.coherence;
-  const crop = CROPS[state.cropId];
+  const g = features.grassScore;
+  let dikha = null;
+  if (g >= M.GRASS_MIN) dikha = 'grass';
+  else if (g <= M.BROAD_MAX) dikha = 'broad';
+  // beech ka hissa = pakka nahi -> rokte nahi
 
-  if ((want === 'grass' || want === 'tubular') && co < M.BROAD_MAX) {
-    return 'यह फोटो चौड़ी पत्ती की लग रही है, जबकि आपने ' + crop.nameHi +
-           ' चुना है (' + crop.nameHi + ' की पत्ती लंबी-पतली होती है)। ' +
-           'फसल सही चुनी है? — साइडबार में "फसल चुनें" से बदल सकते हैं।';
-  }
-  if (want === 'broad' && co > M.GRASS_MIN) {
-    return 'यह फोटो लंबी-पतली (घास जैसी) पत्ती की लग रही है, जबकि आपने ' +
-           crop.nameHi + ' चुना है (' + crop.nameHi + ' की पत्ती चौड़ी होती है)। ' +
-           'फसल सही चुनी है? — साइडबार में "फसल चुनें" से बदल सकते हैं।';
-  }
-  return null;
+  if (!dikha || dikha === want) return null;
+
+  const crop = CROPS[state.cropId];
+  const cropHi = crop ? crop.nameHi : 'चुनी हुई फसल';
+
+  return {
+    ok: false,
+    titleHi: 'यह ' + cropHi + ' की फोटो नहीं लग रही',
+    reasonHi:
+      'आपने ' + cropHi + ' चुना है, जिसकी पत्ती ' + FAMILY_NAME_HI[want] +
+      ' होती है — पर इस फोटो में ' + FAMILY_NAME_HI[dikha] + ' पत्ती दिख रही है।',
+    tipsHi: [
+      'साइडबार में "फसल चुनें" से सही फसल चुनें, फिर दोबारा जाँचें',
+      'या ' + cropHi + ' की पत्ती की फोटो लें',
+      'पत्ती को फ्रेम में पूरा भरें, 15–20 सें.मी. दूर से',
+    ],
+  };
 }
 
 /**
@@ -8230,18 +8321,9 @@ function renderResultNotes(checked) {
     ].join(''));
   }
 
-  const cropWarn = checkCropFamily(state.imageFeatures);
-  if (cropWarn) {
-    parts.push([
-      '<div class="rnote rnote--warn">',
-        '<span class="rnote__icon" aria-hidden="true">🌱</span>',
-        '<div>',
-          '<p class="rnote__title">फसल शायद अलग है</p>',
-          '<p class="rnote__sub">', escapeHtml(cropWarn), '</p>',
-        '</div>',
-      '</div>',
-    ].join(''));
-  }
+  /* NOTE: "fasal shayad alag hai" wali halki chetavni yahan se hata di gayi.
+     Ab yeh jaanch runPrediction me PEHLE hoti hai aur seedha rok deti hai —
+     kyunki galat fasal par rog batana chetavni se nahi, rukawat se hi rukta hai. */
 
   el.resultNotes.innerHTML = parts.join('');
   el.resultNotes.hidden = parts.length === 0;

@@ -386,25 +386,36 @@ yani **behtar rakhne** ki salah, dawa ki nahi.
 (jaise "पीला रतुआ 79.6%"), aur note me saaf likha hota hai ki model ne kya kaha
 tha aur kyun nahi maana gaya. Kuch chhupaya nahi jata.
 
-### Samasya 2 — "ganne me sirf ganna"
+### Samasya 2 — "jo fasal chuni hai, uski hi photo par jaanch ho"
 
-`checkCropFamily()` patti ki **disha (coherence)** naapta hai (structure tensor):
+Seb chunkar ganne ki photo daalein to seb ka model use bhi kisi seb ke rog me
+daal deta hai — 90% bharose ke saath. Isliye **model chalne se PEHLE hi** rok
+dete hain.
 
-| Fasal-parivaar | Coherence | Fasal |
+`checkCropFamily()` patti ki **nason ki disha** naapta hai:
+
+```
+grassScore = 0.6 x orientConc  +  0.4 x coherence
+             (nason ki disha)     (structure tensor)
+```
+
+| Parivaar | grassScore (naapa gaya) | Fasal |
 |---|---|---|
-| Ghaas-kul — lambi patli patti | zyada (> 0.55) | dhaan, gehu, ganna, makka |
-| Chaudi patti | kam (< 0.08) | tamatar, aalu, sarson |
+| **Ghaas-kul** — nasein samanantar | 0.39 – 0.55 | dhaan, gehu, ganna, makka, pyaz |
+| **Chaudi patti** — beech ki nas se shaakhaein | 0.19 – 0.20 | seb, aam, tamatar, aalu, kapas |
 
-Mismatch par halki chetavni: *"यह फोटो चौड़ी पत्ती की लग रही है, जबकि आपने गन्ना
-चुना है"* — jaanch rokti nahi, sirf poochti hai.
+Faisla: `> 0.32` = ghaas, `< 0.24` = chaudi, beech me = "pakka nahi" (rokte nahi).
 
-> ⚠️ **Iski seema saaf samajh lein:** yeh sirf PARIVAAR alag karta hai.
-> **Gehu aur dhaan me farq karna is tarike se sambhav nahi** — dono lambi-patli
-> pattiyan hain. Uske liye online AI hai (neeche).
->
-> Test me pata chala ki **rogi patti par daag uski disha mita dete hain**
-> (coherence 0.03), isliye `damage > 0.20` hone par yeh jaanch chalti hi nahi —
-> warna har rogi ghaas-patti par jhoothi chetavni aati.
+Mismatch par **jaanch ruk jaati hai** — *"यह सेब की फोटो नहीं लग रही"* — saath me
+**"फिर भी जाँचें"** ka button rehta hai.
+
+**orientConc kyun, sirf coherence kyun nahi:** rogi patti par daag coherence
+gira dete hain (0.54 → 0.34), par orientConc tikta hai (0.56 → 0.42). Pehle
+sirf coherence tha aur rogi ghaas-patti "chaudi" padhi jaati thi.
+
+> ⚠️ **Seema saaf samajh lein:** yeh sirf PARIVAAR alag karta hai.
+> **Seb aur aam me farq karna is tarike se sambhav NAHI** — dono chaudi patti
+> hain. Waise hi dhaan aur gehu me bhi nahi. Uske liye online AI hai (neeche).
 
 ### Teesri parat — online AI
 
@@ -425,9 +436,10 @@ HEALTH: {
 },
 CROP_MATCH: {
   ENABLED: true,
-  GRASS_MIN: 0.55,
-  BROAD_MAX: 0.08,
-  SKIP_IF_DAMAGE: 0.20,
+  BLOCK: true,           // false karein to sirf chetavni, rukawat nahi
+  GRASS_MIN: 0.32,       // sahi photo ruk rahi hai? -> badhayein
+  BROAD_MAX: 0.24,       // galat photo nikal rahi hai? -> ghatayein
+  SKIP_IF_DAMAGE: 0.55,
 },
 ```
 
@@ -654,7 +666,8 @@ Output softmax probabilities होती हैं। तीन case handle क
 | नया model डाला पर पुराना चल रहा है | Model files cache-first cached हैं — `CACHE_VERSION` बढ़ाएँ |
 | iPhone HEIC photo error | Camera settings → "Most Compatible" (JPEG) |
 | **स्वस्थ फसल को भी रोगी बताता है** | v23 से **health check** लगा है — फोटो में नुकसान न दिखे तो मॉडल का रोग-फ़ैसला नहीं माना जाता, "फसल स्वस्थ है" + बेहतरी की सलाह मिलती है। देखें section 3F |
-| **दूसरी फसल की फोटो पर भी रोग बताता है** | leaf-family चेतावनी (घास बनाम चौड़ी पत्ती) + online AI का `wrong_crop`। गेहूँ-धान का फ़र्क सिर्फ़ online AI कर सकता है — section 3F |
+| **दूसरी फसल की फोटो पर भी रोग बताता है** | v29 से **जाँच रुक जाती है** — सेब चुनकर गन्ने की फोटो डालें तो मॉडल चलता ही नहीं। घास बनाम चौड़ी पत्ती की पहचान से। सेब-आम या धान-गेहूँ का फ़र्क सिर्फ़ online AI कर सकता है — section 3F |
+| सही फसल की फोटो भी रुक रही है | `CONFIG.CROP_MATCH.GRASS_MIN` / `BROAD_MAX` को पास लाएँ, या कार्ड पर **"फिर भी जाँचें"** दबाएँ। Console की `[crop-match]` लाइन में `grassScore` दिखता है |
 | **किसी भी फोटो पर रोग बता देता है** | v18 से **leaf gate** लगा है — पौधा/पत्ती न दिखे तो मॉडल चलता ही नहीं। देखें section 3E |
 | असली पत्ती की फोटो भी reject हो रही है | `CONFIG.LEAF_GATE.MIN_SCORE` घटाएँ (0.16 → 0.10), या कार्ड पर **"फिर भी जाँचें"** दबाएँ। console की `[leaf-gate]` लाइन में सारे नंबर दिखते हैं |
 | **नया code deploy किया पर पुराना चल रहा है** | v18 से `script.js`/`style.css` अब cache-first नहीं हैं (सिर्फ़ `tf.min.js` है), इसलिए redeploy अपने आप पहुँचता है। फिर भी अटके तो `CACHE_VERSION` बढ़ाएँ |
