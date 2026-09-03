@@ -47,6 +47,8 @@ Local copy मिलते ही app CDN को हाथ नहीं लग�
 | आलू / Potato | ✅ TensorFlow.js | 10 |
 | टमाटर / Tomato | ✅ TensorFlow.js | 10 |
 | कपास / Cotton | ✅ TensorFlow.js | 12 |
+| आम / Mango | ✅ TensorFlow.js | 8 |
+| सेब / Apple | ✅ TensorFlow.js | 9 |
 
 > ⚠️ **Label का नाम बदलना मना है।** `models/<fasal>/metadata.json` में जो नाम और जो **क्रम** है, `js/script.js` के `CROPS.<fasal>.labels` में हू-ब-हू वही होना चाहिए। कई जगह model के नाम जान-बूझकर "गलत" रखे गए हैं, क्योंकि model वही string देता है — इन्हें ठीक करते ही advisory मिलनी बंद हो जाएगी:
 >
@@ -122,7 +124,8 @@ KRASHI MITRA/
 │                            (OpenRouter ki API key SIRF yahan, server par)
 ├── models/                  har fasal: model.json + weights.bin + metadata.json
 │   ├── rice/ (17)  wheat/ (14)  sugarcane/ (16)  onion/ (14)
-│   └── maize/ (7)  potato/ (10)  tomato/ (10)  cotton/ (12)
+│   ├── maize/ (7)  potato/ (10)  tomato/ (10)  cotton/ (12)
+│   └── mango/ (8)  apple/ (9)              ← baagwani (ped) ki fasalein
 ├── assets/logo.svg
 ├── icon.svg, manifest.json, sw.js, serve.sh, vercel.json
 └── README.md
@@ -646,6 +649,7 @@ Output softmax probabilities होती हैं। तीन case handle क
 | हिंदी आवाज़ नहीं आती | Phone: Settings → Language & input → Text-to-speech → Hindi voice download करें। *Offline & Help* स्क्रीन पर **"ऑफ़लाइन आवाज़"** कार्ड बता देता है कि फ़ोन में आवाज़ है या नहीं |
 | **बिना इंटरनेट आवाज़ नहीं आती** | Chrome `getVoices()` में **network** आवाज़ें भी देता है (जैसे "Google हिन्दी") जो ऑफ़लाइन चुप रहती हैं। v16 से app ऑफ़लाइन होने पर सिर्फ़ **phone के अंदर वाली** (`localService`) आवाज़ चुनती है, और network आवाज़ फेल हो तो अपने आप local से दोबारा कोशिश करती है |
 | **आवाज़ आधी बोलकर रुक जाती है** | Chrome का पुराना bug — `SpeechSynthesisUtterance` का reference न रहे तो garbage collector उसे बीच में उठा लेता है (न `end` आता है, न `error`), और पुराना `pause()`/`resume()` वाला उपाय टुकड़ा काट देता था। v16 में utterance `speech.current` में पकड़ कर रखा जाता है, `pause()` खुद से कभी नहीं होता, और एक **watchdog** हर सेकंड देखता है — आवाज़ चुपचाप रुके तो 2 सेकंड में अगला टुकड़ा शुरू कर देता है |
+| **एक फसल दबाकर तुरंत दूसरी दबाई, तो गलत रोग बताता है** | v28 में ठीक — `loadModelForCrop` में अब request-token guard है। पहले दोनों model साथ लोड होते थे और **बाद में खत्म होने वाला** `state.model` में बचा रह जाता था (आम के labels + सेब का model)। Console में `[model] ... ka load radd` दिखे तो यही guard काम कर रहा है |
 | पुरानी file दिख रही है | `sw.js` में `CACHE_VERSION` बढ़ाएँ, या DevTools → Application → Unregister SW |
 | नया model डाला पर पुराना चल रहा है | Model files cache-first cached हैं — `CACHE_VERSION` बढ़ाएँ |
 | iPhone HEIC photo error | Camera settings → "Most Compatible" (JPEG) |
