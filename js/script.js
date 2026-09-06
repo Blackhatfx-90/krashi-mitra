@@ -6576,7 +6576,6 @@ const el = {
   previewWrap:  $('#previewWrap'),
   previewImg:   $('#previewImg'),
   clearBtn:     $('#clearBtn'),
-  predictBtn:   $('#predictBtn'),
   againBtn:     $('#againBtn'),
   loadingBox:   $('#loadingBox'),
   loadingText:  $('#loadingText'),
@@ -6586,6 +6585,19 @@ const el = {
   advisoryAlert:    $('#advisoryAlert'),
   reportToggle:     $('#reportToggle'),
   reportNote:       $('#reportNote'),
+  /* batch scan */
+  batchGrid:        $('#batchGrid'),
+  batchCount:       $('#batchCount'),
+  batchHint:        $('#batchHint'),
+  batchScanBtn:     $('#batchScanBtn'),
+  batchClearBtn:    $('#batchClearBtn'),
+  batchProgress:    $('#batchProgress'),
+  batchBarFill:     $('#batchBarFill'),
+  batchProgressText:$('#batchProgressText'),
+  batchProgressSub: $('#batchProgressSub'),
+  batchSummaryCard: $('#batchSummaryCard'),
+  batchSummary:     $('#batchSummary'),
+
   resultNotes:      $('#resultNotes'),
   notPlantBox:      $('#notPlantBox'),
   notPlantReason:   $('#notPlantReason'),
@@ -6669,6 +6681,11 @@ const state = {
   lastResult: null,      // { label, prob, confident }
   forceScan: false,      // kisan ne "फिर भी जाँचें" dabaya — leaf-gate ek baar chhodo
   imageFeatures: null,   // photo ka rang/banawat vishleshan (gate + health dono use karte hain)
+
+  /* --- batch scan (5 se 40 photo) --- */
+  batch: [],             // [{ id, name, url, img, status, result, reasonHi }]
+  batchSeq: 0,
+  batchSummary: null,    // sab milakar nateeja
 
   /* --- krishi vibhag se judaav --- */
   reportOptIn: false,    // kisan ne jaanch bhejna chalu kiya ya nahi (default BAND)
@@ -7019,6 +7036,7 @@ async function loadModelForCrop(cropId) {
 
     state.model = model;
     state.modelKind = kind;
+    setTimeout(renderBatchTray, 0);        // "सब जाँचें" ab dabaya ja sakta hai
 
     // Model ke input se asli size aur dtype lo — [1, H, W, 3]
     state.inputDType = 'float32';
@@ -7041,7 +7059,9 @@ async function loadModelForCrop(cropId) {
     });
 
     setStatus('तैयार / Model ready', 'ready');
-    el.predictBtn.disabled = !state.imageEl;
+    // Purana single-photo #predictBtn ab HTML me hai hi nahi — batch tray
+    // khud tay karti hai ki "सब जाँचें" dabaya ja sakta hai ya nahi.
+    renderBatchTray();
   } catch (err) {
     console.error('[model] load error:', err);
     setStatus('मॉडल विफल / Model failed', 'error');
@@ -7105,11 +7125,9 @@ async function acceptFile(file) {
 
     state.imageEl = await loadImageElement(state.objectUrl);
 
-    el.previewImg.src = state.objectUrl;
+    if (el.previewImg) el.previewImg.src = state.objectUrl;
     show(el.previewWrap);
     hide(el.dropzoneEmpty);
-
-    el.predictBtn.disabled = !state.model;
     hide(el.resultWrap);
     stopSpeaking();
   } catch (err) {
@@ -7124,9 +7142,10 @@ async function acceptFile(file) {
   }
 }
 
+/* Ab ek nahi, kai photo aati hain — camera se ek-ek karke, gallery se sab ek saath. */
 function handleFileSelected(evt) {
-  const file = evt.target.files && evt.target.files[0];
-  acceptFile(file).finally(() => { evt.target.value = ''; });   // same file dobara chun sakein
+  const files = evt.target.files;
+  addFilesToBatch(files).finally(() => { evt.target.value = ''; });  // same file dobara chun sakein
 }
 
 function loadImageElement(src) {
@@ -7144,12 +7163,482 @@ function loadImageElement(src) {
 function clearImage() {
   if (state.objectUrl) { URL.revokeObjectURL(state.objectUrl); state.objectUrl = null; }
   state.imageEl = null;
-  el.previewImg.removeAttribute('src');
+  if (el.previewImg) el.previewImg.removeAttribute('src');
   hide(el.previewWrap);
   show(el.dropzoneEmpty);
   hide(el.resultWrap);
-  el.predictBtn.disabled = true;
   stopSpeaking();
+}
+
+
+/* ============================================================================
+ * SECTION 6C — BATCH SCAN (5 se 40 photo ek saath)  📸📸📸
+ *
+ * KYUN: ek patti se poore khet ka haal pata nahi chalta. Ho sakta hai kisan ne
+ * galti se sabse kharab patti chun li ho, ya sabse achhi. Isliye ab kam se kam
+ * 5 aur zyada se zyada 40 photo li jaati hain, har ek alag se jaanchi jaati hai,
+ * aur aakhir me SAB milakar ek nateeja banta hai:
+ *
+ *   - kaun sa rog mila
+ *   - kitni photo me mila (yani khet me kitna faila hua hai)
+ *   - kitni photo swasth thi
+ *   - kaun si photo jaanch hi nahi paayi (dhundhli / galat fasal) aur kyun
+ *
+ * "Kitni photo me mila" hi asli kaam ki cheez hai — 20 me se 2 me rog matlab
+ * shuruaat, aur 20 me se 15 matlab poora khet chapet me hai. Salah bhi isi ke
+ * hisaab se badalti hai.
+ *
+ * Memory ka dhyan: 40 photo ek saath GPU par nahi chadhate — ek-ek karke
+ * (sequentially) chalate hain aur har baar tensor turant dispose karte hain,
+ * warna sasta phone atak jayega.
+ * ========================================================================= */
+
+const BATCH = {
+  MIN: 5,
+  MAX: 40,
+};
+
+/** Nayi file(en) batch me jodo — limit aur validation ke saath. */
+async function addFilesToBatch(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+
+  hide(el.errorBanner);
+  hide(el.infoBanner);
+
+  const jagah = BATCH.MAX - state.batch.length;
+  if (jagah <= 0) {
+    showInfo(
+      'ज़्यादा से ज़्यादा ' + BATCH.MAX + ' फोटो ही जाँची जा सकती हैं। ' +
+      'कुछ हटाकर नई जोड़ें।',
+      'At most ' + BATCH.MAX + ' photos can be checked. Remove some to add more.'
+    );
+    return;
+  }
+
+  const lene = files.slice(0, jagah);
+  const chhoot = files.length - lene.length;
+
+  let skipped = 0;
+  for (const file of lene) {
+    const typeOk = file.type ? file.type.startsWith('image/')
+                             : /\.(jpe?g|png|webp|bmp)$/i.test(file.name);
+    if (!typeOk || file.size > CONFIG.MAX_FILE_BYTES) { skipped++; continue; }
+
+    try {
+      const url = URL.createObjectURL(file);
+      const img = await loadImageElement(url);
+      state.batch.push({
+        id: 'P' + (++state.batchSeq),
+        name: file.name || 'photo',
+        url: url,
+        img: img,
+        status: 'ready',      // ready | ok | skipped | error
+        result: null,
+        reasonHi: '',
+      });
+    } catch (err) {
+      console.warn('[batch] photo nahi khuli:', file.name, err.message);
+      skipped++;
+    }
+  }
+
+  if (skipped) {
+    showInfo(
+      skipped + ' फोटो नहीं जोड़ी जा सकीं (इमेज नहीं है, 10 MB से बड़ी है, ' +
+      'या फ़ॉर्मैट सपोर्ट नहीं — जैसे iPhone की HEIC)।',
+      skipped + ' photo(s) could not be added (not an image, larger than 10 MB, ' +
+      'or an unsupported format such as iPhone HEIC).'
+    );
+  }
+  if (chhoot) {
+    showInfo(
+      'सिर्फ पहली ' + lene.length + ' फोटो जोड़ी गईं — एक बार में ज़्यादा से ज़्यादा ' +
+      BATCH.MAX + ' फोटो जाँची जा सकती हैं।',
+      'Only the first ' + lene.length + ' photos were added — at most ' + BATCH.MAX +
+      ' photos can be checked at once.'
+    );
+  }
+
+  renderBatchTray();
+}
+
+function removeFromBatch(id) {
+  const i = state.batch.findIndex((p) => p.id === id);
+  if (i === -1) return;
+  try { URL.revokeObjectURL(state.batch[i].url); } catch (_) {}
+  state.batch.splice(i, 1);
+  renderBatchTray();
+}
+
+function clearBatch() {
+  state.batch.forEach((p) => { try { URL.revokeObjectURL(p.url); } catch (_) {} });
+  state.batch = [];
+  state.batchSummary = null;
+  hide(el.resultWrap);
+  hide(el.batchProgress);
+  renderBatchTray();
+  stopSpeaking();
+}
+
+/* ---------------------------------------------------------------------------
+ * Tray — chuni hui photo, ginti, aur "jaanch shuru karein" ki halat
+ * ------------------------------------------------------------------------- */
+function renderBatchTray() {
+  const n = state.batch.length;
+
+  if (el.batchCount) {
+    el.batchCount.textContent = n + ' / ' + BATCH.MAX;
+  }
+
+  if (el.batchHint) {
+    if (n === 0) {
+      el.batchHint.textContent =
+        'कम से कम ' + BATCH.MIN + ' फोटो चाहिए। खेत की अलग-अलग जगहों से पत्तियों की ' +
+        'फोटो लें — तभी पता चलेगा कि रोग कितना फैला है।';
+    } else if (n < BATCH.MIN) {
+      el.batchHint.textContent =
+        'अभी ' + n + ' फोटो हैं। ' + (BATCH.MIN - n) + ' और चाहिए ' +
+        '(कम से कम ' + BATCH.MIN + ')।';
+    } else {
+      el.batchHint.textContent =
+        n + ' फोटो तैयार हैं। "सब जाँचें" दबाइए — हर फोटो अलग से जाँची जाएगी।';
+    }
+  }
+
+  if (el.batchGrid) {
+    el.batchGrid.innerHTML = state.batch.map((p) => {
+      const badge = p.status === 'ok' ? '✓'
+                  : p.status === 'skipped' ? '!'
+                  : p.status === 'error' ? '✕' : '';
+      return [
+        '<li class="bthumb bthumb--', escapeHtml(p.status), '" data-id="', escapeHtml(p.id), '">',
+          '<img src="', escapeHtml(p.url), '" alt="" loading="lazy" />',
+          badge ? '<span class="bthumb__badge">' + badge + '</span>' : '',
+          '<button type="button" class="bthumb__x" data-remove="', escapeHtml(p.id),
+            '" aria-label="यह फोटो हटाएँ">✕</button>',
+        '</li>',
+      ].join('');
+    }).join('');
+  }
+
+  if (el.batchScanBtn) {
+    el.batchScanBtn.disabled = !(n >= BATCH.MIN && state.model && !state.isPredicting);
+    const span = el.batchScanBtn.querySelector('span');
+    if (span) {
+      span.textContent = n >= BATCH.MIN
+        ? 'सब जाँचें (' + n + ' फोटो)'
+        : 'कम से कम ' + BATCH.MIN + ' फोटो चाहिए';
+    }
+  }
+  if (el.batchClearBtn) el.batchClearBtn.hidden = n === 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * Ek-ek karke sab photo jaancho — beech me progress dikhate hue
+ * ------------------------------------------------------------------------- */
+async function runBatchScan() {
+  if (state.isPredicting) return;
+  if (!state.model) {
+    showError('मॉडल अभी तैयार नहीं है, कृपया कुछ सेकंड रुकें।',
+              'The model is not ready yet. Please wait a few seconds.');
+    return;
+  }
+  if (state.batch.length < BATCH.MIN) {
+    showInfo('कम से कम ' + BATCH.MIN + ' फोटो चाहिए।',
+             'At least ' + BATCH.MIN + ' photos are needed.');
+    return;
+  }
+
+  state.isPredicting = true;
+  state.batchSummary = null;
+  hide(el.resultWrap);
+  hide(el.errorBanner);
+  stopSpeaking();
+  renderBatchTray();
+  show(el.batchProgress);
+
+  const total = state.batch.length;
+  const good = [];
+
+  for (let i = 0; i < total; i++) {
+    const p = state.batch[i];
+    setBatchProgress(i, total, p);
+
+    // UI ko saans lene do — warna 40 photo par screen jam ho jati hai
+    await new Promise((r) => setTimeout(r, 30));
+
+    let inputTensor = null, output = null;
+    try {
+      const canvas = cropToSquareCanvas(p.img, state.inputSize);
+      const feat = analyzeImageContent(canvas);
+
+      /* Wahi do jaanchein jo single photo par lagti hain */
+      const gate = checkIsPlantPhoto(canvas, feat);
+      if (!gate.ok) {
+        p.status = 'skipped';
+        p.reasonHi = gate.reasonHi || 'पत्ती की फोटो नहीं लगी';
+        p.result = null;
+        continue;
+      }
+      if (CONFIG.CROP_MATCH.BLOCK) {
+        const cropGate = checkCropFamily(feat);
+        if (cropGate) {
+          p.status = 'skipped';
+          p.reasonHi = cropGate.reasonHi;
+          p.result = null;
+          continue;
+        }
+      }
+
+      inputTensor = preprocess(canvas);
+      output = state.model.predict(inputTensor);
+      const outTensor = Array.isArray(output) ? output[0] : output;
+      const probs = toProbabilities(await outTensor.data());
+
+      const results = probs
+        .map((prob, idx) => ({ label: state.labels[idx] || ('Class ' + idx), prob: prob, index: idx }))
+        .sort((a, b) => b.prob - a.prob);
+
+      // Health check yahan bhi lagta hai — swasth patti ko rogi nahi batana
+      const checked = applyHealthCheck(results, feat);
+      const top = checked.switchedToHealthy
+        ? { label: checked.healthyLabel,
+            prob: Math.min(0.92, Math.max(1 - feat.damage, 0.80)) }
+        : results[0];
+
+      p.status = 'ok';
+      p.reasonHi = '';
+      p.result = {
+        label: top.label,
+        prob: top.prob,
+        confident: checked.switchedToHealthy || top.prob >= CONFIG.CONFIDENCE_THRESHOLD,
+        damage: feat.damage,
+        switched: !!checked.switchedToHealthy,
+      };
+      good.push(p.result);
+
+    } catch (err) {
+      console.error('[batch] photo', p.id, 'fail:', err);
+      p.status = 'error';
+      p.reasonHi = 'जाँच नहीं हो पाई (' + err.message + ')';
+      p.result = null;
+    } finally {
+      if (inputTensor) inputTensor.dispose();
+      if (output) Array.isArray(output) ? output.forEach((t) => t.dispose()) : output.dispose();
+    }
+
+    renderBatchTray();     // har photo ke baad tick/cross dikha do
+  }
+
+  setBatchProgress(total, total, null);
+  hide(el.batchProgress);
+
+  state.isPredicting = false;
+  renderBatchTray();
+
+  const summary = summariseBatch();
+  state.batchSummary = summary;
+  renderBatchSummary(summary);
+}
+
+function setBatchProgress(done, total, current) {
+  if (el.batchBarFill) el.batchBarFill.style.width = Math.round((done / total) * 100) + '%';
+  if (el.batchProgressText) {
+    el.batchProgressText.textContent = done >= total
+      ? 'सभी ' + total + ' फोटो जाँची जा चुकी हैं — नतीजा बन रहा है…'
+      : 'फोटो ' + (done + 1) + ' / ' + total + ' जाँची जा रही है…';
+  }
+  if (el.batchProgressSub && current) {
+    el.batchProgressSub.textContent = current.name.slice(0, 40);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Sab milakar ek nateeja
+ * ------------------------------------------------------------------------- */
+function summariseBatch() {
+  const healthy = healthyLabelOf(state.labels);
+  const scanned = state.batch.filter((p) => p.status === 'ok' && p.result);
+  const skipped = state.batch.filter((p) => p.status === 'skipped');
+  const errored = state.batch.filter((p) => p.status === 'error');
+
+  // Har rog ke liye: kitni photo, aur unka औसत bharosa
+  const tally = {};
+  scanned.forEach((p) => {
+    const l = p.result.label;
+    if (!tally[l]) tally[l] = { label: l, count: 0, probSum: 0 };
+    tally[l].count++;
+    tally[l].probSum += p.result.prob;
+  });
+
+  const rows = Object.keys(tally).map((l) => ({
+    label: l,
+    count: tally[l].count,
+    share: tally[l].count / Math.max(1, scanned.length),
+    avgProb: tally[l].probSum / tally[l].count,
+    isHealthy: l === healthy,
+  })).sort((a, b) => b.count - a.count || b.avgProb - a.avgProb);
+
+  const diseased = rows.filter((r) => !r.isHealthy);
+  const healthyRow = rows.find((r) => r.isHealthy);
+
+  const diseasedCount = diseased.reduce((s, r) => s + r.count, 0);
+  const spread = scanned.length ? diseasedCount / scanned.length : 0;
+
+  /* Failav ke hisaab se halat — yahi asli kaam ki baat hai */
+  let level, levelHi, adviceHi;
+  if (!scanned.length) {
+    level = 'none'; levelHi = 'कुछ जाँचा नहीं जा सका';
+    adviceHi = 'एक भी फोटो जाँच के लायक नहीं मिली। नीचे कारण देखकर दोबारा फोटो लें।';
+  } else if (spread === 0) {
+    level = 'ok'; levelHi = 'खेत स्वस्थ लग रहा है';
+    adviceHi = 'जाँची गई सभी फोटो में कोई रोग नहीं मिला। अभी दवा की ज़रूरत नहीं है — ' +
+               'निगरानी जारी रखें और 10–15 दिन बाद दोबारा जाँचें।';
+  } else if (spread <= 0.20) {
+    level = 'low'; levelHi = 'शुरुआती अवस्था — अभी रोका जा सकता है';
+    adviceHi = 'रोग अभी कुछ ही जगह है। तुरंत उन्हीं हिस्सों पर ध्यान दें — इसी समय ' +
+               'रोकना सबसे सस्ता और असरदार होता है।';
+  } else if (spread <= 0.50) {
+    level = 'medium'; levelHi = 'फैल रहा है — देर न करें';
+    adviceHi = 'खेत के अच्छे-खासे हिस्से में रोग पहुँच चुका है। पूरे खेत में छिड़काव की ' +
+               'योजना बनाएँ और 10–15 दिन बाद दोबारा जाँचें।';
+  } else {
+    level = 'high'; levelHi = 'पूरे खेत में फैला है — तुरंत कार्रवाई करें';
+    adviceHi = 'ज़्यादातर फोटो में रोग मिला है। पूरे खेत में तुरंत छिड़काव करें और ' +
+               'अपने कृषि विज्ञान केंद्र (KVK) से भी संपर्क करें।';
+  }
+
+  return {
+    total: state.batch.length,
+    scanned: scanned.length,
+    skipped: skipped.length,
+    errored: errored.length,
+    healthyCount: healthyRow ? healthyRow.count : 0,
+    diseasedCount: diseasedCount,
+    spread: spread,
+    level: level,
+    levelHi: levelHi,
+    adviceHi: adviceHi,
+    rows: rows,
+    main: diseased[0] || healthyRow || null,   // sabse zyada mila hua
+    skippedList: skipped.concat(errored).map((p) => ({ id: p.id, reasonHi: p.reasonHi })),
+  };
+}
+
+/* ---------------------------------------------------------------------------
+ * Nateeja dikhana — pehle poore khet ka haal, phir sabse bade rog ki salah
+ * ------------------------------------------------------------------------- */
+function renderBatchSummary(s) {
+  if (!el.batchSummary) return;
+
+  hide(el.notPlantBox);
+  hide(el.lowConfidenceBox);
+  renderAiCard(null);
+  if (el.resultNotes) { el.resultNotes.innerHTML = ''; el.resultNotes.hidden = true; }
+
+  const pct0 = (x) => Math.round(x * 100) + '%';
+
+  /* --- 1. Upar: poore khet ka haal --- */
+  const head = [
+    '<div class="bsum__head bsum__head--', escapeHtml(s.level), '">',
+      '<div class="bsum__level">',
+        '<span class="bsum__icon" aria-hidden="true">',
+          s.level === 'ok' ? '✅' : s.level === 'low' ? '🟡'
+          : s.level === 'medium' ? '🟠' : s.level === 'high' ? '🔴' : '❓',
+        '</span>',
+        '<div>',
+          '<p class="bsum__title">', escapeHtml(s.levelHi), '</p>',
+          '<p class="bsum__sub">', escapeHtml(s.adviceHi), '</p>',
+        '</div>',
+      '</div>',
+      '<div class="bsum__stats">',
+        '<div class="bsum__stat"><b>', s.scanned, '</b><span>जाँची गईं</span></div>',
+        '<div class="bsum__stat"><b>', s.diseasedCount, '</b><span>में रोग</span></div>',
+        '<div class="bsum__stat"><b>', s.healthyCount, '</b><span>स्वस्थ</span></div>',
+        s.skipped + s.errored > 0
+          ? '<div class="bsum__stat bsum__stat--muted"><b>' + (s.skipped + s.errored) +
+            '</b><span>छोड़ी गईं</span></div>'
+          : '',
+      '</div>',
+      s.scanned > 0
+        ? '<div class="bsum__bar"><div class="bsum__bar-fill" style="width:' +
+          pct0(s.spread) + '"></div></div>' +
+          '<p class="bsum__spread">' + s.diseasedCount + ' / ' + s.scanned +
+          ' फोटो में रोग मिला (' + pct0(s.spread) + ' फैलाव)</p>'
+        : '',
+    '</div>',
+  ].join('');
+
+  /* --- 2. Kis rog ki kitni photo --- */
+  const list = s.rows.length ? [
+    '<div class="bsum__block">',
+      '<p class="bsum__label">क्या-क्या मिला</p>',
+      '<ul class="bsum__rows">',
+      s.rows.map((r) => {
+        const a = getAdvisory(r.label);
+        return [
+          '<li class="bsum__row', r.isHealthy ? ' bsum__row--ok' : '', '">',
+            '<span class="bsum__row-name">', escapeHtml(a.nameHi),
+              ' <small>', escapeHtml(a.nameEn), '</small></span>',
+            '<span class="bsum__row-count">', r.count, ' फोटो · ', pct0(r.share), '</span>',
+            '<span class="bsum__row-track"><i style="width:', pct0(r.share), '"></i></span>',
+          '</li>',
+        ].join('');
+      }).join(''),
+      '</ul>',
+    '</div>',
+  ].join('') : '';
+
+  /* --- 3. Jo photo chhod di gayi, kyun --- */
+  const skippedBlock = s.skippedList.length ? [
+    '<details class="bsum__skipped">',
+      '<summary>', s.skippedList.length, ' फोटो जाँची नहीं जा सकीं — क्यों?</summary>',
+      '<ul>',
+      s.skippedList.map((x) => '<li>' + escapeHtml(x.reasonHi || 'कारण नहीं मिला') + '</li>').join(''),
+      '</ul>',
+    '</details>',
+  ].join('') : '';
+
+  el.batchSummary.innerHTML = head + list + skippedBlock;
+  show(el.batchSummaryCard);
+
+  /* --- 4. Sabse bade rog ki poori salah (wahi purana advisory card) --- */
+  if (s.main && !s.main.isHealthy) {
+    state.lastResult = { label: s.main.label, prob: s.main.avgProb,
+                         confident: true, source: 'batch' };
+    show(el.advisoryCard);
+    el.advisoryHost.innerHTML = buildAdvisoryHtml(s.main.label,
+      { prob: s.main.avgProb, speakId: 'speakResult' });
+    wireSpeakButton($('#speakResult'), el.advisoryHost.querySelector('.adv'));
+  } else if (s.main && s.main.isHealthy) {
+    state.lastResult = { label: s.main.label, prob: s.main.avgProb,
+                         confident: true, source: 'batch' };
+    show(el.advisoryCard);
+    el.advisoryHost.innerHTML = buildAdvisoryHtml(s.main.label,
+      { prob: s.main.avgProb, speakId: 'speakResult' });
+    wireSpeakButton($('#speakResult'), el.advisoryHost.querySelector('.adv'));
+  } else {
+    hide(el.advisoryCard);
+    el.advisoryHost.innerHTML = '';
+    state.lastResult = null;
+  }
+
+  /* Purana single-photo scores card is mode me matlab nahi rakhta */
+  const scoresCard = el.scoresList && el.scoresList.closest('.card');
+  if (scoresCard) scoresCard.hidden = true;
+
+  show(el.resultWrap);
+  el.resultWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  /* History me ek hi entry — poore khet ka nateeja */
+  if (s.main) {
+    saveToHistory({ label: s.main.label, prob: s.main.avgProb, confident: true });
+    reportScanToDept({ label: s.main.label, prob: s.main.avgProb, confident: true });
+  }
+
+  console.info('[batch] nateeja:', s.level, '| jaanchi', s.scanned, '| rog',
+               s.diseasedCount, '| failav', pct0(s.spread));
 }
 
 
@@ -7513,7 +8002,6 @@ async function runPrediction() {
   }
 
   state.isPredicting = true;
-  el.predictBtn.disabled = true;
   hide(el.resultWrap);
   hide(el.errorBanner);
   show(el.loadingBox);
@@ -7601,8 +8089,8 @@ async function runPrediction() {
     if (inputTensor) inputTensor.dispose();
     if (output) Array.isArray(output) ? output.forEach((t) => t.dispose()) : output.dispose();
     hide(el.loadingBox);
-    el.predictBtn.disabled = false;
     state.isPredicting = false;
+    renderBatchTray();
   }
 }
 
@@ -8603,6 +9091,7 @@ async function selectCrop(cropId) {
 
   // Purani photo / result saaf karo — dusri fasal ka result confuse karega
   clearImage();
+  clearBatch();
   if (el.advisoryHost) el.advisoryHost.innerHTML = '';
 
   updateCropChip();
@@ -10236,10 +10725,20 @@ function wireEvents() {
     });
   }
 
-  el.clearBtn.addEventListener('click', (e) => { e.stopPropagation(); clearImage(); });
-  el.predictBtn.addEventListener('click', runPrediction);
-  el.againBtn.addEventListener('click', () => {
-    clearImage();
+  if (el.clearBtn) el.clearBtn.addEventListener('click', (e) => { e.stopPropagation(); clearImage(); });
+
+  /* ---- BATCH SCAN (5 se 40 photo) ---- */
+  if (el.batchScanBtn) el.batchScanBtn.addEventListener('click', runBatchScan);
+  if (el.batchClearBtn) el.batchClearBtn.addEventListener('click', clearBatch);
+  if (el.batchGrid) {
+    el.batchGrid.addEventListener('click', (e) => {
+      const x = e.target.closest('[data-remove]');
+      if (x) removeFromBatch(x.dataset.remove);
+    });
+  }
+
+  if (el.againBtn) el.againBtn.addEventListener('click', () => {
+    clearBatch();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
@@ -10278,6 +10777,7 @@ async function init() {
   renderRecent();
   updateHistoryBadge();
   updateCropChip();
+  renderBatchTray();
   registerServiceWorker();
 
   // App hamesha CROP SELECTION screen se shuru hoti hai

@@ -535,6 +535,56 @@ kisan ko nahi jaati (`crop: "all"` daalein to sabko jaayegi).
 
 ---
 
+## 3I. 📸 BATCH SCAN — 5 se 40 photo ek saath
+
+Ek patti se poore khet ka haal pata nahi chalta. Ho sakta hai kisan ne galti se
+sabse kharab patti chun li ho, ya sabse achhi. Isliye ab **kam se kam 5 aur
+zyada se zyada 40** photo li jaati hain.
+
+### Kaise chalta hai
+
+```
+photo chuno (5-40)  ->  ek-ek karke jaanch  ->  sab milakar nateeja
+                        (progress bar +
+                         har photo par ✓ / ! / ✕)
+```
+
+Har photo par wahi teen jaanchein lagti hain jo single photo par lagti thin —
+**leaf gate**, **crop match**, aur **health check**. Jo photo in me se kisi me
+fail ho jaaye wo *chhod* di jaati hai (poora batch nahi rukta), aur nateeje me
+uska **kaaran** likha aata hai.
+
+### Nateeje me kya milta hai
+
+| | |
+|---|---|
+| **Failav** | `13 / 20 photo me rog mila (65%)` — yahi asli kaam ki baat hai |
+| **Halat** | 0% = swasth · ≤20% = shuruaat · ≤50% = fail raha · >50% = poora khet |
+| **Kya-kya mila** | har rog ki alag ginti aur hissa |
+| **Chhodi gayi photo** | kitni aur kyun (dhundhli / galat fasal / patti nahi) |
+| **Salah** | sabse zyada mile rog ki poori salah, failav ke hisaab se |
+
+Failav ke hisaab se salah badalti hai — 20 me se 2 matlab "abhi roka ja sakta
+hai", aur 20 me se 15 matlab "poore khet me turant chhidkav".
+
+### Technical
+
+- Photo **ek-ek karke (sequentially)** chalti hain, saath me nahi — 40 photo ek
+  saath GPU par chadhane se sasta phone atak jayega. Har photo ke baad tensor
+  turant `dispose()` hote hain.
+- Har photo ke beech 30ms ka break — warna 40 photo par screen jam ho jati hai
+  aur progress bar hilta hi nahi.
+- History me **ek hi entry** jaati hai (poore khet ka nateeja), 40 alag nahi.
+- Krishi vibhag ko bhi ek hi report jaati hai (agar kisan ne opt-in kiya ho).
+
+Limits badalni hon to `js/script.js` me:
+
+```js
+const BATCH = { MIN: 5, MAX: 40 };
+```
+
+---
+
 ## 4. ⭐ Nayi fasal (9th crop) kaise jodein
 
 **सिर्फ 2 काम** — core logic छूना नहीं है:

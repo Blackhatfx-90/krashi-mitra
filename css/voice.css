@@ -1,0 +1,182 @@
+/* ============================================================================
+   voice.css — Voice Assistant (Feature B)
+
+   ⚠️ YEH FILE BHI PURI TARAH ALAG HAI.
+   Har class ".km-voice" / ".km-perm" se shuru hoti hai aur apne hi
+   --kmv-* variables use karti hai. App ki maujooda style se koi takraav nahi.
+   ========================================================================= */
+
+:root{
+  --kmv-brand:      #15803d;
+  --kmv-brand-2:    #22c55e;
+  --kmv-red:        #dc2626;
+  --kmv-surface:    #ffffff;
+  --kmv-ink:        #101828;
+  --kmv-ink-2:      #475467;
+  --kmv-ink-3:      #98a2b3;
+  --kmv-line:       #eaecf0;
+  --kmv-radius:     16px;
+  --kmv-z:          8000;    /* tour (9000) se neeche, app (60) se upar */
+}
+
+/* ---------- FLOATING MIC BUTTON ----------------------------------------- */
+.km-voice-fab{
+  position:fixed; right:16px;
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  z-index:var(--kmv-z);
+  width:64px;height:64px;border-radius:50%;   /* bada touch target */
+  border:none;cursor:pointer;
+  display:grid;place-items:center;
+  background:linear-gradient(150deg,var(--kmv-brand-2),var(--kmv-brand));
+  color:#fff;font-size:26px;line-height:1;
+  box-shadow:0 8px 22px rgba(21,128,61,.38);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .12s ease, background .2s ease, box-shadow .2s ease;
+}
+.km-voice-fab:active{transform:scale(.94);}
+.km-voice-fab:focus-visible{outline:3px solid #fbbf24;outline-offset:3px;}
+
+/* Sun raha hai — laal + dhadakti hui ring */
+.km-voice-fab[data-state="listening"]{
+  background:linear-gradient(150deg,#ef4444,var(--kmv-red));
+  box-shadow:0 8px 22px rgba(220,38,38,.4);
+  animation:kmv-pulse 1.25s ease-in-out infinite;
+}
+@keyframes kmv-pulse{
+  0%,100%{box-shadow:0 8px 22px rgba(220,38,38,.4), 0 0 0 0 rgba(239,68,68,.45);}
+  50%    {box-shadow:0 8px 22px rgba(220,38,38,.4), 0 0 0 16px rgba(239,68,68,0);}
+}
+
+/* Bol raha hai — neela + halka jhilmilata */
+.km-voice-fab[data-state="speaking"]{
+  background:linear-gradient(150deg,#3b82f6,#1d4ed8);
+  box-shadow:0 8px 22px rgba(29,78,216,.4);
+  animation:kmv-glow 1s ease-in-out infinite;
+}
+@keyframes kmv-glow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+
+/* Kaam kar raha hai */
+.km-voice-fab[data-state="working"]{background:linear-gradient(150deg,#f59e0b,#b45309);}
+
+/* Support hi nahi hai */
+.km-voice-fab[data-state="off"]{
+  background:#98a2b3; box-shadow:0 6px 16px rgba(16,24,40,.2);
+}
+
+/* ---------- CAPTION / SUBTITLE BAR --------------------------------------
+   Mic button ke upar ek chhoti patti — kisan ko dikhta hai ki app ne kya suna
+   aur ab kya kar raha hai.
+   ----------------------------------------------------------------------- */
+.km-voice-cap{
+  position:fixed; right:16px;
+  /* Neeche se kram: mic button -> ❓ Help button -> yeh caption patti */
+  bottom:calc(148px + env(safe-area-inset-bottom));
+  z-index:var(--kmv-z);
+  width:min(320px, calc(100vw - 32px));
+  background:var(--kmv-surface);
+  border:1px solid var(--kmv-line);
+  border-radius:var(--kmv-radius);
+  box-shadow:0 12px 30px rgba(16,24,40,.18);
+  padding:12px 14px;
+  font-family:"Inter","Noto Sans","Noto Sans Devanagari",-apple-system,
+              BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+}
+.km-voice-cap.is-on{opacity:1;transform:none;pointer-events:auto;}
+
+.km-voice-cap__row{display:flex;align-items:flex-start;gap:8px;}
+.km-voice-cap__dot{
+  width:9px;height:9px;border-radius:50%;background:var(--kmv-ink-3);
+  flex:0 0 auto;margin-top:6px;
+}
+.km-voice-cap.is-listening .km-voice-cap__dot{background:var(--kmv-red);animation:kmv-blink .9s infinite;}
+.km-voice-cap.is-speaking  .km-voice-cap__dot{background:#3b82f6;}
+.km-voice-cap.is-ok        .km-voice-cap__dot{background:var(--kmv-brand-2);}
+.km-voice-cap.is-error     .km-voice-cap__dot{background:#f59e0b;}
+@keyframes kmv-blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+.km-voice-cap__heard{
+  font-size:14px;font-weight:600;color:var(--kmv-ink);line-height:1.45;
+  word-break:break-word;
+}
+.km-voice-cap__act{font-size:12.5px;color:var(--kmv-ink-2);margin-top:3px;line-height:1.45;}
+.km-voice-cap__note{
+  margin-top:8px;padding-top:8px;border-top:1px dashed var(--kmv-line);
+  font-size:11px;color:var(--kmv-ink-3);line-height:1.45;
+}
+.km-voice-cap__close{
+  margin-left:auto;background:none;border:none;cursor:pointer;
+  font-size:15px;color:var(--kmv-ink-3);padding:2px 4px;line-height:1;
+}
+
+/* "Aap yeh keh sakte hain" — commands ki chhoti list */
+.km-voice-cap__tips{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:5px;}
+.km-voice-cap__tips li{
+  font-size:11px;font-weight:600;color:var(--kmv-brand);
+  background:#f0fdf4;border:1px solid #d7f0e1;
+  padding:3px 8px;border-radius:999px;
+}
+
+/* ---------- PERMISSION PRE-PROMPT MODAL ---------------------------------- */
+.km-perm{
+  position:fixed;inset:0;z-index:9500;      /* tour se bhi upar */
+  display:grid;place-items:center;padding:18px;
+  background:rgba(12,22,16,.6);
+  font-family:"Inter","Noto Sans","Noto Sans Devanagari",-apple-system,
+              BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+.km-perm__box{
+  width:min(400px,100%);
+  background:var(--kmv-surface);color:var(--kmv-ink);
+  border-radius:20px;padding:22px;
+  box-shadow:0 24px 60px rgba(16,24,40,.36);
+  text-align:center;
+}
+.km-perm__icon{font-size:40px;line-height:1;margin-bottom:8px;}
+.km-perm__box h2{margin:0 0 6px;font-size:19px;font-weight:800;}
+.km-perm__box p{margin:0 0 4px;font-size:14px;color:var(--kmv-ink-2);line-height:1.6;}
+.km-perm__box .km-perm__en{font-size:12.5px;color:var(--kmv-ink-3);}
+
+.km-perm__list{
+  list-style:none;margin:14px 0 0;padding:0;text-align:left;
+  display:flex;flex-direction:column;gap:10px;
+}
+.km-perm__list li{
+  display:flex;gap:10px;align-items:flex-start;
+  background:#f9fafb;border:1px solid var(--kmv-line);
+  border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5;
+}
+.km-perm__list b{display:block;font-size:13.5px;margin-bottom:1px;}
+.km-perm__list span.km-perm__emoji{font-size:19px;line-height:1.2;flex:0 0 auto;}
+
+.km-perm__btns{display:flex;flex-direction:column;gap:8px;margin-top:18px;}
+.km-perm__btn{
+  min-height:50px;border:none;border-radius:12px;cursor:pointer;
+  font:inherit;font-size:15px;font-weight:700;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .14s ease,transform .08s ease;
+}
+.km-perm__btn:active{transform:scale(.98);}
+.km-perm__btn--yes{background:var(--kmv-brand);color:#fff;}
+.km-perm__btn--yes:hover{background:#14682f;}
+.km-perm__btn--no{background:transparent;color:var(--kmv-ink-2);min-height:44px;font-size:13.5px;font-weight:600;}
+.km-perm__btn--no:hover{background:#f2f4f7;}
+.km-perm__foot{margin-top:12px;font-size:11px;color:var(--kmv-ink-3);line-height:1.5;}
+
+/* ---------- reduced motion ---------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  .km-voice-fab,.km-voice-fab[data-state="listening"],.km-voice-fab[data-state="speaking"]{animation:none;}
+  .km-voice-cap{transition:none;}
+}
+
+/* ---------- dark mode ---------------------------------------------------- */
+@media (prefers-color-scheme:dark){
+  :root{
+    --kmv-surface:#16241d; --kmv-ink:#e8f2ec; --kmv-ink-2:#a8bcb0;
+    --kmv-ink-3:#7d928a;   --kmv-line:#2a3d33;
+  }
+  .km-perm__list li{background:#13201a;}
+  .km-perm__btn--no:hover{background:#22332b;}
+  .km-voice-cap__tips li{background:#13291f;border-color:#2a4d3a;color:#6fd897;}
+}
