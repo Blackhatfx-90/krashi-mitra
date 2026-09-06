@@ -73,7 +73,7 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'hi-IN'; u.rate = 0.92;
+        u.lang = (window.KrashiMitraOffline && window.KrashiMitraOffline.language().code) || 'hi-IN'; u.rate = 0.92;
         window.speechSynthesis.speak(u);
       }
     } catch (err) { console.warn('[voice] bol nahi paya:', err.message); }
@@ -512,7 +512,7 @@
         return;
       }
 
-      rec.lang            = 'hi-IN';
+      rec.lang            = (window.KrashiMitraOffline && window.KrashiMitraOffline.language().code) || 'hi-IN';
       rec.interimResults  = true;              // bolte-bolte caption me dikhe
       rec.continuous      = false;             // ek baar me ek hukm
       rec.maxAlternatives = 3;                 // teen anumaan — match ka mauka badhta hai
@@ -530,7 +530,7 @@
           tips: ['कैमरा खोलो', 'मौसम बताओ', 'सलाह पढ़ो', 'धान चुनो', 'जाँच करो', 'रुको'],
           note: navigator.onLine
             ? null
-            : 'Awaaz pehchanne ke liye internet chahiye. Rog pehchan bina internet ke chalti rahegi.',
+            : 'नेट बंद है। इस ब्राउज़र में आवाज़ पहचान उपलब्ध हो तो यह स्थानीय रूप से चलेगी; नहीं तो नीचे लिखकर पूछें। फसल जाँच और कृषि सहायक ऑफलाइन चलते रहेंगे.',
         });
         // 10 sec me kuch na bole to apne aap band
         this._timeout = setTimeout(() => { try { rec.stop(); } catch (_) {} }, 10000);
@@ -638,16 +638,20 @@
       const cmd = matchCommand(normalized);
 
       /* Samajh nahi aaya */
-      if (!cmd) {
-        this._respond('समझ नहीं आया, दोबारा बोलिए।', {
-          heard: '“' + raw + '”',
-          action: 'समझ नहीं आया / Not understood',
-          kind: 'error',
-          tips: ['कैमरा खोलो', 'मौसम बताओ', 'सलाह पढ़ो', 'धान चुनो', 'जाँच करो', 'टूर दिखाओ', 'रुको'],
-          hold: 9000,
+if (!cmd) {
+      const answer = window.KrashiMitraOffline && window.KrashiMitraOffline.offlineAnswer(raw);
+      const onlineAnswer = window.KrashiMitraOffline && window.KrashiMitraOffline.officialFallback;
+      if (answer && onlineAnswer) {
+        const respond = (text, stale) => this._respond(text, { heard: '“' + raw + '”', action: stale ? 'ऑफलाइन कृषि सहायक' : 'ताज़ा कृषि जानकारी', kind: 'ok', note: stale ? 'नेट नहीं है — आखिरी स्थानीय ज्ञान से जवाब दिया गया।' : null, hold: 10000 });
+        if (navigator.onLine) onlineAnswer(raw).then(text => respond(text, false)).catch(() => respond(answer, true));
+        else respond(answer, true);
+      } else {
+        this._respond('समझ नहीं आया। कृपया फसल, रोग, कीट, दवा, मौसम या मंडी भाव से जुड़ा सवाल पूछिए।', {
+          heard: '“' + raw + '”', action: 'कृषि विषय पूछिए / Ask an agriculture question', kind: 'error', hold: 9000,
         });
-        return;
       }
+      return;
+    }
 
       this._setState('working');
 
