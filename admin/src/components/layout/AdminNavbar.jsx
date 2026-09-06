@@ -38,7 +38,7 @@ export default function AdminNavbar({
       <div className="flex items-center justify-between gap-4">
         
         {/* Left: Active State Govt Identity
-            NOTE: yahan pehle DOBARA "AgriAI / Krishi Mitra" ka logo aur naam tha,
+            NOTE: yahan pehle purana logo aur naam tha,
             jabki wahi cheez sidebar ke sabse upar bhi hai. Main public site par
             brand sirf sidebar me rehta hai aur topbar par PAGE ka naam aata hai —
             isliye sirf wo dohra logo hataya gaya hai.
@@ -151,7 +151,7 @@ export default function AdminNavbar({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
             </span>
-            <span className="font-bold text-red-700 shrink-0">🚨 {activeState.code} RADAR:</span>
+            <span className="font-bold text-red-700 shrink-0">�� {activeState.code} RADAR:</span>
             <span className="truncate text-red-900 font-medium">
               {activeState.hotspots[0]?.district} ({activeState.hotspots[0]?.disease}) • {activeState.farmPlots?.length} Farm Parcels Geofenced
             </span>
