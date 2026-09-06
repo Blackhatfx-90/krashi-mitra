@@ -1,7 +1,7 @@
 /* ============================================================================
    voice.css — Voice Assistant (Feature B)
 
-   ⚠️ YEH FILE BHI PURI TARAH ALAG HAI.
+   NOTE: YEH FILE BHI PURI TARAH ALAG HAI.
    Har class ".km-voice" / ".km-perm" se shuru hoti hai aur apne hi
    --kmv-* variables use karti hai. App ki maujooda style se koi takraav nahi.
    ========================================================================= */
@@ -19,6 +19,12 @@
   --kmv-z:          8000;    /* tour (9000) se neeche, app (60) se upar */
 }
 
+/* ---------- icons ---------------------------------------------------------
+   Saare icon inline SVG hain (js/voice-assistant.js ke ICONS me).
+   ------------------------------------------------------------------------ */
+.km-voice-ic{width:20px;height:20px;flex:0 0 auto;stroke:currentColor;fill:none;}
+.km-voice-ic--fab{width:28px;height:28px;stroke-width:1.6;}
+
 /* ---------- FLOATING MIC BUTTON ----------------------------------------- */
 .km-voice-fab{
   position:fixed; right:16px;
@@ -28,7 +34,7 @@
   border:none;cursor:pointer;
   display:grid;place-items:center;
   background:linear-gradient(150deg,var(--kmv-brand-2),var(--kmv-brand));
-  color:#fff;font-size:26px;line-height:1;
+  color:#fff;line-height:0;
   box-shadow:0 8px 22px rgba(21,128,61,.38);
   -webkit-tap-highlight-color:transparent;
   transition:transform .12s ease, background .2s ease, box-shadow .2s ease;
@@ -69,7 +75,7 @@
    ----------------------------------------------------------------------- */
 .km-voice-cap{
   position:fixed; right:16px;
-  /* Neeche se kram: mic button -> ❓ Help button -> yeh caption patti */
+  /* Neeche se kram: mic button -> Help button -> yeh caption patti */
   bottom:calc(148px + env(safe-area-inset-bottom));
   z-index:var(--kmv-z);
   width:min(320px, calc(100vw - 32px));
@@ -85,16 +91,22 @@
 }
 .km-voice-cap.is-on{opacity:1;transform:none;pointer-events:auto;}
 
-.km-voice-cap__row{display:flex;align-items:flex-start;gap:8px;}
-.km-voice-cap__dot{
-  width:9px;height:9px;border-radius:50%;background:var(--kmv-ink-3);
-  flex:0 0 auto;margin-top:6px;
+.km-voice-cap__row{display:flex;align-items:flex-start;gap:10px;}
+.km-voice-cap__body{flex:1;min-width:0;}
+
+/* Baayein taraf ka chhota icon — rang haalat ke hisaab se badalta hai */
+.km-voice-cap__badge{
+  width:32px;height:32px;border-radius:9px;flex:0 0 auto;
+  display:grid;place-items:center;
+  background:#f2f4f7;color:var(--kmv-ink-3);
 }
-.km-voice-cap.is-listening .km-voice-cap__dot{background:var(--kmv-red);animation:kmv-blink .9s infinite;}
-.km-voice-cap.is-speaking  .km-voice-cap__dot{background:#3b82f6;}
-.km-voice-cap.is-ok        .km-voice-cap__dot{background:var(--kmv-brand-2);}
-.km-voice-cap.is-error     .km-voice-cap__dot{background:#f59e0b;}
-@keyframes kmv-blink{0%,100%{opacity:1}50%{opacity:.25}}
+.km-voice-cap.is-listening .km-voice-cap__badge{
+  background:#fdecec;color:var(--kmv-red);animation:kmv-blink 1s ease-in-out infinite;
+}
+.km-voice-cap.is-speaking .km-voice-cap__badge{background:#e7f0fb;color:#1d4ed8;}
+.km-voice-cap.is-ok       .km-voice-cap__badge{background:#f0fdf4;color:var(--kmv-brand);}
+.km-voice-cap.is-error    .km-voice-cap__badge{background:#fffbeb;color:#b45309;}
+@keyframes kmv-blink{0%,100%{opacity:1}50%{opacity:.45}}
 
 .km-voice-cap__heard{
   font-size:14px;font-weight:600;color:var(--kmv-ink);line-height:1.45;
@@ -107,8 +119,10 @@
 }
 .km-voice-cap__close{
   margin-left:auto;background:none;border:none;cursor:pointer;
-  font-size:15px;color:var(--kmv-ink-3);padding:2px 4px;line-height:1;
+  color:var(--kmv-ink-3);padding:4px;line-height:0;border-radius:7px;
 }
+.km-voice-cap__close:hover{background:#f2f4f7;}
+.km-voice-cap__close svg{width:16px;height:16px;}
 
 /* "Aap yeh keh sakte hain" — commands ki chhoti list */
 .km-voice-cap__tips{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:5px;}
@@ -133,7 +147,7 @@
   box-shadow:0 24px 60px rgba(16,24,40,.36);
   text-align:center;
 }
-.km-perm__icon{font-size:40px;line-height:1;margin-bottom:8px;}
+.km-perm__logo{width:52px;height:52px;margin:0 auto 10px;display:block;}
 .km-perm__box h2{margin:0 0 6px;font-size:19px;font-weight:800;}
 .km-perm__box p{margin:0 0 4px;font-size:14px;color:var(--kmv-ink-2);line-height:1.6;}
 .km-perm__box .km-perm__en{font-size:12.5px;color:var(--kmv-ink-3);}
@@ -148,7 +162,11 @@
   border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5;
 }
 .km-perm__list b{display:block;font-size:13.5px;margin-bottom:1px;}
-.km-perm__list span.km-perm__emoji{font-size:19px;line-height:1.2;flex:0 0 auto;}
+.km-perm__ic{
+  width:34px;height:34px;border-radius:9px;flex:0 0 auto;
+  display:grid;place-items:center;
+  background:#f0fdf4;color:var(--kmv-brand);border:1px solid #d7f0e1;
+}
 
 .km-perm__btns{display:flex;flex-direction:column;gap:8px;margin-top:18px;}
 .km-perm__btn{
@@ -176,6 +194,9 @@
     --kmv-surface:#16241d; --kmv-ink:#e8f2ec; --kmv-ink-2:#a8bcb0;
     --kmv-ink-3:#7d928a;   --kmv-line:#2a3d33;
   }
+  .km-voice-cap__badge{background:#22332b;}
+  .km-voice-cap__close:hover{background:#22332b;}
+  .km-perm__ic{background:#13291f;border-color:#2a4d3a;color:#6fd897;}
   .km-perm__list li{background:#13201a;}
   .km-perm__btn--no:hover{background:#22332b;}
   .km-voice-cap__tips li{background:#13291f;border-color:#2a4d3a;color:#6fd897;}

@@ -24,7 +24,7 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v32';
+const CACHE_VERSION = 'krashi-mitra-v33';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* Sarkari officer ka Regional Admin dashboard (alag React app) yahan rehta hai.
@@ -33,8 +33,26 @@ const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badl
 const ADMIN_PATH = 'regional-admin';
 
 /* App shell — install ke waqt yahi cache hota hai (models NAHI). */
+/* Ab site ke do hisse hain:
+     /       -> landing / login / signup  (naya, nayi files)
+     /app    -> kisan wali scan app       (purani, bilkul waisi hi)
+   Dono ek hi service worker ke andar hain, par har page APNE URL par cache
+   hota hai — pehle sab kuch './' par likha jata tha, jisse landing aur app
+   ek doosre ko mita dete. */
+const APP_PATH = 'app';
+
 const APP_SHELL = [
-  './',
+  './',                 // landing
+  './app',              // kisan wali app — asli app shell
+  './login',
+  './signup',
+  './css/landing.css',
+  './css/auth.css',
+  './css/landing-tour.css',
+  './js/landing.js',
+  './js/auth.js',
+  './js/landing-tour.js',
+  './assets/logo-icon.png',
   // NOTE: './index.html' JAAN-BOOJH KAR yahan nahi hai.
   // Vercel me cleanUrls on hai, isliye /index.html -> 308 redirect -> /
   // Redirect wala jawab cache karke navigation me dena browser MANA karta hai
@@ -138,8 +156,10 @@ self.addEventListener('fetch', (event) => {
      * Uske page ko kisan wali app ke shell ('./') me likh dena bahut bada
      * bug hota: offline kholne par kisan ko apni app ki jagah admin dashboard
      * dikhne lagta. Isliye admin ke page apne hi URL par cache hote hain.  */
+    /* Har page apne hi URL par cache hota hai — landing, app aur admin
+       teeno alag. Pehle sab './' par jaate the, jisse ek doosre ko mita dete. */
     const isAdmin = url.pathname.indexOf('/' + ADMIN_PATH) === 0;
-    const shellKey = isAdmin ? req : './';
+    const shellKey = req;
 
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_VERSION);
@@ -162,9 +182,14 @@ self.addEventListener('fetch', (event) => {
         return fresh;
       } catch (_) {
         // Offline — cache se wahi shell do jo is app ka hai
-        const shell = isAdmin
-          ? await cache.match(req, { ignoreSearch: true })
-          : ((await cache.match('./')) || (await cache.match('./index.html')));
+        /* Offline: pehle bilkul wahi page, phir uske app ka shell */
+        let shell = await cache.match(req, { ignoreSearch: true });
+        if (!shell && !isAdmin) {
+          // /app ke andar ka koi bhi rasta -> app ka shell
+          shell = url.pathname.indexOf('/' + APP_PATH) === 0
+            ? await cache.match('./app')
+            : await cache.match('./');
+        }
         if (shell) return shell;
         if (isAdmin) {
           return new Response(

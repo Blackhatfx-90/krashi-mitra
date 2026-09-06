@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your Kisan Sathi account — Your smart AI companion for healthier crops.">
+  <meta name="theme-color" content="#168A3A">
+  <title>Sign Up — Kisan Sathi</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/landing-tour.css?v=1" />
+</head>
+<body>
+
+  <main class="auth-page" id="signup-page">
+    <div class="auth-card">
+
+      <!-- Logo & Branding -->
+      <header class="auth-header">
+        <a href="/" class="auth-header__logo">
+          <img src="assets/logo-icon.png" alt="Kisan Sathi" class="auth-header__logo-icon" width="64" height="64">
+          <span class="auth-header__logo-name">Kisan Sathi</span>
+        </a>
+        <p class="auth-header__tagline">Your smart AI companion for healthier crops.</p>
+
+        <h1 class="auth-header__title">Create Account</h1>
+        <p class="auth-header__subtitle">Join Kisan Sathi today</p>
+      </header>
+
+      <!-- Sign Up Form -->
+      <form class="auth-form" id="signup-form" novalidate>
+
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="signup-name" class="form-group__label">Full Name</label>
+          <div class="form-group__input-wrapper">
+            <input
+              type="text"
+              id="signup-name"
+              class="form-group__input"
+              placeholder="Enter your full name"
+              autocomplete="name"
+              required
+            >
+          </div>
+          <span class="form-group__error">Please enter your full name</span>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label for="signup-phone" class="form-group__label">Phone Number</label>
+          <div class="form-group__input-wrapper">
+            <input
+              type="tel"
+              id="signup-phone"
+              class="form-group__input"
+              placeholder="Enter your phone number"
+              autocomplete="tel"
+              required
+            >
+          </div>
+          <span class="form-group__error">Please enter a valid phone number</span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="signup-email" class="form-group__label">Email Address</label>
+          <div class="form-group__input-wrapper">
+            <input
+              type="email"
+              id="signup-email"
+              class="form-group__input"
+              placeholder="Enter your email address"
+              autocomplete="email"
+              required
+            >
+          </div>
+          <span class="form-group__error">Please enter a valid email address</span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="signup-password" class="form-group__label">Password</label>
+          <div class="form-group__input-wrapper">
+            <input
+              type="password"
+              id="signup-password"
+              class="form-group__input form-group__input--has-toggle"
+              placeholder="Create a password"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="form-group__toggle-password" aria-label="Show password">
+              <svg class="icon-eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="icon-eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <span class="form-group__error">Please create a password</span>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="signup-confirm-password" class="form-group__label">Confirm Password</label>
+          <div class="form-group__input-wrapper">
+            <input
+              type="password"
+              id="signup-confirm-password"
+              class="form-group__input form-group__input--has-toggle"
+              placeholder="Confirm your password"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="form-group__toggle-password" aria-label="Show password">
+              <svg class="icon-eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="icon-eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <span class="form-group__error">Passwords do not match</span>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="auth-checkbox">
+          <input type="checkbox" id="terms-agree" required>
+          <label for="terms-agree">I agree to the <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a></label>
+        </div>
+
+        <!-- Sign Up Button -->
+        <button type="submit" class="btn btn--primary btn--full" id="signup-submit-btn">Sign Up</button>
+
+        <!-- Divider -->
+        <div class="auth-divider">
+          <span>or</span>
+        </div>
+
+        <!-- Google Sign Up -->
+        <button type="button" class="btn btn--google btn--full" id="signup-google-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <footer class="auth-footer">
+        <p>Already have an account? <a href="/login">Login</a></p>
+      </footer>
+
+    </div>
+  </main>
+
+  <script src="js/landing.js"></script>
+<script src="js/auth.js?v=1"></script>
+<script src="js/landing-tour.js?v=1"></script>
+</body>
+</html>

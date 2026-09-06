@@ -585,6 +585,64 @@ const BATCH = { MIN: 5, MAX: 40 };
 
 ---
 
+## 3J. 🚪 LANDING + LOGIN + SIGNUP
+
+Site ab do hisson me hai:
+
+| Rasta | Kya | Files |
+|---|---|---|
+| `/` | **Landing page** (marketing) | `index.html`, `css/landing.css`, `js/landing.js` |
+| `/login` `/signup` `/forgot-password` | **Auth pages** | `login.html`, `signup.html`, `css/auth.css`, `js/auth.js` |
+| `/app` | **Kisan wali scan app** — UI bilkul waisi hi | `app.html` (pehle `index.html` tha) |
+| `/regional-admin` | Officer dashboard | `regional-admin/` |
+
+Vercel ke `cleanUrls` ki wajah se `app.html` apne aap `/app` par mil jata hai —
+koi rewrite nahi likhna pada.
+
+### ⚠️ Auth abhi DEMO hai — asli suraksha NAHI
+
+`js/auth.js` poora **browser me hi** chalta hai (localStorage). Koi server nahi,
+koi database nahi. Iska matlab:
+
+- console kholkar koi bhi data dekh/badal sakta hai
+- ek phone ka account doosre phone par nahi milega
+- yeh kisi bhi asli jaankari ki hifazat nahi karta
+
+Password plain text me nahi rakha jata (SHA-256 hash), par **yeh bhi asli
+suraksha nahi** — sirf itna ki localStorage kholne par password seedha na dikhe.
+
+SIH demo/viva ke liye theek hai. Asli kisanon ke saath chalane se pehle
+server-side auth lagana **zaroori** hai — Firebase Auth, Supabase, ya apna
+backend + JWT.
+
+### Google login chalu karna
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → APIs & Services → Credentials
+2. Create OAuth client ID → Web application
+3. Authorized JavaScript origins me daalein: `https://krashi-mitrasih.vercel.app`
+4. Jo Client ID mile, `js/auth.js` ke sabse upar `GOOGLE_CLIENT_ID` me paste karein
+
+Khali chhodne par button **jhootha "login ho gaya" nahi dikhata** — saaf keh
+deta hai ki setup baaki hai.
+
+### Naye user ka tour
+
+`js/landing-tour.js` — landing, login aur signup par alag-alag kadam. Ek baar
+dekhne ke baad dobara nahi aata; `[data-landing-tour]` wale kisi bhi button se
+phir chalaya ja sakta hai. **Yeh app ke andar wale tour (`js/tour.js`) se alag
+hai** aur dono ek doosre ko chhute nahi.
+
+### Installed PWA ka dhyan
+
+- `manifest.json` ka `start_url` ab `/app` hai — install ki hui app seedha
+  scan app kholegi, landing nahi.
+- Purane installs ka `start_url` abhi bhi `/` hai, isliye landing page standalone
+  mode me khulte hi `/app` par bhej deta hai.
+- `sw.js` me har page **apne URL par** cache hota hai. Pehle sab `'./'` par
+  likha jata tha — us hisaab se landing aur app ek doosre ko mita dete.
+
+---
+
 ## 4. ⭐ Nayi fasal (9th crop) kaise jodein
 
 **सिर्फ 2 काम** — core logic छूना नहीं है:

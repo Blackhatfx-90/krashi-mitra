@@ -132,8 +132,8 @@
       selector: '#kmTourHelp',
       titleHi: 'यह मदद वाला बटन याद रखिए',
       titleEn: 'The help button',
-      descHi: 'कभी भी भूल जाएँ तो इस प्रश्नचिह्न वाले बटन को दबाइए — यह पूरा तरीका ' +
-              'फिर से दिखा देगा। अब आप ऐप चलाने के लिए तैयार हैं। शुभकामनाएँ!',
+      descHi: 'कभी भी भूल जाएँ तो इस मदद वाले बटन को दबाइए, यह पूरा तरीका फिर से ' +
+              'दिखा देगा। अब आप ऐप चलाने के लिए तैयार हैं।',
       descEn: 'Tap this any time to replay the tour. You are ready to go!',
       optional: true,
     },
@@ -191,6 +191,29 @@
       if (typeof window.stopSpeaking === 'function') window.stopSpeaking();
       else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     } catch (_) {}
+  }
+
+  /* ---------------------------------------------------------------------
+   * ICONS — emoji ki jagah saaf line-icons.
+   * Sab 24x24 grid par, sirf outline (stroke), rang parent se aata hai —
+   * isliye har jagah ek jaise aur har theme me theek dikhte hain.
+   * ------------------------------------------------------------------- */
+  const ICONS = {
+    arrowLeft:  '<path d="M20 12H5"/><path d="m11 6-6 6 6 6"/>',
+    arrowRight: '<path d="M4 12h15"/><path d="m13 6 6 6-6 6"/>',
+    volumeOn:   '<path d="M4 9.5h3L11.5 6v12L7 14.5H4z"/><path d="M15.3 9.2a4 4 0 0 1 0 5.6"/>' +
+                '<path d="M18 6.6a7.6 7.6 0 0 1 0 10.8"/>',
+    volumeOff:  '<path d="M4 9.5h3L11.5 6v12L7 14.5H4z"/><path d="m16 10 4 4"/><path d="m20 10-4 4"/>',
+    help:       '<circle cx="12" cy="12" r="9"/>' +
+                '<path d="M9.7 9.3a2.4 2.4 0 1 1 3.2 2.3c-.6.2-1 .8-1 1.4v.4"/>' +
+                '<path d="M12 16.6h.01"/>',
+  };
+
+  /** ICONS me se ek icon ka SVG banata hai. */
+  function svgIcon(name, cls) {
+    return '<svg class="' + (cls || 'km-tour-ic') + '" viewBox="0 0 24 24" fill="none" ' +
+           'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" ' +
+           'stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
   }
 
   function esc(s) {
@@ -323,7 +346,7 @@
       root.innerHTML = [
         '<div class="km-tour-blocker"></div>',
         '<div class="km-tour-ring" id="kmTourRing"></div>',
-        '<div class="km-tour-pointer" id="kmTourPointer" aria-hidden="true">👉</div>',
+        '<div class="km-tour-pointer" id="kmTourPointer" aria-hidden="true"></div>',
         '<div class="km-tour-arrow" id="kmTourArrow" aria-hidden="true"></div>',
         '<div class="km-tour-tip" id="kmTourTip">',
           '<div class="km-tour-tip__head">',
@@ -341,8 +364,8 @@
           '<div class="km-tour-tip__bar">',
             '<div class="km-tour-dots" id="kmTourDots"></div>',
             '<div class="km-tour-tip__btns">',
-              '<button type="button" class="km-tour-btn km-tour-btn--back" id="kmTourBack">← पीछे</button>',
-              '<button type="button" class="km-tour-btn km-tour-btn--next" id="kmTourNext">आगे →</button>',
+              '<button type="button" class="km-tour-btn km-tour-btn--back" id="kmTourBack"></button>',
+              '<button type="button" class="km-tour-btn km-tour-btn--next" id="kmTourNext"></button>',
             '</div>',
           '</div>',
         '</div>',
@@ -376,7 +399,7 @@
     }
 
     _paintMute() {
-      this.$mute.textContent = this.muted ? '🔇' : '🔊';
+      this.$mute.innerHTML = svgIcon(this.muted ? 'volumeOff' : 'volumeOn');
       this.$mute.title = this.muted ? 'आवाज़ चालू करें' : 'आवाज़ बंद करें';
     }
 
@@ -396,8 +419,11 @@
       this.$descEn.textContent = step.descEn || '';
       this.$descEn.style.display = step.descEn ? '' : 'none';
 
-      this.$back.disabled   = this.index === 0;
-      this.$next.textContent = (this.index === total - 1) ? 'हो गया ✓' : 'आगे →';
+      this.$back.disabled  = this.index === 0;
+      this.$back.innerHTML = svgIcon('arrowLeft') + '<span>पीछे</span>';
+      this.$next.innerHTML = (this.index === total - 1)
+        ? svgIcon('check') + '<span>हो गया</span>'
+        : '<span>आगे</span>' + svgIcon('arrowRight');
 
       this.$dots.innerHTML = this.steps
         .map((_, i) => '<span class="km-tour-dot' + (i === this.index ? ' is-on' : '') + '"></span>')
@@ -490,18 +516,19 @@
         this.$arrow.style.top  = (placeBelow ? (top + h + 2) : (top - 14)) + 'px';
       }
 
-      /* --- chalta hua 👉 pointer, hamesha target ke kinare par --- */
+      /* --- ishara karta hua teer, hamesha target ke kinare par --- */
       this.$pointer.classList.remove('is-hidden');
       const px = Math.min(vw - 34, left + w + 6);
       const py = Math.max(4, top + h / 2 - 14);
       this.$pointer.style.left = px + 'px';
       this.$pointer.style.top  = py + 'px';
-      // Agar daayein jagah na ho to baayein taraf le jao (aur ulta kar do)
+      // Teer hamesha target ki TARAF dekhe: daayein khada ho to baayein ishara,
+      // baayein khada ho to daayein.
       if (left + w + 40 > vw) {
-        this.$pointer.style.left = Math.max(4, left - 32) + 'px';
-        this.$pointer.textContent = '👈';
+        this.$pointer.style.left = Math.max(4, left - 34) + 'px';
+        this.$pointer.innerHTML = svgIcon('arrowRight', 'km-tour-ic km-tour-ic--lg');
       } else {
-        this.$pointer.textContent = '👉';
+        this.$pointer.innerHTML = svgIcon('arrowLeft', 'km-tour-ic km-tour-ic--lg');
       }
     }
 
@@ -519,7 +546,7 @@
 
 
   /* ==========================================================================
-   * 4. "❓ मदद" button — kabhi bhi tour dobara chalane ke liye
+   * 4. "मदद" button — kabhi bhi tour dobara chalane ke liye
    * ======================================================================= */
   function mountHelpButton() {
     if (document.getElementById('kmTourHelp')) return;
@@ -528,7 +555,7 @@
     btn.id = 'kmTourHelp';
     btn.className = 'km-tour-help';
     btn.setAttribute('aria-label', 'मदद — तरीका दोबारा देखें / Replay tour');
-    btn.innerHTML = '<span aria-hidden="true">❓</span><span class="km-tour-help__txt">मदद / Help</span>';
+    btn.innerHTML = svgIcon('help') + '<span class="km-tour-help__txt">मदद / Help</span>';
     btn.addEventListener('click', () => window.kmTour.start());
     document.body.appendChild(btn);
   }

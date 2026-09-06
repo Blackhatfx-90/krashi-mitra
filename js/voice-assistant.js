@@ -26,6 +26,36 @@
    * 1. Chhote helpers
    * ======================================================================= */
 
+  /* ---------------------------------------------------------------------
+   * ICONS — emoji ki jagah saaf line-icons.
+   * Sab 24x24 grid par, sirf outline (stroke), rang parent se aata hai.
+   * ------------------------------------------------------------------- */
+  const ICONS = {
+    mic:      '<path d="M12 3.4a2.7 2.7 0 0 0-2.7 2.7v5.5a2.7 2.7 0 0 0 5.4 0V6.1A2.7 2.7 0 0 0 12 3.4z"/>' +
+              '<path d="M5.6 11.1a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.5v3M9 20.5h6"/>',
+    micOff:   '<path d="M14.7 5.6a2.7 2.7 0 0 0-5.4.5v4.6"/>' +
+              '<path d="M14.7 11.9a2.7 2.7 0 0 1-4 1.6"/>' +
+              '<path d="M5.6 11.1a6.4 6.4 0 0 0 9.9 5.4M18.4 11.1v.6"/>' +
+              '<path d="M12 17.5v3M9 20.5h6"/><path d="M4 4l16 16"/>',
+    close:    '<path d="M6 6l12 12M18 6L6 18"/>',
+    alert:    '<path d="M12 4.6 20.6 19.5H3.4z"/><path d="M12 10v4M12 16.9h.01"/>',
+    info:     '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    wifiOff:  '<path d="M3.5 3.5 20.5 20.5"/><path d="M8.7 15.6a4.6 4.6 0 0 1 6.6 0"/>' +
+              '<path d="M5.2 12.1a9.4 9.4 0 0 1 3.1-2.1"/><path d="M18.8 12.1a9.4 9.4 0 0 0-7-2.8"/>' +
+              '<path d="M12 19h.01"/>',
+    pin:      '<path d="M12 20.6s6.4-5.5 6.4-10.1a6.4 6.4 0 1 0-12.8 0C5.6 15.1 12 20.6 12 20.6z"/>' +
+              '<circle cx="12" cy="10.4" r="2.4"/>',
+    lock:     '<rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/>' +
+              '<path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7"/>',
+  };
+
+  /** ICONS me se ek icon ka SVG banata hai. */
+  function svgIcon(name, cls) {
+    return '<svg class="' + (cls || 'km-voice-ic') + '" viewBox="0 0 24 24" fill="none" ' +
+           'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" ' +
+           'stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
+  }
+
   /** Suna hua vaakya saaf karo — chhote akshar, bina virām chinh, ek space. */
   function norm(s) {
     return String(s || '')
@@ -180,6 +210,7 @@
                   'ऊपर मौसम वाले कार्ड में ताज़ा करने का बटन दबाइए।',
           actionHi: 'मौसम का डेटा अभी नहीं है',
           actionEn: 'No weather data yet',
+          icon: 'wifiOff',
         };
       },
     },
@@ -370,7 +401,7 @@
       fab.className = 'km-voice-fab';
       fab.dataset.state = this.supported ? 'idle' : 'off';
       fab.setAttribute('aria-label', 'बोलकर ऐप चलाएँ / Voice assistant');
-      fab.textContent = '🎤';
+      fab.innerHTML = svgIcon('mic', 'km-voice-ic km-voice-ic--fab');
       fab.addEventListener('click', () => this.toggle());
       document.body.appendChild(fab);
       this.fab = fab;
@@ -382,19 +413,20 @@
       cap.setAttribute('aria-live', 'polite');
       cap.innerHTML = [
         '<div class="km-voice-cap__row">',
-          '<span class="km-voice-cap__dot"></span>',
-          '<div style="flex:1;min-width:0">',
+          '<span class="km-voice-cap__badge" id="kmVoiceBadge"></span>',
+          '<div class="km-voice-cap__body">',
             '<p class="km-voice-cap__heard" id="kmVoiceHeard"></p>',
             '<p class="km-voice-cap__act" id="kmVoiceAct"></p>',
           '</div>',
           '<button type="button" class="km-voice-cap__close" id="kmVoiceClose" ',
-            'aria-label="बंद करें">✕</button>',
+            'aria-label="बंद करें">' + svgIcon('close') + '</button>',
         '</div>',
         '<ul class="km-voice-cap__tips" id="kmVoiceTips"></ul>',
         '<p class="km-voice-cap__note" id="kmVoiceNote" hidden></p>',
       ].join('');
       document.body.appendChild(cap);
       this.cap    = cap;
+      this.$badge = cap.querySelector('#kmVoiceBadge');
       this.$heard = cap.querySelector('#kmVoiceHeard');
       this.$act   = cap.querySelector('#kmVoiceAct');
       this.$tips  = cap.querySelector('#kmVoiceTips');
@@ -406,10 +438,16 @@
 
     /**
      * Caption patti dikhao.
-     * @param {object} o {heard, action, kind:'listening'|'speaking'|'ok'|'error', tips:[], note, sticky}
+     * @param {object} o {heard, action, icon, kind:'listening'|'speaking'|'ok'|'error',
+     *                    tips:[], note, sticky}
      */
     _cap(o) {
       clearTimeout(this.hideTimer);
+
+      // Kaunsa icon — command ne bataya ho to wahi, warna kind se tay
+      const fallbackIcon = { listening: 'mic', error: 'alert', ok: 'info' }[o.kind] || 'info';
+      this.$badge.innerHTML = svgIcon(o.icon || fallbackIcon);
+
       this.$heard.textContent = o.heard || '';
       this.$act.textContent   = o.action || '';
       this.cap.className = 'km-voice-cap is-on' + (o.kind ? ' is-' + o.kind : '');
@@ -455,10 +493,10 @@
         this._respond(
           'माफ़ कीजिए, इस ब्राउज़र में आवाज़ पहचानने की सुविधा नहीं है। कृपया क्रोम ब्राउज़र इस्तेमाल कीजिए।',
           {
-            heard: '🎤 आवाज़ पहचान उपलब्ध नहीं',
+            heard: 'आवाज़ पहचान उपलब्ध नहीं',
             action: 'Voice recognition is not supported in this browser.',
-            kind: 'error',
-            note: 'Chrome (Android/Desktop) me yeh feature chalta hai. Safari/Firefox me abhi nahi.',
+            kind: 'error', icon: 'micOff',
+            note: 'Chrome (Android / Desktop) me yeh suvidha chalti hai. Safari aur Firefox me abhi nahi.',
             hold: 9000,
           }
         );
@@ -470,7 +508,7 @@
       let rec;
       try { rec = new this.SR(); }
       catch (err) {
-        this._respond('आवाज़ चालू नहीं हो पाई।', { heard: '⚠️ ' + err.message, kind: 'error' });
+        this._respond('आवाज़ चालू नहीं हो पाई।', { heard: err.message, kind: 'error' });
         return;
       }
 
@@ -492,7 +530,7 @@
           tips: ['कैमरा खोलो', 'मौसम बताओ', 'सलाह पढ़ो', 'धान चुनो', 'जाँच करो', 'रुको'],
           note: navigator.onLine
             ? null
-            : '⚠️ आवाज़ पहचान के लिए इंटरनेट चाहिए (Chrome). रोग पहचान बिना इंटरनेट के चलती रहेगी।',
+            : 'Awaaz pehchanne ke liye internet chahiye. Rog pehchan bina internet ke chalti rahegi.',
         });
         // 10 sec me kuch na bole to apne aap band
         this._timeout = setTimeout(() => { try { rec.stop(); } catch (_) {} }, 10000);
@@ -531,8 +569,9 @@
         if (heard) this._handle(heard, finalText.trim());
         else if (!this._errored) {
           this._respond('कुछ सुनाई नहीं दिया। कृपया दोबारा बोलिए।', {
-            heard: '🤔 कुछ सुनाई नहीं दिया', action: 'Nothing heard — tap the mic and try again',
-            kind: 'error',
+            heard: 'कुछ सुनाई नहीं दिया',
+            action: 'Nothing heard. Tap the mic and try again.',
+            kind: 'error', icon: 'micOff',
           });
         }
         this._errored = false;
@@ -556,36 +595,42 @@
     /* ---------- error ko aasan bhasha me badlo ---------------------------- */
     _handleError(code) {
       this._errored = true;
-      let speak, heard, note = null;
+      let speak, heard, note = null, ic = 'alert';
 
       switch (code) {
         case 'not-allowed':
         case 'service-not-allowed':
-          heard = '🚫 माइक की अनुमति नहीं मिली';
+          heard = 'माइक की अनुमति नहीं मिली';
           speak = 'माइक की अनुमति नहीं मिली। कृपया ब्राउज़र में माइक को अनुमति दीजिए।';
-          note  = 'Address bar me 🔒 par tap karke Microphone ko "Allow" karein, phir dobara try karein.';
+          note  = 'Address bar ke taale par tap karke Microphone ko "Allow" karein, phir dobara boliye.';
+          ic    = 'micOff';
           break;
         case 'no-speech':
-          heard = '🤔 कुछ सुनाई नहीं दिया';
+          heard = 'कुछ सुनाई नहीं दिया';
           speak = 'कुछ सुनाई नहीं दिया। कृपया दोबारा बोलिए।';
+          ic    = 'micOff';
           break;
         case 'audio-capture':
-          heard = '🎙️ माइक नहीं मिला';
+          heard = 'माइक नहीं मिला';
           speak = 'फ़ोन का माइक नहीं मिला। कृपया जाँच लीजिए।';
+          ic    = 'micOff';
           break;
         case 'network':
-          heard = '📴 इंटरनेट नहीं है';
+          heard = 'इंटरनेट नहीं है';
           speak = 'आवाज़ पहचानने के लिए इंटरनेट चाहिए। रोग पहचान बिना इंटरनेट के चलती रहेगी।';
-          note  = '⚠️ Browser ki speech-to-text service internet se chalti hai. ' +
+          note  = 'Browser ki speech-to-text service internet se chalti hai. ' +
                   'Baaki app (rog pehchan, salah, awaaz) offline kaam karti hai.';
+          ic    = 'wifiOff';
           break;
         case 'aborted':
           return;                                   // user ne khud roka — chup raho
         default:
-          heard = '⚠️ आवाज़ नहीं समझ पाया';
+          heard = 'आवाज़ समझ नहीं आई';
           speak = 'कुछ गड़बड़ हुई। कृपया दोबारा कोशिश कीजिए।';
       }
-      this._respond(speak, { heard: heard, action: code, kind: 'error', note: note, hold: 9000 });
+      this._respond(speak, {
+        heard: heard, action: code, kind: 'error', icon: ic, note: note, hold: 9000,
+      });
     }
 
     /* ---------- suna hua vaakya -> kaam ----------------------------------- */
@@ -620,6 +665,7 @@
         heard: '“' + raw + '”',
         action: (out.actionHi || '') + (out.actionEn ? ' · ' + out.actionEn : ''),
         kind: out.failHi ? 'error' : 'ok',
+        icon: out.icon || null,
         hold: 7000,
       });
 
@@ -646,16 +692,16 @@
       wrap.setAttribute('aria-modal', 'true');
       wrap.innerHTML = [
         '<div class="km-perm__box">',
-          '<div class="km-perm__icon" aria-hidden="true">🌾</div>',
+          '<img class="km-perm__logo" src="assets/logo.svg" alt="" width="52" height="52" />',
           '<h2>नमस्ते! एक छोटी सी अनुमति चाहिए</h2>',
           '<p>यह ऐप आपकी <b>आवाज़</b> और <b>लोकेशन</b> का उपयोग करके आपकी मदद करेगा।</p>',
           '<p class="km-perm__en">This app uses your voice and location to help you.</p>',
           '<ul class="km-perm__list">',
-            '<li><span class="km-perm__emoji">🎤</span><div>',
+            '<li><span class="km-perm__ic">' + svgIcon('mic') + '</span><div>',
               '<b>माइक / Microphone</b>',
-              'ताकि आप बोलकर ऐप चला सकें — “कैमरा खोलो”, “मौसम बताओ”।',
+              'ताकि आप बोलकर ऐप चला सकें, जैसे “कैमरा खोलो” या “मौसम बताओ”।',
             '</div></li>',
-            '<li><span class="km-perm__emoji">📍</span><div>',
+            '<li><span class="km-perm__ic">' + svgIcon('pin') + '</span><div>',
               '<b>लोकेशन / Location</b>',
               'ताकि आपके खेत का मौसम और बारिश की चेतावनी दिखा सकें।',
             '</div></li>',
@@ -667,8 +713,8 @@
               'अभी नहीं / Not now</button>',
           '</div>',
           '<p class="km-perm__foot">',
-            'आपकी फोटो और आवाज़ कहीं नहीं भेजी जाती — रोग की जाँच आपके फ़ोन में ही होती है। ',
-            'अनुमति बाद में भी दे सकते हैं।',
+            'आपकी फोटो और आवाज़ कहीं नहीं भेजी जाती। रोग की जाँच आपके फ़ोन में ही होती है। ',
+            'अनुमति बाद में भी दी जा सकती है।',
           '</p>',
         '</div>',
       ].join('');

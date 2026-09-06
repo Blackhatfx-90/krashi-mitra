@@ -3,8 +3,8 @@
   "short_name": "AgriAI",
   "description": "Offline multi-crop disease detection with Hindi advisory, voice output and weather-based spray warnings.",
   "id": "/",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
   "display_override": [
     "standalone",

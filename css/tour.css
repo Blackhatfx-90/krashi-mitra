@@ -1,7 +1,7 @@
 /* ============================================================================
    tour.css — Guided Tour overlay (Feature A)
 
-   ⚠️ YEH FILE PURI TARAH ALAG HAI.
+   NOTE: YEH FILE PURI TARAH ALAG HAI.
    Har class ka naam ".km-tour" se shuru hota hai, aur saare colors is file ke
    apne variables (--kmt-*) se aate hain. Isliye yeh app ki maujooda style se
    kabhi nahi takrayegi — na app ki style isse.
@@ -23,6 +23,13 @@
 
   --kmt-z:          9000;   /* app ka sabse upar wala element z-index 60 hai */
 }
+
+/* ---------- icons ---------------------------------------------------------
+   Saare icon inline SVG hain (js/tour.js ke ICONS me). Rang parent se aata
+   hai, isliye har button par apne aap sahi dikhte hain.
+   ------------------------------------------------------------------------ */
+.km-tour-ic{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;fill:none;}
+.km-tour-ic--lg{width:26px;height:26px;}
 
 /* ---------- root: sirf tour chalte waqt DOM me hota hai ------------------ */
 .km-tour-root{
@@ -66,13 +73,15 @@
 .km-tour-arrow.is-down{ border-top:12px solid var(--kmt-surface); }
 .km-tour-arrow.is-hidden{display:none;}
 
-/* Ek chhota chalta hua haath/teer jo target par ishara karta hai */
+/* Ek chhota chalta hua teer jo target par ishara karta hai */
 .km-tour-pointer{
-  position:absolute; pointer-events:none; font-size:26px; line-height:1;
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));
-  animation:kmt-bob 1.1s ease-in-out infinite;
+  position:absolute; pointer-events:none; line-height:0;
+  color:#fff;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.7));
+  animation:kmt-nudge 1.2s ease-in-out infinite;
 }
-@keyframes kmt-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.km-tour-pointer svg{stroke-width:2.4;}
+@keyframes kmt-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-5px)}}
 .km-tour-pointer.is-hidden{display:none;}
 
 /* ---------- TOOLTIP / caption box --------------------------------------- */
@@ -135,7 +144,7 @@
 .km-tour-btn--ghost:hover{background:#f2f4f7;}
 .km-tour-btn--icon{
   background:transparent;padding:0;width:40px;height:40px;
-  font-size:17px;color:var(--kmt-ink-2);
+  color:var(--kmt-ink-2);
 }
 .km-tour-btn--icon:hover{background:#f2f4f7;}
 
@@ -167,7 +176,7 @@
 .km-tour-help:active{transform:scale(.97);}
 .km-tour-help__txt{white-space:nowrap;}
 @media (max-width:420px){
-  .km-tour-help__txt{display:none;}          /* chhoti screen par sirf ❓ */
+  .km-tour-help__txt{display:none;}          /* chhoti screen par sirf icon */
   .km-tour-help{padding:0;width:44px;justify-content:center;}
 }
 
@@ -175,6 +184,7 @@
 @media (prefers-reduced-motion:reduce){
   .km-tour-ring{animation:none;transition:none;}
   .km-tour-pointer{animation:none;}
+  .km-tour-pointer svg{stroke-width:2.4;}
   .km-tour-tip,.km-tour-arrow{transition:none;}
 }
 
