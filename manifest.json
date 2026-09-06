@@ -1,6 +1,6 @@
 {
-  "name": "AgriAI — फसल रोग पहचान व स्मार्ट सलाह",
-  "short_name": "AgriAI",
+  "name": "Krashi Mitra — फसल रोग पहचान व स्मार्ट सलाह",
+  "short_name": "Krashi Mitra",
   "description": "Offline multi-crop disease detection with Hindi advisory, voice output and weather-based spray warnings.",
   "id": "/",
   "start_url": "/app",
