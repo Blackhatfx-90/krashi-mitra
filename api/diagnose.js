@@ -195,18 +195,41 @@ async function callModel(model, apiKey, imageDataUrl, prompt, referer) {
   }
 }
 
+async function callGemini(apiKey, imageDataUrl, prompt) {
+  const match = imageDataUrl.match(/^data:(image\/[a-z0-9.+-]+);base64,(.+)$/i);
+  if (!match) return { ok: false, status: 400, error: 'bad_image' };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), PER_MODEL_TIMEOUT_MS);
+  try {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + encodeURIComponent(apiKey), {
+      method: 'POST', signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: match[1], data: match[2] } }] }] }),
+    });
+    const text = await res.text();
+    if (!res.ok) return { ok: false, status: res.status, error: text.slice(0, 300) };
+    const data = JSON.parse(text);
+    const content = data?.candidates?.[0]?.content?.parts?.map((part) => part.text).filter(Boolean).join('\\n') || '';
+    return { ok: true, content, usedModel: 'gemini-2.0-flash' };
+  } catch (err) {
+    return { ok: false, status: err?.name === 'AbortError' ? 504 : 500, error: String(err?.message || err) };
+  } finally { clearTimeout(timer); }
+}
+
 /* ------------------------------------------------------------------------- */
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
+  const geminiKey = process.env.GEMINI_API_KEY;
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   /* GET = health check. Key kabhi wapas nahi bhejte, sirf "lagi hai ya nahi". */
   if (req.method === 'GET') {
     return res.status(200).json({
       ok: true,
-      configured: Boolean(apiKey),
-      models: models(),
+      configured: Boolean(geminiKey || apiKey),
+      provider: geminiKey ? 'gemini' : (apiKey ? 'openrouter' : null),
+      models: geminiKey ? ['gemini-2.0-flash'] : models(),
     });
   }
 
@@ -215,7 +238,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'method_not_allowed' });
   }
 
-  if (!apiKey) {
+  if (!geminiKey && !apiKey) {
     return res.status(503).json({
       ok: false,
       error: 'not_configured',
@@ -254,7 +277,21 @@ module.exports = async function handler(req, res) {
   const chain = models();
   const tried = [];
 
-  for (let i = 0; i < chain.length && tried.length < MAX_ATTEMPTS; i++) {
+  if (geminiKey) {
+    const out = await callGemini(geminiKey, image, prompt);
+    tried.push(out.usedModel || 'gemini-2.0-flash');
+    if (out.ok) {
+      const parsed = parseJsonish(out.content);
+      const label = parsed && matchLabel(parsed.label, labels);
+      if (label) {
+        const confidence = Math.max(0, Math.min(1, Number(parsed.confidence) || 0.7));
+        const localLabel = (localTop[0] && localTop[0].label) || null;
+        return res.status(200).json({ ok: true, label, confidence, second: matchLabel(parsed.second, labels) || '', evidence: String(parsed.evidence || '').slice(0, 400), evidenceHi: String(parsed.evidence_hi || '').slice(0, 400), agree: Boolean(localLabel && label === localLabel), localLabel, model: out.usedModel, tried });
+      }
+    }
+  }
+
+  for (let i = 0; apiKey && i < chain.length && tried.length < MAX_ATTEMPTS; i++) {
     const model = chain[i];
     const out = await callModel(model, apiKey, image, prompt, referer);
     tried.push(model);
