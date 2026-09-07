@@ -1,0 +1,109 @@
+/* ============================================================================
+   MANDI BHAAV card — js/mandi.js ke saath jaati hai.
+   Yeh file poori tarah alag hai; saare class naam "mandi-" se shuru hote hain
+   taaki app ki apni CSS se kabhi na takraayein.
+   Rang app ki hi style.css ke variables se aate hain, isliye theme ek jaisi rehti hai.
+   ========================================================================= */
+
+.mandi-card{border-color:#fde68a;background:linear-gradient(180deg,#fffdf5 0%,var(--surface) 55%);}
+.mandi-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
+
+/* ---------- sabse achha bhaav ---------- */
+.mandi-best{
+  border:1.5px solid var(--green-500);border-radius:12px;
+  background:var(--green-050);padding:14px;margin-bottom:12px;
+}
+.mandi-best__label{
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--green-700);
+}
+.mandi-best__price{
+  font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.15;
+  color:var(--green-700);margin-top:4px;
+}
+.mandi-best__price span{font-size:12px;font-weight:600;color:var(--ink-2);margin-left:5px;}
+.mandi-best__where{font-size:13.5px;font-weight:600;margin-top:2px;}
+.mandi-best__gain{
+  display:flex;align-items:flex-start;gap:5px;
+  margin-top:8px;padding-top:8px;border-top:1px dashed var(--green-100);
+  font-size:13px;color:var(--green-700);
+}
+.mandi-best__gain b{font-weight:800;}
+.mandi-best__gain--flat{color:var(--ink-2);}
+
+/* ---------- radius chunav ---------- */
+.mandi-radius{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin:12px 0 8px;font-size:12.5px;color:var(--ink-2);
+}
+.mandi-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.mandi-chip{
+  min-height:34px;padding:0 12px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line-strong);background:var(--surface);
+  font-size:12.5px;font-weight:600;color:var(--ink-2);
+}
+.mandi-chip:hover{background:var(--bg);}
+.mandi-chip.is-on{background:var(--green-700);border-color:var(--green-700);color:#fff;}
+
+/* ---------- mandiyon ki list ---------- */
+.mandi-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0;padding:0;}
+.mandi-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);
+}
+.mandi-row--best{border-color:var(--green-500);background:var(--green-050);}
+.mandi-row--worst{border-color:#fecaca;background:var(--red-050);}
+.mandi-row__main{flex:1;min-width:0;}
+.mandi-row__name{
+  font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+}
+.mandi-row__sub{font-size:11.5px;color:var(--ink-3);margin-top:1px;}
+.mandi-row__price{text-align:right;flex:0 0 auto;}
+.mandi-row__price b{display:block;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;}
+.mandi-row__price small{font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;}
+.mandi-row--best .mandi-row__price b{color:var(--green-700);}
+.mandi-row--worst .mandi-row__price b{color:var(--red-600);}
+
+.mandi-tag{
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;
+  background:var(--green-100);color:var(--green-700);
+}
+.mandi-row--worst .mandi-tag{background:#fee2e2;color:var(--red-600);}
+
+/* ---------- sandesh / loading ---------- */
+.mandi-msg{
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  padding:24px 14px;text-align:center;
+}
+.mandi-msg__ic{line-height:0;color:var(--ink-3);}
+.mandi-msg__ic .ic{width:26px;height:26px;}
+.mandi-msg p{font-size:13.5px;color:var(--ink-2);max-width:420px;}
+.mandi-msg__en{font-size:12px;color:var(--ink-3);}
+
+.mandi-note{
+  display:flex;align-items:flex-start;gap:6px;
+  margin:10px 0 0;padding:8px 11px;border-radius:9px;
+  background:var(--amber-050);border:1px solid #fde68a;color:var(--amber-600);
+  font-size:12px;line-height:1.5;
+}
+
+.mandi-foot{
+  margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);
+  font-size:11px;color:var(--ink-3);line-height:1.6;
+}
+
+/* ---------- chhoti screen ---------- */
+@media (max-width:420px){
+  .mandi-best__price{font-size:26px;}
+  .mandi-row__price b{font-size:14px;}
+  .mandi-radius{gap:6px;}
+}
+
+/* Chhoti screen: heading aur buttons ek hi line me thuns jaate the, jisse
+   subtitle 3 tukdon me toot raha tha. Yahan unhe upar-neeche kar dete hain. */
+@media (max-width:520px){
+  .mandi-card .card__head--row{flex-direction:column;align-items:stretch;gap:10px;}
+  .mandi-actions{justify-content:flex-start;}
+  .mandi-actions .speak-btn{flex:1;justify-content:center;}
+}

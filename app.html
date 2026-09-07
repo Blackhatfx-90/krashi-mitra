@@ -14,6 +14,7 @@
   <!-- NAYE FEATURE — alag files, purani style ko haath nahi lagate -->
   <link rel="stylesheet" href="css/tour.css?v=2" />
   <link rel="stylesheet" href="css/voice.css?v=2" />
+  <link rel="stylesheet" href="css/mandi.css?v=1" />
 </head>
 
 <body>
@@ -457,6 +458,27 @@
         </article>
 
 
+        <!-- ---------- MANDI BHAAV (js/mandi.js chalata hai) ---------- -->
+        <article class="card mandi-card" id="mandiCard">
+          <div class="card__head card__head--row">
+            <div>
+              <h2>आस-पास की मंडी का भाव</h2>
+              <p>अपनी फसल कहाँ बेचने पर सबसे अच्छा दाम मिलेगा</p>
+            </div>
+            <div class="mandi-actions">
+              <button type="button" class="speak-btn" id="mandiSpeakBtn" data-speaking="false" disabled>
+                <svg class="ic"><use href="#i-speaker"/></svg><span>सुनो / Listen</span>
+              </button>
+              <button type="button" class="icon-btn" id="mandiRefreshBtn" aria-label="ताज़ा करें / Refresh">
+                <svg class="ic"><use href="#i-refresh"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="mandiBody"></div>
+        </article>
+
+
         <div class="grid grid--2">
 
           <!-- Upload / capture -->
@@ -811,5 +833,6 @@
 <script src="js/tour.js?v=2"></script>
 <script src="js/offline-agriculture.js?v=1"></script>
 <script src="js/voice-assistant.js?v=2"></script>
+<script src="js/mandi.js?v=1"></script>
 </body>
 </html>

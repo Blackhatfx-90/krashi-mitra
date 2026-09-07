@@ -8985,6 +8985,10 @@ async function selectCrop(cropId) {
   // Weather sirf ek baar shuru karo (fasal badalne par dobara fetch ki zaroorat nahi)
   if (!state.weather) refreshWeather({ silent: true });
 
+  // Mandi bhaav har fasal ke liye alag hota hai, isliye fasal badalte hi dobara laao.
+  // (js/mandi.js apne aap cache sambhalta hai — har baar API call nahi hoti.)
+  if (window.kmMandi) window.kmMandi.load();
+
   // Is fasal ke liye vibhag ki koi chetavni hai kya
   fetchAdvisories();
 
