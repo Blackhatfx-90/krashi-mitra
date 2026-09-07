@@ -6697,7 +6697,7 @@ function switchView(name) {
   const crop = activeCrop();
   if (crop && (name === 'scan' || name === 'handbook')) {
     el.viewSubtitle.innerHTML =
-      icon(crop.icon, 'ic ic--inline') + ' ' + escapeHtml(crop.nameHi) +
+      icon(crop.icon, 'cropart cropart--sm') + ' ' + escapeHtml(crop.nameHi) +
       ' · ' + VIEW_META[name].sub;
   }
 
@@ -8947,7 +8947,7 @@ function renderCropCards() {
         ' data-crop="', escapeHtml(id), '"', (ready ? '' : ' disabled'),
         ' aria-label="', escapeHtml(c.nameHi + ' / ' + c.nameEn), '">',
 
-        '<span class="crop-card__icon" aria-hidden="true">', icon(c.icon, 'ic ic--crop'), '</span>',
+        '<span class="crop-card__icon" aria-hidden="true">', icon(c.icon, 'cropart'), '</span>',
         '<span class="crop-card__text">',
           '<span class="crop-card__name">', escapeHtml(c.nameHi), '</span>',
           '<small>', escapeHtml(c.nameEn), ' · ', escapeHtml(c.altHi), '</small>',
@@ -8996,7 +8996,7 @@ function updateCropChip() {
   const crop = activeCrop();
   if (el.cropChip) {
     el.cropChip.innerHTML = crop
-      ? icon(crop.icon, 'ic ic--inline') + ' ' + escapeHtml(crop.nameHi)
+      ? icon(crop.icon, 'cropart cropart--sm') + ' ' + escapeHtml(crop.nameHi)
       : icon('sprout', 'ic ic--inline') + ' फसल चुनें';
   }
   if (el.handbookCropName) {
@@ -9152,7 +9152,7 @@ async function renderOfflineManager() {
     const n = (crop.labels || []).length;
     return [
       '<li class="dl-item" data-crop="', escapeHtml(id), '">',
-        '<span class="dl-icon" aria-hidden="true">', icon(crop.icon, 'ic ic--crop'), '</span>',
+        '<span class="dl-icon" aria-hidden="true">', icon(crop.icon, 'cropart'), '</span>',
         '<span class="dl-body">',
           '<span class="dl-name">', escapeHtml(crop.nameHi),
             ' <small>', escapeHtml(crop.nameEn), '</small></span>',

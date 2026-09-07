@@ -91,48 +91,161 @@
   <symbol id="i-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 21v-8"/><path d="M12 13C12 9 9 6.5 5 6.5 5 10.5 8 13 12 13z"/><path d="M12 13c0-3.3 2.6-6 6-6 0 3.3-2.6 6-6 6z"/>
   </symbol>
-  <!-- ===== FASAL ke icons (js/script.js ke CROPS config me naam diye gaye hain) ===== -->
-  <symbol id="i-crop-rice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 21v-8"/><path d="M12 13c-3.3 0-5.5-2.3-5.8-5.6C9.6 7.7 11.8 9.9 12 13z"/>
-    <path d="M12 13c3.3 0 5.5-2.3 5.8-5.6C14.4 7.7 12.2 9.9 12 13z"/>
-    <path d="M12 8.4c-.2-2.6 1-4.6 3-5.4.6 2.6-.6 4.7-3 5.4z"/>
+  <!-- ===== FASAL ke icons =====================================================
+       Yeh flat colour illustrations hain (line-icons nahi), taaki kisan ko
+       fasal ek nazar me pehchan aaye. Har ek 32x32 grid par bana hai.
+       Rang har path me khud likhe hain — isliye inhe .cropart class chahiye,
+       .ic class NAHI (wo fill hata deti hai).
+       Naya crop jodna ho to yahan ek naya <symbol id="i-crop-XXX"> bana dein
+       aur js/script.js ke CROPS config me  icon: 'crop-XXX'  likh dein.
+       ========================================================================= -->
+
+  <symbol id="i-crop-rice" viewBox="0 0 32 32">
+    <!-- tana + jhuki hui baali ki dandi -->
+    <path d="M13 30V15c0-4 1.6-7 5-9" stroke="#4d7c0f" stroke-width="1.8"
+          stroke-linecap="round" fill="none"/>
+    <path d="M18 6c3.4 1.4 5.4 4 6 7.6-3.6-.4-6.2-2.8-6-7.6z"
+          stroke="#ca8a04" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <!-- patti -->
+    <path d="M12.6 23.6c-4-.6-6.4-3.2-6.6-7 3.9.7 6.3 3.3 6.6 7z" fill="#65a30d"/>
+    <path d="M13.4 19.4c3.4-.5 5.6-2.7 5.8-6-3.4.6-5.5 2.9-5.8 6z" fill="#84cc16"/>
+    <!-- latakte hue daane -->
+    <g fill="#eab308">
+      <ellipse cx="16.4" cy="9.6" rx="1.4" ry="2.4" transform="rotate(-22 16.4 9.6)"/>
+      <ellipse cx="19.4" cy="6.4" rx="1.4" ry="2.4" transform="rotate(-8 19.4 6.4)"/>
+      <ellipse cx="22.6" cy="7.4" rx="1.4" ry="2.4" transform="rotate(16 22.6 7.4)"/>
+      <ellipse cx="24.4" cy="10.6" rx="1.4" ry="2.4" transform="rotate(32 24.4 10.6)"/>
+      <ellipse cx="25" cy="14.4" rx="1.4" ry="2.4" transform="rotate(48 25 14.4)"/>
+      <ellipse cx="21.4" cy="11.2" rx="1.4" ry="2.4" transform="rotate(20 21.4 11.2)"/>
+      <ellipse cx="18.2" cy="13" rx="1.4" ry="2.4" transform="rotate(-4 18.2 13)"/>
+    </g>
   </symbol>
-  <symbol id="i-crop-wheat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 21v-9"/>
-    <path d="M12 12c-2.2 0-3.6-1.5-3.6-3.6C10.6 8.4 12 9.8 12 12z"/><path d="M12 12c2.2 0 3.6-1.5 3.6-3.6C13.4 8.4 12 9.8 12 12z"/>
-    <path d="M12 8c-2.2 0-3.6-1.5-3.6-3.6C10.6 4.4 12 5.8 12 8z"/><path d="M12 8c2.2 0 3.6-1.5 3.6-3.6C13.4 4.4 12 5.8 12 8z"/>
+
+  <symbol id="i-crop-wheat" viewBox="0 0 32 32">
+    <!-- tana -->
+    <path d="M16 30V19" stroke="#a16207" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <!-- upar nikli hui patli soolein (awns) -->
+    <g stroke="#d4a017" stroke-width=".9" stroke-linecap="round" fill="none">
+      <path d="M16 8V1.8M16 8 12.2 2.6M16 8l3.8-5.4M16 8 9.6 4.2M16 8l6.4-3.8"/>
+    </g>
+    <!-- daanon ke jode, neeche se upar chhote hote hue -->
+    <g fill="#d4a017">
+      <ellipse cx="12.9" cy="19.2" rx="2.1" ry="3.2" transform="rotate(-26 12.9 19.2)"/>
+      <ellipse cx="19.1" cy="19.2" rx="2.1" ry="3.2" transform="rotate(26 19.1 19.2)"/>
+      <ellipse cx="13.1" cy="15" rx="2" ry="3.1" transform="rotate(-26 13.1 15)"/>
+      <ellipse cx="18.9" cy="15" rx="2" ry="3.1" transform="rotate(26 18.9 15)"/>
+      <ellipse cx="13.4" cy="11" rx="1.8" ry="2.9" transform="rotate(-26 13.4 11)"/>
+      <ellipse cx="18.6" cy="11" rx="1.8" ry="2.9" transform="rotate(26 18.6 11)"/>
+    </g>
+    <!-- beech ki kataar upar, thoda halka rang -->
+    <g fill="#eab308">
+      <ellipse cx="16" cy="20.4" rx="2.1" ry="3.3"/>
+      <ellipse cx="16" cy="16.2" rx="2" ry="3.2"/>
+      <ellipse cx="16" cy="12.2" rx="1.9" ry="3"/>
+      <ellipse cx="16" cy="8.6" rx="1.7" ry="2.6"/>
+    </g>
   </symbol>
-  <symbol id="i-crop-sugarcane" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M9.5 21V6a2.5 2.5 0 0 1 5 0v15"/><path d="M9.5 11h5M9.5 15.5h5"/>
-    <path d="M14.5 8.2c2-1.3 3.7-1.1 4.9.3-1.6 1.5-3.4 1.5-4.9-.3z"/>
+
+  <symbol id="i-crop-sugarcane" viewBox="0 0 32 32">
+    <g stroke="#3f6212" stroke-width=".7">
+      <rect x="6.2" y="9" width="5.4" height="20" rx="2.4" fill="#84cc16" transform="rotate(-9 8.9 19)"/>
+      <rect x="13.3" y="7.4" width="5.4" height="21.6" rx="2.4" fill="#a3e635"/>
+      <rect x="20.4" y="9" width="5.4" height="20" rx="2.4" fill="#84cc16" transform="rotate(9 23.1 19)"/>
+    </g>
+    <g stroke="#4d7c0f" stroke-width=".9" stroke-linecap="round" fill="none">
+      <path d="M6.6 15.4h5.2M6.9 21.4h5.2M7.2 26.4h5.2"/>
+      <path d="M13.6 13.6h4.8M13.6 19.6h4.8M13.6 25.6h4.8"/>
+      <path d="M20.2 15.4h5.2M19.9 21.4h5.2M19.6 26.4h5.2"/>
+    </g>
+    <path d="M16 7.4c-3.4-1.6-4.8-4-4.3-7 3.3.8 4.9 3.2 4.3 7z" fill="#65a30d"/>
+    <path d="M16 7.4c3.4-1.6 4.8-4 4.3-7-3.3.8-4.9 3.2-4.3 7z" fill="#4d7c0f"/>
   </symbol>
-  <symbol id="i-crop-cotton" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="9.4" r="2.3"/><circle cx="8.5" cy="12.2" r="2.1"/><circle cx="15.5" cy="12.2" r="2.1"/>
-    <path d="M12 21v-6.2"/><path d="m9.2 17.6 2.8-2.4 2.8 2.4"/>
+
+  <symbol id="i-crop-cotton" viewBox="0 0 32 32">
+    <path d="M16 30v-8" stroke="#6b7280" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+    <g fill="#f8fafc" stroke="#cbd5e1" stroke-width=".7">
+      <circle cx="16" cy="10.4" r="5"/>
+      <circle cx="10.2" cy="15" r="4.4"/>
+      <circle cx="21.8" cy="15" r="4.4"/>
+      <circle cx="16" cy="17.6" r="4.6"/>
+    </g>
+    <g fill="#92400e">
+      <path d="M16 22.4 10.6 19l1.2 4.6z"/>
+      <path d="m16 22.4 5.4-3.4-1.2 4.6z"/>
+      <path d="M16 22.4 13.4 18h5.2z"/>
+    </g>
   </symbol>
-  <symbol id="i-crop-onion" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 21c-3.3 0-5.7-2.2-5.7-5.3 0-3.1 2.4-5.7 5.7-8.4 3.3 2.7 5.7 5.3 5.7 8.4 0 3.1-2.4 5.3-5.7 5.3z"/>
-    <path d="M12 7.3V4"/><path d="M12 6.1c1.3-1 2.5-1.4 3.9-1.4M12 6.1c-1.3-1-2.5-1.4-3.9-1.4"/>
+
+  <symbol id="i-crop-onion" viewBox="0 0 32 32">
+    <path d="M16 10.6c-1.4-3-3.4-4.6-6.2-5 .3 3 2.3 4.8 6.2 5z" fill="#65a30d"/>
+    <path d="M16 10.6c1.4-3 3.4-4.6 6.2-5-.3 3-2.3 4.8-6.2 5z" fill="#4d7c0f"/>
+    <path d="M16 3.4v7.4" stroke="#4d7c0f" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path d="M16 30c-5.2 0-8.6-3.3-8.6-8 0-4.7 3.6-8.6 8.6-11.4 5 2.8 8.6 6.7 8.6 11.4 0 4.7-3.4 8-8.6 8z"
+          fill="#c084fc"/>
+    <path d="M16 10.6c-2.6 2.6-4 6.6-4 11.4 0 3.4 1.3 6.2 3.3 8h.7c-1.6-2.2-2.4-5-2.4-8 0-4.3 .8-8.2 2.4-11.4z"
+          fill="#e9d5ff"/>
+    <path d="M20.4 13.8c1.6 2.6 2.4 5.5 2.4 8.2 0 3-1 5.8-2.8 7.6 2.8-1.2 4.6-4 4.6-7.6 0-3-1.5-5.8-4.2-8.2z"
+          fill="#a855f7"/>
   </symbol>
-  <symbol id="i-crop-maize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 21c-2.6 0-4.4-2.2-4.4-5.6 0-4.4 2-9.4 4.4-12.4 2.4 3 4.4 8 4.4 12.4 0 3.4-1.8 5.6-4.4 5.6z"/>
-    <path d="M9.5 9.2h5M9.1 12.6h5.8M9.7 16h4.6"/>
+
+  <symbol id="i-crop-maize" viewBox="0 0 32 32">
+    <path d="M9.4 12.6C6.6 9.8 5.6 6.4 6.4 2.6c3.8 1 6.2 3.6 7 8z" fill="#65a30d"/>
+    <path d="M22.6 12.6c2.8-2.8 3.8-6.2 3-10-3.8 1-6.2 3.6-7 8z" fill="#4d7c0f"/>
+    <path d="M16 30c-3.9 0-6.6-3.3-6.6-8.4 0-6.6 2.9-14.1 6.6-18.6 3.7 4.5 6.6 12 6.6 18.6 0 5.1-2.7 8.4-6.6 8.4z"
+          fill="#facc15"/>
+    <g fill="#eab308">
+      <circle cx="13.2" cy="12.4" r="1.3"/><circle cx="16" cy="10.6" r="1.3"/><circle cx="18.8" cy="12.4" r="1.3"/>
+      <circle cx="12.4" cy="17" r="1.3"/><circle cx="16" cy="15.6" r="1.3"/><circle cx="19.6" cy="17" r="1.3"/>
+      <circle cx="12.6" cy="21.6" r="1.3"/><circle cx="16" cy="20.4" r="1.3"/><circle cx="19.4" cy="21.6" r="1.3"/>
+      <circle cx="13.8" cy="26" r="1.3"/><circle cx="16" cy="25" r="1.3"/><circle cx="18.2" cy="26" r="1.3"/>
+    </g>
   </symbol>
-  <symbol id="i-crop-potato" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M4.7 13.7c-.8-3.9 2-7.5 6.2-8.2 4.2-.7 8.1 1.8 8.7 5.6.6 3.7-2.3 7.3-6.5 8-4.2.7-7.7-1.6-8.4-5.4z"/>
-    <path d="M9.6 10.6h.01M13.6 9.6h.01M11.6 14.1h.01M15.6 13.1h.01"/>
+
+  <symbol id="i-crop-potato" viewBox="0 0 32 32">
+    <path d="M4.6 18.4c-1-4.6 2.6-8.8 8-9.6 5.4-.8 10.4 2.2 11.2 6.6.8 4.4-2.8 8.6-8.2 9.4-5.4.8-10.2-2-11-6.4z"
+          fill="#c2925c"/>
+    <path d="M12.6 8.8c-2.6 2.6-3.6 6.4-2.6 10 1 3.6 3.8 6.2 7.2 7-3.4.4-6.6-.6-8.8-2.8 3-1 5-4 5-7.6 0-2.6-.4-5-.8-6.6z"
+          fill="#a97c50"/>
+    <path d="M19.6 21.6c3.4-1.6 5.4-4.6 5-7.8 1.6 1.4 2.4 3.2 2 5.2-.4 2.4-3 4.2-7 2.6z" fill="#d8ab77"/>
+    <g fill="#7c5a34">
+      <ellipse cx="11.4" cy="14.4" rx=".9" ry=".7"/><ellipse cx="16.6" cy="12.4" rx=".9" ry=".7"/>
+      <ellipse cx="20.4" cy="16" rx=".9" ry=".7"/><ellipse cx="14" cy="20.4" rx=".9" ry=".7"/>
+      <ellipse cx="19" cy="21.4" rx=".9" ry=".7"/>
+    </g>
   </symbol>
-  <symbol id="i-crop-tomato" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="14.2" r="6.5"/><path d="M12 7.7V5.2"/>
-    <path d="M12 7.7c-1.6-1.5-3-2-4.8-2 .2 1.7 1 2.8 2.4 3.4"/><path d="M12 7.7c1.6-1.5 3-2 4.8-2-.2 1.7-1 2.8-2.4 3.4"/>
+
+  <symbol id="i-crop-tomato" viewBox="0 0 32 32">
+    <circle cx="16" cy="19.4" r="10.2" fill="#ef4444"/>
+    <path d="M16 9.2c-4.2 2-6.6 5.8-6.6 10.2 0 3.6 1.6 6.8 4.2 8.8-3.6-1.6-6-5-6-9 0-4.8 3.4-8.8 8.4-10z"
+          fill="#f87171"/>
+    <path d="M21.8 12.4c2.2 2 3.4 4.6 3.4 7.4 0 3.4-1.8 6.4-4.6 8.2 4-1.4 6.8-4.8 6.8-8.8 0-2.8-1.4-5.4-3.6-7z"
+          fill="#dc2626"/>
+    <path d="M16 9.6 12.2 5.2c2.6-.6 4-.4 5.6.8l2.6-1.8c.4 2-.4 3.6-2 4.6z" fill="#22c55e"/>
+    <path d="M16 9.8c-2.2-1.8-4.4-2.4-6.8-2 .8 2.2 2.6 3.4 5 3.4z" fill="#16a34a"/>
+    <path d="M16 9.8c2.2-1.8 4.4-2.4 6.8-2-.8 2.2-2.6 3.4-5 3.4z" fill="#16a34a"/>
+    <path d="M16 10.6V6.4" stroke="#15803d" stroke-width="1.5" stroke-linecap="round" fill="none"/>
   </symbol>
-  <symbol id="i-crop-mango" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M15.4 6c3 1.7 4.3 5.5 2.9 8.8-1.5 3.4-5.3 5-8.5 3.8-3.2-1.2-4.9-4.5-3.9-7.7C7 7.8 11 4.4 15.4 6z"/>
-    <path d="M15.4 6c.6-1.8 2-2.9 3.9-3.1-.1 1.9-1 3.2-2.6 3.9"/>
+
+  <symbol id="i-crop-mango" viewBox="0 0 32 32">
+    <path d="M20.6 8c4 2.4 5.6 7.6 3.6 12.2-2.1 4.6-7.4 6.8-11.8 5-4.4-1.8-6.6-6.6-4.8-11 1.7-4.4 7.8-8.6 13-6.2z"
+          fill="#f59e0b"/>
+    <path d="M20.6 8c-4.4-.6-8.4 2-10.4 5.8-1.9 3.6-1.3 7.8 1.3 10.6-3.2-1.2-5.2-4.4-5-8 .3-4.6 5.6-10 14.1-8.4z"
+          fill="#fbbf24"/>
+    <path d="M23.2 10.6c2.2 3 2.6 6.8 1 10.2-1.4 3-4.2 4.8-7.2 5.2 5-.2 9-3.8 9.4-8.4.2-2.6-.9-5.1-3.2-7z"
+          fill="#ea580c"/>
+    <path d="M20.6 8c.4-2.6 2.2-4.2 5.2-4.6.2 2.8-1.2 4.6-3.6 5.4z" fill="#22c55e"/>
+    <path d="M25.8 3.4c-2.2 1.2-3.6 2.8-4.6 5" stroke="#15803d" stroke-width=".9" stroke-linecap="round" fill="none"/>
   </symbol>
-  <symbol id="i-crop-apple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 8.4c-1-1-2.3-1.4-3.6-1.1C6.1 7.8 4.8 10.2 5.2 13c.5 3.4 2.9 7.4 5.2 7.4.7 0 1.1-.3 1.6-.3s.9.3 1.6.3c2.3 0 4.7-4 5.2-7.4.4-2.8-.9-5.2-3.2-5.7-1.3-.3-2.6.1-3.6 1.1z"/>
-    <path d="M12 8.4V5.6"/><path d="M12 5.6c1.4-1.2 2.6-1.6 4.2-1.5-.2 1.7-1.4 2.7-3 2.9"/>
+
+  <symbol id="i-crop-apple" viewBox="0 0 32 32">
+    <path d="M16 11.6c-1.6-1.4-3.6-2-5.6-1.6-3.6.8-5.6 4.4-5 8.8.8 5.2 4.6 11.2 8.2 11.2 1.1 0 1.7-.5 2.4-.5s1.3.5 2.4.5c3.6 0 7.4-6 8.2-11.2.6-4.4-1.4-8-5-8.8-2-.4-4 .2-5.6 1.6z"
+          fill="#ef4444"/>
+    <path d="M16 11.6c-1.4 2.8-2 6-1.6 9.4.4 3.4 1.8 6.6 3.8 8.9-.5.1-.9.3-1.4.3-.7 0-1.3-.5-2.4-.5-3.6 0-7.4-6-8.2-11.2-.6-4.4 1.4-8 5-8.8 2-.4 4 .2 5.6 1.6z"
+          fill="#f87171"/>
+    <path d="M22.4 10.4c3 1.4 4.4 4.6 3.8 8.4-.8 5.2-4.6 11.2-8.2 11.2h-.4c3.4-2 6.4-7.4 7.2-12 .5-3.2-.2-5.8-2.4-7.6z"
+          fill="#dc2626"/>
+    <path d="M16 11.6V6.8" stroke="#78350f" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <path d="M16.4 7.6c1.4-2.6 3.6-3.8 6.6-3.6-.4 3-2.6 4.6-6.2 4.4z" fill="#22c55e"/>
   </symbol>
 
   <!-- ===== baaki UI icons ===== -->

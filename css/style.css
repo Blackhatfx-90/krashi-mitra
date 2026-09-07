@@ -61,7 +61,12 @@ ul{margin:0;padding:0;}
 /* Icon ke naap — pehle yahan emoji the, ab inline SVG hain */
 .ic--xs{width:15px;height:15px;}
 .ic--inline{width:17px;height:17px;vertical-align:-3px;display:inline-block;}
-.ic--crop{width:30px;height:30px;stroke-width:1.5;}
+
+/* FASAL ke icons rangeen illustrations hain, isliye inhe .ic NAHI de sakte —
+   .ic fill hata deti hai aur har shape par stroke laga deti hai.
+   Yahan fill/stroke ko unchhua chhodte hain taaki symbol ke apne rang chalein. */
+.cropart{width:34px;height:34px;flex:0 0 auto;display:block;}
+.cropart--sm{width:20px;height:20px;display:inline-block;vertical-align:-5px;}
 
 .muted-sm{font-size:12px;color:var(--ink-3);}
 
@@ -470,11 +475,13 @@ ul{margin:0;padding:0;}
 .crop-card__icon{
   width:54px;height:54px;border-radius:14px;flex:0 0 auto;
   background:var(--green-050);border:1px solid var(--green-100);
-  display:grid;place-items:center;color:var(--green-700);
+  display:grid;place-items:center;
 }
+/* Coming Soon wali fasal halki dikhe */
 .crop-card.is-disabled .crop-card__icon{
-  background:var(--bg);border-color:var(--line);color:var(--ink-3);
+  background:var(--bg);border-color:var(--line);
 }
+.crop-card.is-disabled .cropart{filter:grayscale(1);opacity:.55;}
 
 .crop-card__text{flex:1;min-width:0;}
 .crop-card__name{display:block;font-size:18px;font-weight:700;letter-spacing:-.01em;}
