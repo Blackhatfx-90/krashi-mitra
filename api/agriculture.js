@@ -1,5 +1,8 @@
 'use strict';
 
+const { fertilizerRecommendation } = require('../lib/fertilizer');
+const cultivationTips = require('../data/cultivation-tips.json');
+
 const ALLOWED = /crop|फसल|disease|रोग|pest|कीट|pesticide|दवा|medicine|मौसम|weather|rain|बारिश|mandi|मंडी|price|भाव|rate|रेट|fertilizer|खाद|soil|मिट्टी/i;
 
 module.exports = async function handler(req, res) {
@@ -11,6 +14,8 @@ module.exports = async function handler(req, res) {
   const district = String(req.query?.district || '');
   const mandi = String(req.query?.mandi || '');
   const context = [crop && `crop: ${crop}`, state && `state: ${state}`, district && `district: ${district}`, mandi && `mandi: ${mandi}`].filter(Boolean).join(', ');
+  const fertilizer = crop ? (() => { try { return fertilizerRecommendation(crop, Number(req.query?.plotSize || 1), String(req.query?.unit || 'acre')); } catch (_) { return null; } })() : null;
+  const tips = cultivationTips[crop.toLowerCase()] || null;
   const answer = 'ऑनलाइन कृषि स्रोत उपलब्ध होने पर ' + (context ? context + ' के लिए ' : '') + 'ताज़ा मौसम और मंडी जानकारी यहाँ दिखाई जाएगी। अभी स्थानीय कृषि विभाग या eNAM/Agmarknet पर भी यही जानकारी सत्यापित करें।';
-  return res.status(200).json({ answer, source: 'official-source-fallback', checkedAt: new Date().toISOString(), stale: false });
+  return res.status(200).json({ answer, tips, fertilizer, source: 'official-source-fallback', checkedAt: new Date().toISOString(), stale: false });
 };
