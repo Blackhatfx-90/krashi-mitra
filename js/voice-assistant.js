@@ -301,7 +301,7 @@
     {
       id: 'history',
       words: ['इतिहास', 'पुरानी जाँच', 'पुरानी जांच', 'हिस्ट्री', 'history', 'itihas', 'purani jaanch'],
-      replyHi: 'पुरानी जाँचें दिखा रहा हूँ।',
+      replyHi: 'पुरानी जाँचें दिख��� रहा हूँ।',
       run() {
         window.switchView('history');
         return { actionHi: 'इतिहास खोला', actionEn: 'Opened history' };
@@ -666,7 +666,7 @@ if (!cmd) {
       const speakText = out.failHi || out.speakHi || cmd.replyHi || null;
 
       this._respond(speakText, {
-        heard: '“' + raw + '”',
+        heard: '“' + raw + '��',
         action: (out.actionHi || '') + (out.actionEn ? ' · ' + out.actionEn : ''),
         kind: out.failHi ? 'error' : 'ok',
         icon: out.icon || null,
@@ -771,16 +771,20 @@ if (!cmd) {
    * 6. Boot — app ke interactive hone ke BAAD
    * ======================================================================= */
   async function boot() {
-    window.KMVoice  = KMVoice;
-    window.kmVoice  = new KMVoice();
-    window.KM_VOICE_COMMANDS = COMMANDS;      // console se dekhne/test karne ke liye
-
-    // Console se test: kmVoiceTest('mausam batao')
-    window.kmVoiceTest = (phrase) => window.kmVoice._handle(norm(phrase), phrase);
-
-    // Pehli baar: permission poochho, PHIR tour ko chalne do
-    await askPermissionsFirstRun();
-    window.__kmFirstRunReady = true;          // tour.js is flag ko bhi dekhta hai
+    try {
+      window.KMVoice = KMVoice;
+      window.kmVoice = new KMVoice();
+      window.KM_VOICE_COMMANDS = COMMANDS;
+      window.kmVoiceTest = (phrase) => window.kmVoice._handle(norm(phrase), phrase);
+      await askPermissionsFirstRun();
+    } catch (err) {
+      console.warn('[voice] startup continued without permissions:', err);
+      if (!window.kmVoice) {
+        window.KMVoice = KMVoice;
+        window.kmVoice = new KMVoice();
+      }
+    }
+    window.__kmFirstRunReady = true;
     window.dispatchEvent(new CustomEvent('km:first-run-ready'));
   }
 
