@@ -1,7 +1,7 @@
 /* ============================================================================
  * js/auth.js — Login / Signup ka kaam
  *
- * ⚠️ SABSE ZAROORI BAAT — YEH DEMO AUTH HAI, ASLI SURAKSHA NAHI ⚠️
+ * SABSE ZAROORI BAAT — YEH DEMO AUTH HAI, ASLI SURAKSHA NAHI
  *
  * Yeh poora login SIRF browser me chalta hai (localStorage). Koi server nahi,
  * koi database nahi. Iska matlab:

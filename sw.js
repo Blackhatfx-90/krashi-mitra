@@ -24,7 +24,7 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v35';
+const CACHE_VERSION = 'krashi-mitra-v36';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* Sarkari officer ka Regional Admin dashboard (alag React app) yahan rehta hai.
@@ -153,7 +153,7 @@ self.addEventListener('fetch', (event) => {
    * redirect wale jawab ki ek SAAF copy bana kar dete hain.
    * ---------------------------------------------------------------------- */
   if (req.mode === 'navigate') {
-    /* ⚠️ /regional-admin ek ALAG app hai (sarkari officer ka dashboard).
+    /* /regional-admin ek ALAG app hai (sarkari officer ka dashboard).
      * Uske page ko kisan wali app ke shell ('./') me likh dena bahut bada
      * bug hota: offline kholne par kisan ko apni app ki jagah admin dashboard
      * dikhne lagta. Isliye admin ke page apne hi URL par cache hote hain.  */

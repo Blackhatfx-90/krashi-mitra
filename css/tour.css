@@ -189,16 +189,9 @@
 }
 
 /* ---------- dark mode (agar phone dark me ho) ---------------------------- */
-@media (prefers-color-scheme:dark){
-  :root{
-    --kmt-surface:#16241d; --kmt-ink:#e8f2ec; --kmt-ink-2:#a8bcb0;
-    --kmt-ink-3:#7d928a;   --kmt-line:#2a3d33; --kmt-brand-soft:#13291f;
-    --kmt-brand:#6fd897;
-  }
-  .km-tour-btn--back{background:#22332b;color:var(--kmt-ink);}
-  .km-tour-btn--back:hover{background:#2b4036;}
-  .km-tour-btn--ghost:hover,.km-tour-btn--icon:hover{background:#22332b;}
-  .km-tour-arrow.is-up{border-bottom-color:var(--kmt-surface);}
-  .km-tour-arrow.is-down{border-top-color:var(--kmt-surface);}
-  .km-tour-help{border-color:#2a4d3a;}
-}
+/* NOTE: yahan pehle dark-mode block tha, hata diya gaya hai.
+   Wajah: app ki apni css/style.css dark mode support NAHI karti (hamesha light hai).
+   Is component me dark mode rakhne se phone dark par hone par sirf yeh overlay
+   kaala ho jaata tha aur baaki app safed — bahut kharaab lagta tha.
+   Agar kabhi poori app me dark theme aaye, tab yeh block wapas jodna. */
+

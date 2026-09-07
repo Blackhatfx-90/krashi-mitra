@@ -9,7 +9,7 @@
  *  Section 1  CONFIG          -> thresholds, paths, WEATHER API KEY
  *  Section 2  CROPS           -> 8 fasal + unke 93 rog/keet ki poori salah
  *                                (dhaan 6, gehu 14, ganna 5, sarson 5)
- *                                ⭐ NAYI FASAL sirf yahin add karni hai ⭐
+ *                                >>> NAYI FASAL sirf yahin add karni hai <<<
  *  Section 3  DOM + state     -> element references aur app ki state
  *  Section 4  Views + drawer  -> screen switching
  *  Section 5  Model loading   -> TF.js + chuni hui fasal ka model (lazy)
@@ -30,7 +30,7 @@
  * ========================================================================= */
 
 /* ┌──────────────────────────────────────────────────────────────────────┐
-   │  👇  APNI OpenWeatherMap API KEY YAHAN PASTE KAREIN  👇               │
+   │  APNI OpenWeatherMap API KEY YAHAN PASTE KAREIN                       │
    │                                                                      │
    │  Free key lene ke liye: https://openweathermap.org/api               │
    │  → Sign up → API keys tab → key copy karke neeche paste kar dein.    │
@@ -128,7 +128,7 @@ const CONFIG = {
    * Beech ka hissa (0.24–0.32) "pakka nahi" maana jata hai — wahan hum rokte
    * NAHI, kyunki jhoothi rukawat bhi utni hi buri hai.
    *
-   * ⚠️ SEEMA: yeh sirf PARIVAAR alag karta hai. Seb aur aam (dono chaudi) me
+   * SEEMA: yeh sirf PARIVAAR alag karta hai. Seb aur aam (dono chaudi) me
    * farq karna is tarike se sambhav NAHI. Uske liye online AI (wrong_crop) hai.
    */
   CROP_MATCH: {
@@ -256,7 +256,7 @@ const AI_CONFIG = {
 
 
 /* ============================================================================
- * SECTION 2 — CROPS CONFIG  ⭐ SABSE ZAROORI FILE-BLOCK ⭐
+ * SECTION 2 — CROPS CONFIG  (sabse zaroori file-block)
  *
  * Har fasal ke liye:
  *   id        : folder ka naam — models/<id>/model.json
@@ -288,7 +288,7 @@ const CROPS = {
     nameHi: 'धान',
     nameEn: 'Rice',
     altHi: 'चावल',
-    icon: '🌾',
+    icon: 'crop-rice',
     seasonHi: 'खरीफ',
     labels: [
       'rice_brownspot',           // 0
@@ -313,7 +313,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_brownspot: {
-        emoji: '🟤',
         nameHi: 'भूरा धब्बा रोग',
         nameEn: 'Brown Spot',
         pathogen: 'कवक / Fungus — Bipolaris oryzae',
@@ -359,7 +358,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_blast: {
-        emoji: '🔥',
         nameHi: 'झोंका रोग (ब्लास्ट)',
         nameEn: 'Rice Blast',
         pathogen: 'कवक / Fungus — Magnaporthe oryzae',
@@ -410,7 +408,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_Bacterialblight: {
-        emoji: '💧',
         nameHi: 'जीवाणु झुलसा',
         nameEn: 'Bacterial Leaf Blight (BLB)',
         pathogen: 'जीवाणु / Bacteria — Xanthomonas oryzae pv. oryzae',
@@ -459,7 +456,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_tungro: {
-        emoji: '🦠',
         nameHi: 'टुंग्रो रोग',
         nameEn: 'Tungro Virus',
         pathogen: 'विषाणु / Virus — RTBV + RTSV, हरे फुदके से फैलता है',
@@ -508,7 +504,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_leaf_smut: {
-        emoji: '⚫',
         nameHi: 'पत्ती कण्ड',
         nameEn: 'Leaf Smut',
         pathogen: 'कवक / Fungus — Entyloma oryzae',
@@ -557,7 +552,6 @@ const CROPS = {
       /* ------------------------------------------------------------------ */
       /* NOTE: model me yeh 'rice_brownspot' (index 0) ka duplicate hai.     */
       rice_brown_spot: {
-        emoji: '🟤',
         nameHi: 'भूरा धब्बा रोग',
         nameEn: 'Brown Spot',
         pathogen: 'कवक / Fungus — Bipolaris oryzae',
@@ -600,7 +594,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_healthy_leafs: {
-        emoji: '✅',
         nameHi: 'स्वस्थ पत्ती',
         nameEn: 'Healthy Leaf',
         pathogen: '—',
@@ -639,7 +632,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_bakanae: {
-        emoji: '📏',
         nameHi: 'बकाने रोग',
         nameEn: 'Bakanae / Foolish Seedling',
         pathogen: 'कवक / Fungus — Fusarium fujikuroi',
@@ -690,7 +682,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_ragged_virus: {
-        emoji: '🦠',
         nameHi: 'रैग्ड स्टंट विषाणु',
         nameEn: 'Ragged Stunt Virus',
         pathogen: 'विषाणु / Virus — RRSV, भूरे फुदके से फैलता है',
@@ -740,7 +731,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_sheath_rot: {
-        emoji: '🟫',
         nameHi: 'आवरण सड़न (शीथ रॉट)',
         nameEn: 'Sheath Rot',
         pathogen: 'कवक / Fungus — Sarocladium oryzae',
@@ -787,7 +777,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_stem_rot: {
-        emoji: '🕳️',
         nameHi: 'तना सड़न',
         nameEn: 'Stem Rot',
         pathogen: 'कवक / Fungus — Sclerotium oryzae',
@@ -835,7 +824,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_sheath_blight: {
-        emoji: '🩹',
         nameHi: 'आवरण झुलसा (शीथ ब्लाइट)',
         nameEn: 'Sheath Blight',
         pathogen: 'कवक / Fungus — Rhizoctonia solani',
@@ -883,7 +871,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_green_leafhopper: {
-        emoji: '🦗',
         nameHi: 'हरा फुदका',
         nameEn: 'Green Leafhopper',
         pathogen: 'कीट / Insect — Nephotettix spp.',
@@ -933,7 +920,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_bug: {
-        emoji: '🐞',
         nameHi: 'गंधी बग',
         nameEn: 'Rice Ear Bug / Gundhi Bug',
         pathogen: 'कीट / Insect — Leptocorisa spp.',
@@ -981,7 +967,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_planthopper: {
-        emoji: '🪳',
         nameHi: 'भूरा फुदका',
         nameEn: 'Brown Planthopper (BPH)',
         pathogen: 'कीट / Insect — Nilaparvata lugens',
@@ -1036,7 +1021,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       rice_leaf_roller: {
-        emoji: '🍃',
         nameHi: 'पत्ती लपेटक',
         nameEn: 'Leaf Folder',
         pathogen: 'कीट / Insect — Cnaphalocrocis medinalis',
@@ -1084,7 +1068,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Rice_stem_borer: {
-        emoji: '🐛',
         nameHi: 'तना छेदक',
         nameEn: 'Stem Borer',
         pathogen: 'कीट / Insect — Scirpophaga incertulas',
@@ -1142,7 +1125,7 @@ const CROPS = {
     nameHi: 'गेहूँ',
     nameEn: 'Wheat',
     altHi: 'गेहू',
-    icon: '🌿',
+    icon: 'crop-wheat',
     seasonHi: 'रबी',
     labels: [
       'wheat_smut',          // 0
@@ -1164,7 +1147,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_smut: {
-        emoji: '⚫',
         nameHi: 'कंडुआ (काली बाली)',
         nameEn: 'Loose Smut',
         pathogen: 'कवक / Fungus — Ustilago segetum var. tritici (बीज-जनित)',
@@ -1216,7 +1198,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_mite: {
-        emoji: '🕷️',
         nameHi: 'भूरा गेहूँ माइट (चेंपा जूँ)',
         nameEn: 'Brown Wheat Mite',
         pathogen: 'कीट / Mite — Petrobia latens (सूखे-गर्म मौसम का कीट)',
@@ -1268,7 +1249,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_mildew: {
-        emoji: '⚪',
         nameHi: 'चूर्णिल आसिता (सफेद पाउडर रोग)',
         nameEn: 'Powdery Mildew',
         pathogen: 'कवक / Fungus — Blumeria (Erysiphe) graminis f.sp. tritici',
@@ -1318,7 +1298,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_leaf_blight: {
-        emoji: '🟤',
         nameHi: 'पत्ती झुलसा (स्पॉट ब्लॉच)',
         nameEn: 'Leaf Blight / Spot Blotch',
         pathogen: 'कवक / Fungus — Bipolaris sorokiniana (Helminthosporium)',
@@ -1369,7 +1348,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_fusarium: {
-        emoji: '🌸',
         nameHi: 'बाली झुलसा / करनाल-टाइप फ्यूजेरियम',
         nameEn: 'Fusarium Head Blight (Scab)',
         pathogen: 'कवक / Fungus — Fusarium graminearum',
@@ -1423,7 +1401,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_brown_brust: {
-        emoji: '🟠',
         nameHi: 'भूरा रतुआ (पत्ती गेरुई)',
         nameEn: 'Brown Rust / Leaf Rust',
         pathogen: 'कवक / Fungus — Puccinia triticina',
@@ -1473,7 +1450,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_blast: {
-        emoji: '🚨',
         nameHi: 'गेहूँ ब्लास्ट (झुलसा)',
         nameEn: 'Wheat Blast',
         pathogen: 'कवक / Fungus — Magnaporthe oryzae Triticum pathotype',
@@ -1526,7 +1502,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ गेहूँ',
         nameEn: 'Healthy Wheat',
         pathogen: 'कोई रोग नहीं मिला / No disease detected',
@@ -1572,7 +1547,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_septoria: {
-        emoji: '🔘',
         nameHi: 'सेप्टोरिया धब्बा रोग',
         nameEn: 'Septoria Leaf Blotch',
         pathogen: 'कवक / Fungus — Zymoseptoria (Septoria) tritici',
@@ -1624,7 +1598,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_aphid: {
-        emoji: '🐛',
         nameHi: 'माहू / चेपा (एफिड)',
         nameEn: 'Wheat Aphid',
         pathogen: 'कीट / Insect — Rhopalosiphum padi, Sitobion avenae (रस चूसक)',
@@ -1677,7 +1650,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_black_rust: {
-        emoji: '⬛',
         nameHi: 'काला रतुआ (तना गेरुई)',
         nameEn: 'Black Rust / Stem Rust',
         pathogen: 'कवक / Fungus — Puccinia graminis f.sp. tritici',
@@ -1730,7 +1702,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_tan_spot: {
-        emoji: '🟡',
         nameHi: 'टैन स्पॉट (पीला धब्बा रोग)',
         nameEn: 'Tan Spot',
         pathogen: 'कवक / Fungus — Pyrenophora tritici-repentis (अवशेष-जनित)',
@@ -1782,7 +1753,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_stem_fly: {
-        emoji: '🪰',
         nameHi: 'तना मक्खी (डेड हार्ट)',
         nameEn: 'Wheat Stem Fly / Shoot Fly',
         pathogen: 'कीट / Insect — Atherigona spp. (तने में सुरंग बनाने वाली मक्खी)',
@@ -1835,7 +1805,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       wheat_stripe_rust: {
-        emoji: '🟨',
         nameHi: 'पीला रतुआ (धारीदार गेरुई)',
         nameEn: 'Yellow / Stripe Rust',
         pathogen: 'कवक / Fungus — Puccinia striiformis f.sp. tritici',
@@ -1900,7 +1869,7 @@ const CROPS = {
     nameHi: 'गन्ना',
     nameEn: 'Sugarcane',
     altHi: 'ईख',
-    icon: '🎋',
+    icon: 'crop-sugarcane',
     seasonHi: 'वार्षिक',
     labels: [
       'sugarcane_green_leafhopper',  // 0
@@ -1924,7 +1893,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_green_leafhopper: {
-        emoji: '🦗',
         nameHi: 'हरा फुदका',
         nameEn: 'Green Leafhopper',
         pathogen: 'कीट / Insect — रस चूसने वाला फुदका',
@@ -1968,7 +1936,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_red_rot: {
-        emoji: '🔴',
         nameHi: 'लाल सड़न',
         nameEn: 'Red Rot',
         pathogen: 'कवक / Fungus — Colletotrichum falcatum ("गन्ने का कैंसर")',
@@ -2017,7 +1984,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_eyespot: {
-        emoji: '👁️',
         nameHi: 'आँख धब्बा',
         nameEn: 'Eyespot',
         pathogen: 'कवक / Fungus — Bipolaris sacchari',
@@ -2063,7 +2029,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_redleafspot: {
-        emoji: '🟥',
         nameHi: 'लाल पत्ती धब्बा',
         nameEn: 'Red Leaf Spot / Purple Spot',
         pathogen: 'कवक / Fungus — Dimeriella sacchari',
@@ -2105,7 +2070,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ गन्ना',
         nameEn: 'Healthy',
         pathogen: '—',
@@ -2143,7 +2107,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_ringspot: {
-        emoji: '⭕',
         nameHi: 'छल्ला धब्बा',
         nameEn: 'Ring Spot',
         pathogen: 'कवक / Fungus — Leptosphaeria sacchari',
@@ -2186,7 +2149,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_banded_chlorosis: {
-        emoji: '🎗️',
         nameHi: 'पट्टीदार पीलापन',
         nameEn: 'Banded Chlorosis',
         pathogen: 'रोग नहीं — ठंड / पोषक तत्व की कमी (abiotic)',
@@ -2236,7 +2198,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_grassy_shoot: {
-        emoji: '🌱',
         nameHi: 'घसैला अंकुर रोग',
         nameEn: 'Grassy Shoot Disease',
         pathogen: 'फाइटोप्लाज़्मा / Phytoplasma — बीज गन्ने और फुदके से फैलता है',
@@ -2287,7 +2248,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_yellow_leaf: {
-        emoji: '💛',
         nameHi: 'पीली पत्ती रोग',
         nameEn: 'Yellow Leaf Disease',
         pathogen: 'विषाणु / Virus — SCYLV, माहू (एफिड) से फैलता है',
@@ -2337,7 +2297,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_smut: {
-        emoji: '⚫',
         nameHi: 'कंडुआ (कोड़ा रोग)',
         nameEn: 'Whip Smut',
         pathogen: 'कवक / Fungus — Sporisorium scitamineum',
@@ -2388,7 +2347,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_dried_leaves: {
-        emoji: '🍂',
         nameHi: 'सूखी पत्तियाँ',
         nameEn: 'Dried Leaves',
         pathogen: 'रोग नहीं — सामान्य सूखना / पानी की कमी',
@@ -2433,7 +2391,6 @@ const CROPS = {
       /* ------------------------------------------------------------------ */
       /* NOTE: label ki spelling model me 'surgarcane_...' hai — mat badlein. */
       surgarcane_viral_disease: {
-        emoji: '🦠',
         nameHi: 'विषाणु रोग (मोज़ेक)',
         nameEn: 'Viral Disease / Mosaic',
         pathogen: 'विषाणु / Virus — SCMV आदि, माहू और बीज गन्ने से फैलता है',
@@ -2483,7 +2440,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_sett_rot: {
-        emoji: '🍍',
         nameHi: 'सेट सड़न (अनानास रोग)',
         nameEn: 'Sett Rot / Pineapple Disease',
         pathogen: 'कवक / Fungus — Ceratocystis paradoxa',
@@ -2534,7 +2490,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_pokkah_boeng: {
-        emoji: '🌀',
         nameHi: 'पोक्का बोइंग',
         nameEn: 'Pokkah Boeng',
         pathogen: 'कवक / Fungus — Fusarium moniliforme',
@@ -2586,7 +2541,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_brownrust: {
-        emoji: '🟠',
         nameHi: 'भूरा रतुआ (गेरुई)',
         nameEn: 'Brown Rust',
         pathogen: 'कवक / Fungus — Puccinia melanocephala',
@@ -2633,7 +2587,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       sugarcane_brown_spot: {
-        emoji: '🟤',
         nameHi: 'भूरा धब्बा',
         nameEn: 'Brown Spot',
         pathogen: 'कवक / Fungus — Cercospora longipes',
@@ -2678,7 +2631,7 @@ const CROPS = {
 
   /* ##################### 4. COTTON / कपास ##################### */
   /* Model: Teachable Machine (TFJS) — models/cotton/model.json
-     ⚠️ Kuch labels me extra space hai (jaise 'Cotton_bollrot ') — wo model ki
+     NOTE: Kuch labels me extra space hai (jaise 'Cotton_bollrot ') — wo model ki
         apni spelling hai, isliye yahan HU-BA-HU wahi rakhi gayi hai. Badalne
         par advisory milna band ho jayega.                                    */
   cotton: {
@@ -2686,7 +2639,7 @@ const CROPS = {
     nameHi: 'कपास',
     nameEn: 'Cotton',
     altHi: 'रुई / नरमा',
-    icon: '🪴',
+    icon: 'crop-cotton',
     seasonHi: 'खरीफ',
     labels: [
       'Cotton_American_Bollworm',   // 0
@@ -2706,7 +2659,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_American_Bollworm: {
-        emoji: '🐛',
         nameHi: 'अमेरिकन सुंडी',
         nameEn: 'American Bollworm',
         pathogen: 'कीट / Insect — Helicoverpa armigera',
@@ -2759,7 +2711,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_Pink_Bollworm: {
-        emoji: '🩷',
         nameHi: 'गुलाबी सुंडी',
         nameEn: 'Pink Bollworm',
         pathogen: 'कीट / Insect — Pectinophora gossypiella',
@@ -2815,7 +2766,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       'Cotton_Bollworm ': {
-        emoji: '🐛',
         nameHi: 'डोडा सुंडी (सामान्य)',
         nameEn: 'Bollworm',
         pathogen: 'कीट / Insect — डोडे में छेद करने वाली सुंडियाँ (Earias, Helicoverpa)',
@@ -2865,7 +2815,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_Whitefly: {
-        emoji: '🦟',
         nameHi: 'सफेद मक्खी',
         nameEn: 'Whitefly',
         pathogen: 'कीट / Insect — Bemisia tabaci (पत्ती मरोड़ विषाणु फैलाती है)',
@@ -2921,7 +2870,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       'Cotton_Mealy _Bug': {
-        emoji: '🐜',
         nameHi: 'मिलीबग (सफेद जूँ)',
         nameEn: 'Mealybug',
         pathogen: 'कीट / Insect — Phenacoccus solenopsis',
@@ -2976,7 +2924,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_Aphid: {
-        emoji: '🐛',
         nameHi: 'माहू / चेपा',
         nameEn: 'Aphid',
         pathogen: 'कीट / Insect — Aphis gossypii (रस चूसक)',
@@ -3029,7 +2976,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       'Cotton_Thirps ': {
-        emoji: '🌾',
         nameHi: 'थ्रिप्स',
         nameEn: 'Thrips',
         pathogen: 'कीट / Insect — Thrips tabaci / Scirtothrips dorsalis',
@@ -3081,7 +3027,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_Red_Bug: {
-        emoji: '🔴',
         nameHi: 'लाल बग (लाल मत्कुण)',
         nameEn: 'Red Cotton Bug',
         pathogen: 'कीट / Insect — Dysdercus koenigii',
@@ -3134,7 +3079,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_Bacterial_Blight: {
-        emoji: '🟫',
         nameHi: 'जीवाणु झुलसा (कोणीय धब्बा)',
         nameEn: 'Bacterial Blight / Angular Leaf Spot',
         pathogen: 'जीवाणु / Bacteria — Xanthomonas citri pv. malvacearum',
@@ -3190,7 +3134,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_Anthracnose: {
-        emoji: '🟤',
         nameHi: 'एन्थ्रेक्नोज',
         nameEn: 'Anthracnose',
         pathogen: 'कवक / Fungus — Colletotrichum gossypii',
@@ -3243,7 +3186,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       'Cotton_bollrot ': {
-        emoji: '🦠',
         nameHi: 'डोडा सड़न',
         nameEn: 'Boll Rot',
         pathogen: 'कवक + जीवाणु मिलकर — कीट के छेद से अंदर घुसते हैं',
@@ -3297,7 +3239,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Cotton_Healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ कपास',
         nameEn: 'Healthy Cotton',
         pathogen: 'कोई रोग नहीं मिला / No disease detected',
@@ -3356,7 +3297,7 @@ const CROPS = {
     nameHi: 'प्याज',
     nameEn: 'Onion',
     altHi: 'कांदा',
-    icon: '🧅',
+    icon: 'crop-onion',
     seasonHi: 'रबी',
     labels: [
       'onion_bulb_blight',                // 0
@@ -3378,7 +3319,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_bulb_blight: {
-        emoji: '🧅',
         nameHi: 'कंद झुलसा',
         nameEn: 'Bulb Blight',
         pathogen: 'कवक / Fungus — कंद पर हमला करने वाली फफूंद',
@@ -3429,7 +3369,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_virosis: {
-        emoji: '🦠',
         nameHi: 'विषाणु रोग',
         nameEn: 'Virosis / Virus Disease',
         pathogen: 'विषाणु / Virus — माहू और थ्रिप्स से फैलता है',
@@ -3479,7 +3418,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_xanthomonas_leaf_blight: {
-        emoji: '💧',
         nameHi: 'जीवाणु पत्ती झुलसा',
         nameEn: 'Xanthomonas Leaf Blight',
         pathogen: 'जीवाणु / Bacteria — Xanthomonas axonopodis pv. allii',
@@ -3529,7 +3467,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_purple_blotch: {
-        emoji: '🟣',
         nameHi: 'बैंगनी धब्बा',
         nameEn: 'Purple Blotch',
         pathogen: 'कवक / Fungus — Alternaria porri',
@@ -3583,7 +3520,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_rust: {
-        emoji: '🟠',
         nameHi: 'रतुआ (गेरुई)',
         nameEn: 'Rust',
         pathogen: 'कवक / Fungus — Puccinia allii',
@@ -3631,7 +3567,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_fusarium: {
-        emoji: '🫚',
         nameHi: 'फ्यूजेरियम मूल सड़न',
         nameEn: 'Fusarium Basal Rot',
         pathogen: 'कवक / Fungus — Fusarium oxysporum f.sp. cepae',
@@ -3683,7 +3618,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_stemphylium_leaf_blight: {
-        emoji: '🌫️',
         nameHi: 'स्टेम्फीलियम पत्ती झुलसा',
         nameEn: 'Stemphylium Leaf Blight',
         pathogen: 'कवक / Fungus — Stemphylium vesicarium',
@@ -3735,7 +3669,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_iris_yellow_virus_augment: {
-        emoji: '💛',
         nameHi: 'आइरिस पीला धब्बा विषाणु',
         nameEn: 'Iris Yellow Spot Virus (IYSV)',
         pathogen: 'विषाणु / Virus — IYSV, थ्रिप्स से फैलता है',
@@ -3786,7 +3719,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_healthy_leaves: {
-        emoji: '✅',
         nameHi: 'स्वस्थ पत्ती',
         nameEn: 'Healthy Leaves',
         pathogen: '—',
@@ -3827,7 +3759,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_downy_mildew: {
-        emoji: '🌁',
         nameHi: 'मृदुरोमिल आसिता',
         nameEn: 'Downy Mildew',
         pathogen: 'कवक / Fungus — Peronospora destructor',
@@ -3879,7 +3810,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_caterpillar: {
-        emoji: '🐛',
         nameHi: 'इल्ली (सूँडी)',
         nameEn: 'Caterpillar',
         pathogen: 'कीट / Insect — पत्ती और कंद खाने वाली इल्ली',
@@ -3929,7 +3859,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_bulb_rot: {
-        emoji: '🦠',
         nameHi: 'कंद सड़न',
         nameEn: 'Bulb Rot',
         pathogen: 'कवक + जीवाणु / Fungal & bacterial rot',
@@ -3982,7 +3911,6 @@ const CROPS = {
       /* ------------------------------------------------------------------ */
       /* NOTE: label ki spelling model me '..._leaf_light' hai — mat badlein. */
       onion_botrytis_leaf_light: {
-        emoji: '⚪',
         nameHi: 'बोट्रीटिस पत्ती धब्बा',
         nameEn: 'Botrytis Leaf Blight',
         pathogen: 'कवक / Fungus — Botrytis squamosa',
@@ -4031,7 +3959,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       onion_alternaria: {
-        emoji: '🎯',
         nameHi: 'अल्टरनेरिया पत्ती धब्बा',
         nameEn: 'Alternaria Leaf Spot',
         pathogen: 'कवक / Fungus — Alternaria spp.',
@@ -4090,7 +4017,7 @@ const CROPS = {
     nameHi: 'मक्का',
     nameEn: 'Maize',
     altHi: 'भुट्टा / कॉर्न',
-    icon: '🌽',
+    icon: 'crop-maize',
     seasonHi: 'खरीफ',
     photoHintHi: 'मक्का की पत्ती या भुट्टे की साफ फोटो अपलोड करें',
     labels: [
@@ -4106,7 +4033,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Maize_Blight: {
-        emoji: '🔥',
         nameHi: 'पत्ती झुलसा',
         nameEn: 'Northern Leaf Blight',
         pathogen: 'कवक / Fungus — Exserohilum turcicum',
@@ -4153,7 +4079,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Maize_Common_Rust: {
-        emoji: '🟠',
         nameHi: 'सामान्य रतुआ (गेरुई)',
         nameEn: 'Common Rust',
         pathogen: 'कवक / Fungus — Puccinia sorghi',
@@ -4200,7 +4125,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Maize_Ear_Rot: {
-        emoji: '🌽',
         nameHi: 'भुट्टा सड़न',
         nameEn: 'Ear Rot',
         pathogen: 'कवक / Fungus — Fusarium / Aspergillus',
@@ -4251,7 +4175,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Maize_Healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ मक्का',
         nameEn: 'Healthy',
         pathogen: '—',
@@ -4291,7 +4214,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Maize_Gray_Leaf_Spot: {
-        emoji: '⬜',
         nameHi: 'धूसर पत्ती धब्बा',
         nameEn: 'Gray Leaf Spot',
         pathogen: 'कवक / Fungus — Cercospora zeae-maydis',
@@ -4338,7 +4260,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Maize_Fall_Armyworm: {
-        emoji: '🐛',
         nameHi: 'फॉल आर्मीवर्म',
         nameEn: 'Fall Armyworm',
         pathogen: 'कीट / Insect — Spodoptera frugiperda',
@@ -4395,7 +4316,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Maize_Stem_Borer: {
-        emoji: '🕳️',
         nameHi: 'तना छेदक',
         nameEn: 'Stem Borer',
         pathogen: 'कीट / Insect — Chilo partellus',
@@ -4459,7 +4379,7 @@ const CROPS = {
     nameHi: 'आलू',
     nameEn: 'Potato',
     altHi: 'बटाटा',
-    icon: '🥔',
+    icon: 'crop-potato',
     seasonHi: 'रबी',
     photoHintHi: 'आलू (कंद) की साफ फोटो अपलोड करें — कटा हुआ आलू हो तो और अच्छा',
     labels: [
@@ -4478,7 +4398,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Black_Scurf: {
-        emoji: '⚫',
         nameHi: 'काली पपड़ी',
         nameEn: 'Black Scurf',
         pathogen: 'कवक / Fungus — Rhizoctonia solani',
@@ -4529,7 +4448,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Blackleg: {
-        emoji: '🦵',
         nameHi: 'काली टाँग (ब्लैकलेग)',
         nameEn: 'Blackleg',
         pathogen: 'जीवाणु / Bacteria — Pectobacterium atrosepticum',
@@ -4582,7 +4500,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       'Potato_Blackspot_B...': {
-        emoji: '🩶',
         nameHi: 'काला धब्बा (चोट का निशान)',
         nameEn: 'Blackspot Bruising',
         pathogen: 'रोग नहीं — चोट लगने से बना अंदरूनी दाग (abiotic)',
@@ -4632,7 +4549,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Brown_Rot: {
-        emoji: '🟤',
         nameHi: 'भूरी सड़न (जीवाणु उकठा)',
         nameEn: 'Brown Rot / Bacterial Wilt',
         pathogen: 'जीवाणु / Bacteria — Ralstonia solanacearum',
@@ -4687,7 +4603,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Common_Scab: {
-        emoji: '🟫',
         nameHi: 'सामान्य पपड़ी',
         nameEn: 'Common Scab',
         pathogen: 'जीवाणु / Bacteria — Streptomyces scabies',
@@ -4740,7 +4655,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Dry_Rot: {
-        emoji: '🪨',
         nameHi: 'शुष्क सड़न',
         nameEn: 'Dry Rot',
         pathogen: 'कवक / Fungus — Fusarium spp.',
@@ -4793,7 +4707,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ आलू',
         nameEn: 'Healthy',
         pathogen: '—',
@@ -4832,7 +4745,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       'Potato_Miscellaneo...': {
-        emoji: '❔',
         nameHi: 'अन्य / पहचान स्पष्ट नहीं',
         nameEn: 'Miscellaneous / Unclear',
         pathogen: 'निश्चित नहीं — मिली-जुली या अज्ञात श्रेणी',
@@ -4877,7 +4789,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Pink_Rot: {
-        emoji: '🩷',
         nameHi: 'गुलाबी सड़न',
         nameEn: 'Pink Rot',
         pathogen: 'कवक / Fungus — Phytophthora erythroseptica',
@@ -4928,7 +4839,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Potato_Soft_Rot: {
-        emoji: '💧',
         nameHi: 'गीली सड़न',
         nameEn: 'Soft Rot',
         pathogen: 'जीवाणु / Bacteria — Pectobacterium carotovorum',
@@ -4992,7 +4902,7 @@ const CROPS = {
     nameHi: 'टमाटर',
     nameEn: 'Tomato',
     altHi: 'टमाटर',
-    icon: '🍅',
+    icon: 'crop-tomato',
     seasonHi: 'रबी / खरीफ',
     labels: [
       'Tomato_healthy',                               // 0
@@ -5010,7 +4920,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ पत्ती',
         nameEn: 'Healthy',
         pathogen: '—',
@@ -5052,7 +4961,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_Early_blight: {
-        emoji: '🎯',
         nameHi: 'अगेती झुलसा',
         nameEn: 'Early Blight',
         pathogen: 'कवक / Fungus — Alternaria solani',
@@ -5102,7 +5010,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_Late_blight: {
-        emoji: '🌧️',
         nameHi: 'पछेती झुलसा',
         nameEn: 'Late Blight',
         pathogen: 'कवक / Oomycete — Phytophthora infestans',
@@ -5157,7 +5064,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_Bacterial_spot: {
-        emoji: '💧',
         nameHi: 'जीवाणु धब्बा',
         nameEn: 'Bacterial Spot',
         pathogen: 'जीवाणु / Bacteria — Xanthomonas spp.',
@@ -5211,7 +5117,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_Target_Spot: {
-        emoji: '⭕',
         nameHi: 'लक्ष्य धब्बा',
         nameEn: 'Target Spot',
         pathogen: 'कवक / Fungus — Corynespora cassiicola',
@@ -5259,7 +5164,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_Leaf_Mold: {
-        emoji: '🟨',
         nameHi: 'पत्ती फफूंद',
         nameEn: 'Leaf Mold',
         pathogen: 'कवक / Fungus — Passalora fulva',
@@ -5310,7 +5214,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_Septoria_leaf_spot: {
-        emoji: '⚪',
         nameHi: 'सेप्टोरिया पत्ती धब्बा',
         nameEn: 'Septoria Leaf Spot',
         pathogen: 'कवक / Fungus — Septoria lycopersici',
@@ -5358,7 +5261,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       'Tomato_Spider_mites Two-spotted_spider_mite': {
-        emoji: '🕷️',
         nameHi: 'लाल मकड़ी (माइट)',
         nameEn: 'Two-spotted Spider Mite',
         pathogen: 'कीट / Mite — Tetranychus urticae',
@@ -5413,7 +5315,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_mosaic_virus: {
-        emoji: '🦠',
         nameHi: 'मोज़ेक विषाणु',
         nameEn: 'Tomato Mosaic Virus',
         pathogen: 'विषाणु / Virus — ToMV, छूने और औज़ार से फैलता है',
@@ -5468,7 +5369,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Tomato_Yellow_Leaf_Curl_Virus: {
-        emoji: '🌀',
         nameHi: 'पत्ती मरोड़ विषाणु',
         nameEn: 'Yellow Leaf Curl Virus (TYLCV)',
         pathogen: 'विषाणु / Virus — TYLCV, सफेद मक्खी से फैलता है',
@@ -5531,7 +5431,7 @@ const CROPS = {
     nameHi: 'आम',
     nameEn: 'Mango',
     altHi: 'आम का पेड़',
-    icon: '🥭',
+    icon: 'crop-mango',
     seasonHi: 'बागवानी (बारहमासी पेड़)',
     photoHintHi: 'आम की पत्ती या रोगग्रस्त टहनी की साफ फोटो अपलोड करें',
     labels: [
@@ -5548,7 +5448,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Anthracnose: {
-        emoji: '🟤',
         nameHi: 'एन्थ्रेक्नोज (श्यामवर्ण)',
         nameEn: 'Anthracnose',
         pathogen: 'कवक / Fungus — Colletotrichum gloeosporioides',
@@ -5606,7 +5505,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Bacterial_Canker: {
-        emoji: '🟫',
         nameHi: 'जीवाणु कैंकर',
         nameEn: 'Bacterial Canker',
         pathogen: 'जीवाणु / Bacteria — Xanthomonas campestris pv. mangiferae',
@@ -5664,7 +5562,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Die_Back: {
-        emoji: '🥀',
         nameHi: 'डाई-बैक (टहनी सूखना)',
         nameEn: 'Die Back',
         pathogen: 'कवक / Fungus — Botryodiplodia theobromae',
@@ -5720,7 +5617,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Powdery_Mildew: {
-        emoji: '⚪',
         nameHi: 'चूर्णिल आसिता (सफेद पाउडर)',
         nameEn: 'Powdery Mildew',
         pathogen: 'कवक / Fungus — Oidium mangiferae',
@@ -5775,7 +5671,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Sooty_Mould: {
-        emoji: '⚫',
         nameHi: 'काली फफूंद (सूटी मोल्ड)',
         nameEn: 'Sooty Mould',
         pathogen: 'कवक / Fungus — Capnodium spp. (कीट के मीठे स्राव पर उगती है)',
@@ -5832,7 +5727,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Gall_Midge: {
-        emoji: '🫧',
         nameHi: 'गॉल मिज (गाँठ मक्खी)',
         nameEn: 'Gall Midge',
         pathogen: 'कीट / Insect — Procontarinia matteiana',
@@ -5885,7 +5779,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Cutting_Weevil: {
-        emoji: '🪲',
         nameHi: 'कटुआ घुन (कटिंग वीविल)',
         nameEn: 'Cutting Weevil',
         pathogen: 'कीट / Insect — Deporaus marginatus (पत्ती काटने वाला घुन)',
@@ -5941,7 +5834,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Mango_Healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ आम',
         nameEn: 'Healthy Mango',
         pathogen: 'कोई रोग नहीं मिला / No disease detected',
@@ -5999,7 +5891,7 @@ const CROPS = {
     nameHi: 'सेब',
     nameEn: 'Apple',
     altHi: 'सेब का पेड़',
-    icon: '🍎',
+    icon: 'crop-apple',
     seasonHi: 'बागवानी (पहाड़ी क्षेत्र)',
     photoHintHi: 'सेब की पत्ती या रोगग्रस्त फल की साफ फोटो अपलोड करें',
     labels: [
@@ -6017,7 +5909,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Scab: {
-        emoji: '🫒',
         nameHi: 'स्कैब (खुरंट / चित्ती रोग)',
         nameEn: 'Apple Scab',
         pathogen: 'कवक / Fungus — Venturia inaequalis',
@@ -6073,7 +5964,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Powdery_Mildew: {
-        emoji: '⚪',
         nameHi: 'चूर्णिल आसिता (सफेद पाउडर)',
         nameEn: 'Powdery Mildew',
         pathogen: 'कवक / Fungus — Podosphaera leucotricha',
@@ -6130,7 +6020,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Rust: {
-        emoji: '🟠',
         nameHi: 'रतुआ (गेरुई)',
         nameEn: 'Apple Rust',
         pathogen: 'कवक / Fungus — Gymnosporangium spp. (सेब + चीड़/जुनिपर दोनों चाहिए)',
@@ -6186,7 +6075,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Alternaria_Leaf_Spot: {
-        emoji: '🟤',
         nameHi: 'अल्टरनेरिया पत्ती धब्बा',
         nameEn: 'Alternaria Leaf Spot',
         pathogen: 'कवक / Fungus — Alternaria mali / A. alternata',
@@ -6242,7 +6130,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Frogeye_Leaf_Spot: {
-        emoji: '🎯',
         nameHi: 'फ्रॉग-आई धब्बा (मेंढक-आँख)',
         nameEn: 'Frogeye Leaf Spot',
         pathogen: 'कवक / Fungus — Botryosphaeria obtusa (यही black rot भी करता है)',
@@ -6298,7 +6185,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Grey_Spot: {
-        emoji: '🩶',
         nameHi: 'धूसर धब्बा (ग्रे स्पॉट)',
         nameEn: 'Grey Spot',
         pathogen: 'कवक / Fungus — Phyllosticta / Mycosphaerella spp.',
@@ -6354,7 +6240,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Brown_Spot: {
-        emoji: '🟫',
         nameHi: 'भूरा धब्बा',
         nameEn: 'Brown Spot',
         pathogen: 'कवक / Fungus — Marssonina coronaria (भूरा पत्ती धब्बा)',
@@ -6413,14 +6298,13 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Mosaic: {
-        emoji: '🧩',
         nameHi: 'मोज़ेक (चितकबरा विषाणु)',
         nameEn: 'Apple Mosaic Virus',
         pathogen: 'विषाणु / Virus — Apple mosaic virus (ApMV) — कोई दवा नहीं',
         severity: 'high', severityHi: 'ज़्यादा नुकसान',
         risk: 'high', riskHi: 'ज़्यादा जोखिम / High Risk',
         actions: [
-          '⚠️ विषाणु रोग है — किसी भी दवा या फफूंदनाशी से ठीक नहीं होगा',
+          'ज़रूरी: विषाणु रोग है, किसी भी दवा या फफूंदनाशी से ठीक नहीं होगा',
           'ग्रस्त पेड़ से कलम (scion) कभी न लें',
           'बहुत ज़्यादा ग्रस्त पेड़ हटाकर स्वस्थ पौधा लगाएँ',
           'छँटाई के औज़ार हर पेड़ के बाद साफ करें',
@@ -6445,7 +6329,7 @@ const CROPS = {
           'बचे पेड़ को खाद-पानी अच्छा दें ताकि वह फल देता रहे',
         ],
         chemical: [
-          '⚠️ विषाणु रोग का कोई रासायनिक इलाज नहीं है',
+          'ज़रूरी: विषाणु रोग का कोई रासायनिक इलाज नहीं है',
           'फफूंदनाशी या एंटीबायोटिक छिड़कना पैसे की बर्बादी है',
           'सिर्फ पेड़ की सेहत बनाए रखें — संतुलित NPK, ज़िंक और बोरॉन',
         ],
@@ -6471,7 +6355,6 @@ const CROPS = {
 
       /* ------------------------------------------------------------------ */
       Apple_Healthy: {
-        emoji: '✅',
         nameHi: 'स्वस्थ सेब',
         nameEn: 'Healthy Apple',
         pathogen: 'कोई रोग नहीं मिला / No disease detected',
@@ -6716,9 +6599,9 @@ function activeCrop() {
 
 /** Views ki heading — nav badalne par topbar bhi update hota hai. */
 const VIEW_META = {
-  crops:    { title: 'फसल चुनें <span aria-hidden="true">🌱</span>',
+  crops:    { title: 'फसल चुनें',
               sub: 'Which is your crop? — चुनते ही उसी का मॉडल लोड होगा' },
-  scan:     { title: 'नमस्ते, किसान भाई <span aria-hidden="true">👋</span>',
+  scan:     { title: 'नमस्ते, किसान भाई',
               sub: 'पत्ती की फोटो से रोग पहचानें — बिना इंटरनेट के' },
   history:  { title: 'Detection History', sub: 'आपकी पिछली सभी जाँचें' },
   advisory: { title: 'Smart Advisory',    sub: 'आख़िरी जाँच पर आधारित सलाह' },
@@ -6776,7 +6659,6 @@ function getAdvisory(label) {
   // LABEL_INDEX me saari 4 fasalon ke labels hain, isliye purani history
   // (dusri fasal ki) bhi sahi naam dikhati hai.
   return LABEL_INDEX[label] || {
-    emoji: '❓', nameHi: label, nameEn: label, pathogen: '—',
     severity: 'low', severityHi: '—', risk: 'unknown', riskHi: 'अज्ञात / Unknown',
     symptoms: 'इस श्रेणी के लिए सलाह उपलब्ध नहीं है। script.js के CROPS config में जोड़ें।',
     symptomsEn: 'No advisory found for this class.',
@@ -6815,7 +6697,8 @@ function switchView(name) {
   const crop = activeCrop();
   if (crop && (name === 'scan' || name === 'handbook')) {
     el.viewSubtitle.innerHTML =
-      crop.icon + ' ' + escapeHtml(crop.nameHi) + ' · ' + VIEW_META[name].sub;
+      icon(crop.icon, 'ic ic--inline') + ' ' + escapeHtml(crop.nameHi) +
+      ' · ' + VIEW_META[name].sub;
   }
 
   if (name === 'history')  renderHistory();
@@ -7172,7 +7055,7 @@ function clearImage() {
 
 
 /* ============================================================================
- * SECTION 6C — BATCH SCAN (5 se 40 photo ek saath)  📸📸📸
+ * SECTION 6C — BATCH SCAN (5 se 40 photo ek saath)
  *
  * KYUN: ek patti se poore khet ka haal pata nahi chalta. Ho sakta hai kisan ne
  * galti se sabse kharab patti chun li ho, ya sabse achhi. Isliye ab kam se kam
@@ -7308,15 +7191,15 @@ function renderBatchTray() {
 
   if (el.batchGrid) {
     el.batchGrid.innerHTML = state.batch.map((p) => {
-      const badge = p.status === 'ok' ? '✓'
-                  : p.status === 'skipped' ? '!'
-                  : p.status === 'error' ? '✕' : '';
+      const badge = p.status === 'ok' ? icon('check', 'ic ic--xs')
+                  : p.status === 'skipped' ? icon('alert', 'ic ic--xs')
+                  : p.status === 'error' ? icon('close', 'ic ic--xs') : '';
       return [
         '<li class="bthumb bthumb--', escapeHtml(p.status), '" data-id="', escapeHtml(p.id), '">',
           '<img src="', escapeHtml(p.url), '" alt="" loading="lazy" />',
           badge ? '<span class="bthumb__badge">' + badge + '</span>' : '',
           '<button type="button" class="bthumb__x" data-remove="', escapeHtml(p.id),
-            '" aria-label="यह फोटो हटाएँ">✕</button>',
+            '" aria-label="यह फोटो हटाएँ">' + icon('close', 'ic ic--xs') + '</button>',
         '</li>',
       ].join('');
     }).join('');
@@ -7544,8 +7427,8 @@ function renderBatchSummary(s) {
     '<div class="bsum__head bsum__head--', escapeHtml(s.level), '">',
       '<div class="bsum__level">',
         '<span class="bsum__icon" aria-hidden="true">',
-          s.level === 'ok' ? '✅' : s.level === 'low' ? '🟡'
-          : s.level === 'medium' ? '🟠' : s.level === 'high' ? '🔴' : '❓',
+          s.level === 'ok' ? icon('check')
+          : s.level === 'unknown' ? icon('help') : icon('alert'),
         '</span>',
         '<div>',
           '<p class="bsum__title">', escapeHtml(s.levelHi), '</p>',
@@ -7643,7 +7526,7 @@ function renderBatchSummary(s) {
 
 
 /* ============================================================================
- * SECTION 6B — "YEH PHOTO PATTI KI HAI YA NAHI?"  🌿🚫
+ * SECTION 6B — "YEH PHOTO PATTI KI HAI YA NAHI?"
  *
  * SAMASYA: Teachable Machine ka model CLOSED-SET hota hai — usne sirf 14 rog
  *          dekhe hain, isliye wo HAR photo ko unhi 14 me se kisi ek me daal
@@ -8096,7 +7979,7 @@ async function runPrediction() {
 
 
 /* ============================================================================
- * SECTION 7B — ONLINE AI DOUBLE-CHECK  🌐
+ * SECTION 7B — ONLINE AI DOUBLE-CHECK
  *
  * SOCH (yeh sabse zaroori hissa hai):
  *   Phone wala offline model chhota hota hai — turant jawab deta hai par galti
@@ -8163,17 +8046,17 @@ function renderNetMode() {
 
   let txt;
   if (state.netMode === 'offline') {
-    txt = '📴 सिर्फ फ़ोन का मॉडल — इंटरनेट बिल्कुल नहीं लगेगा।';
+    txt = 'सिर्फ फ़ोन का मॉडल। इंटरनेट बिल्कुल नहीं लगेगा।';
   } else if (state.aiReason === 'no_api') {
-    txt = '💻 यह लोकल सर्वर है — यहाँ ऑनलाइन AI नहीं चलता। Vercel वाले लिंक पर चलेगा।';
+    txt = 'यह लोकल सर्वर है, यहाँ ऑनलाइन AI नहीं चलता। Vercel वाले लिंक पर चलेगा।';
   } else if (state.aiConfigured === false) {
-    txt = '⚠️ ऑनलाइन AI अभी उपलब्ध नहीं (सर्वर पर OPENROUTER_API_KEY सेट नहीं है) — ऑफ़लाइन मॉडल चलेगा।';
+    txt = 'ऑनलाइन AI अभी उपलब्ध नहीं है (सर्वर पर OPENROUTER_API_KEY सेट नहीं है)। ऑफ़लाइन मॉडल चलेगा।';
   } else if (!navigator.onLine) {
-    txt = '📴 इंटरनेट नहीं है — अभी ऑफ़लाइन मॉडल से ही जाँच होगी।';
+    txt = 'इंटरनेट नहीं है, अभी ऑफ़लाइन मॉडल से ही जाँच होगी।';
   } else if (state.netMode === 'online') {
-    txt = '🌐 हर जाँच ऑनलाइन AI से दोबारा जाँची जाएगी (सबसे सटीक)।';
+    txt = 'हर जाँच ऑनलाइन AI से दोबारा जाँची जाएगी (सबसे सटीक)।';
   } else {
-    txt = '⚡ नेटवर्क अच्छा हो तो ऑनलाइन AI से डबल-चेक, वरना सीधे ऑफ़लाइन मॉडल।';
+    txt = 'नेटवर्क अच्छा हो तो ऑनलाइन AI से डबल-चेक, वरना सीधे ऑफ़लाइन मॉडल।';
   }
   el.netModeNote.textContent = txt;
 }
@@ -8290,11 +8173,11 @@ function renderAiCard(kind, data) {
     const a = getAdvisory(data.label);
     html = [
       '<div class="ai-row">',
-        '<span class="ai-emoji" aria-hidden="true">✅</span>',
+        '<span class="ai-emoji" aria-hidden="true">', icon('check'), '</span>',
         '<div>',
           '<p class="ai-title">ऑनलाइन AI ने भी यही बताया — ', escapeHtml(a.nameHi), '</p>',
           '<p class="ai-sub">फ़ोन का मॉडल और ऑनलाइन AI दोनों सहमत हैं, इसलिए इस नतीजे पर ज़्यादा भरोसा करें।</p>',
-          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>' : '',
+          data.evidenceHi ? '<p class="ai-ev">' + icon('eye', 'ic ic--xs') + ' ' + escapeHtml(data.evidenceHi) + '</p>' : '',
         '</div>',
       '</div>',
       '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
@@ -8305,12 +8188,12 @@ function renderAiCard(kind, data) {
     const loc = getAdvisory(data.localLabel);
     html = [
       '<div class="ai-row">',
-        '<span class="ai-emoji" aria-hidden="true">🌐</span>',
+        '<span class="ai-emoji" aria-hidden="true">', icon('globe'), '</span>',
         '<div>',
           '<p class="ai-title">ऑनलाइन AI की राय अलग है — ', escapeHtml(ai.nameHi), '</p>',
           '<p class="ai-sub">नीचे दी गई सलाह अब <strong>ऑनलाइन AI</strong> के नतीजे की है, ',
             'क्योंकि वह फ़ोन के छोटे मॉडल से ज़्यादा सटीक होता है।</p>',
-          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>' : '',
+          data.evidenceHi ? '<p class="ai-ev">' + icon('eye', 'ic ic--xs') + ' ' + escapeHtml(data.evidenceHi) + '</p>' : '',
           '<p class="ai-alt">फ़ोन के मॉडल ने कहा था: <strong>', escapeHtml(loc.nameHi),
             '</strong> — दोनों में शक हो तो पत्ती की एक और साफ फोटो लें, या KVK से पूछें।</p>',
         '</div>',
@@ -8321,15 +8204,15 @@ function renderAiCard(kind, data) {
   } else if (kind === 'wrongcrop') {
     html = [
       '<div class="ai-row">',
-        '<span class="ai-emoji" aria-hidden="true">🌱</span>',
+        '<span class="ai-emoji" aria-hidden="true">', icon('sprout'), '</span>',
         '<div>',
           '<p class="ai-title">यह ', escapeHtml(data.cropHi || 'चुनी हुई फसल'),
             ' की फोटो नहीं है</p>',
           '<p class="ai-sub">ऑनलाइन AI ने पहचाना कि फोटो में कोई दूसरी फसल है। ',
             'इसलिए ', escapeHtml(data.cropHi || ''), ' का रोग बताना गलत होता — ',
             'सलाह रोक दी गई है।</p>',
-          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>'
-            : (data.evidence ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidence) + '</p>' : ''),
+          data.evidenceHi ? '<p class="ai-ev">' + icon('eye', 'ic ic--xs') + ' ' + escapeHtml(data.evidenceHi) + '</p>'
+            : (data.evidence ? '<p class="ai-ev">' + icon('eye', 'ic ic--xs') + ' ' + escapeHtml(data.evidence) + '</p>' : ''),
           '<p class="ai-alt">साइडबार में <strong>"फसल चुनें"</strong> से सही फसल चुनकर ',
             'दोबारा जाँचें।</p>',
         '</div>',
@@ -8340,11 +8223,11 @@ function renderAiCard(kind, data) {
   } else if (kind === 'unclear') {
     html = [
       '<div class="ai-row">',
-        '<span class="ai-emoji" aria-hidden="true">🔍</span>',
+        '<span class="ai-emoji" aria-hidden="true">', icon('search'), '</span>',
         '<div>',
           '<p class="ai-title">ऑनलाइन AI फोटो से पक्का नहीं बता पाया</p>',
           '<p class="ai-sub">कृपया छाँव की साफ रोशनी में, पत्ती को पूरे फ्रेम में लेकर एक और फोटो लें।</p>',
-          data.evidenceHi ? '<p class="ai-ev">👁️ ' + escapeHtml(data.evidenceHi) + '</p>' : '',
+          data.evidenceHi ? '<p class="ai-ev">' + icon('eye', 'ic ic--xs') + ' ' + escapeHtml(data.evidenceHi) + '</p>' : '',
         '</div>',
       '</div>',
     ].join('');
@@ -8352,7 +8235,7 @@ function renderAiCard(kind, data) {
   } else if (kind === 'fail') {
     html = [
       '<div class="ai-row">',
-        '<span class="ai-emoji" aria-hidden="true">📴</span>',
+        '<span class="ai-emoji" aria-hidden="true">', icon('wifi-off'), '</span>',
         '<div>',
           '<p class="ai-title">ऑनलाइन जाँच नहीं हो पाई</p>',
           '<p class="ai-sub">', escapeHtml(data && data.messageHi
@@ -8542,7 +8425,8 @@ function buildAdvisoryHtml(label, opts) {
           '<h4>रासायनिक उपचार / Chemical</h4>',
           '<span class="tagline tagline--chemical">मात्रा लगभग / प्रति लीटर पानी</span>',
           bullets(a.chemical),
-          '<p class="kvk-note">⚠️ यह केवल सामान्य मार्गदर्शन है। छिड़काव से पहले अपने ',
+          '<p class="kvk-note">', icon('alert', 'ic ic--xs'),
+          ' यह केवल सामान्य मार्गदर्शन है। छिड़काव से पहले अपने ',
           '<strong>कृषि विज्ञान केंद्र (KVK)</strong> या कृषि अधिकारी से दवा और मात्रा की पुष्टि ज़रूर करें।</p>',
         '</div>',
 
@@ -8795,7 +8679,7 @@ function renderResultNotes(checked) {
     const said = getAdvisory(checked.modelSaid);
     parts.push([
       '<div class="rnote rnote--ok">',
-        '<span class="rnote__icon" aria-hidden="true">✅</span>',
+        '<span class="rnote__icon" aria-hidden="true">', icon('check'), '</span>',
         '<div>',
           '<p class="rnote__title">आपकी फसल स्वस्थ लग रही है</p>',
           '<p class="rnote__sub">', escapeHtml(checked.reason),
@@ -8943,7 +8827,7 @@ function detectItemHtml(entry) {
   const unknown = !entry.confident;
   const name = unknown ? 'पहचान नहीं हो पाई' : a.nameHi;
   const crop = CROPS[entry.cropId || a.cropId];
-  const cropTag = crop ? (crop.icon + ' ' + crop.nameHi + ' · ') : '';
+  const cropTag = crop ? (crop.nameHi + ' · ') : '';
   const sub  = cropTag + (unknown ? ('सबसे करीब: ' + a.nameEn) : a.nameEn);
 
   return [
@@ -9063,7 +8947,7 @@ function renderCropCards() {
         ' data-crop="', escapeHtml(id), '"', (ready ? '' : ' disabled'),
         ' aria-label="', escapeHtml(c.nameHi + ' / ' + c.nameEn), '">',
 
-        '<span class="crop-card__icon" aria-hidden="true">', c.icon, '</span>',
+        '<span class="crop-card__icon" aria-hidden="true">', icon(c.icon, 'ic ic--crop'), '</span>',
         '<span class="crop-card__text">',
           '<span class="crop-card__name">', escapeHtml(c.nameHi), '</span>',
           '<small>', escapeHtml(c.nameEn), ' · ', escapeHtml(c.altHi), '</small>',
@@ -9112,8 +8996,8 @@ function updateCropChip() {
   const crop = activeCrop();
   if (el.cropChip) {
     el.cropChip.innerHTML = crop
-      ? '<span aria-hidden="true">' + crop.icon + '</span> ' + escapeHtml(crop.nameHi)
-      : '<span aria-hidden="true">🌱</span> फसल चुनें';
+      ? icon(crop.icon, 'ic ic--inline') + ' ' + escapeHtml(crop.nameHi)
+      : icon('sprout', 'ic ic--inline') + ' फसल चुनें';
   }
   if (el.handbookCropName) {
     el.handbookCropName.textContent = crop
@@ -9132,7 +9016,7 @@ function updateCropChip() {
 
 
 /* ============================================================================
- * SECTION 10B — OFFLINE MODEL MANAGER  ⬇️
+ * SECTION 10B — OFFLINE MODEL MANAGER
  *
  * SAMASYA: app ab GitHub + Vercel par host hai. Har fasal ka model ~2.2 MB ka hai.
  *          Agar app khulte hi saare 7 model utaar le, to kisan ka 15 MB data
@@ -9241,7 +9125,7 @@ async function renderStorageLine() {
 }
 
 /* ---------------------------------------------------------------------------
- * List render — har fasal ke saamne "डाउनलोड" / "✓ सेव है" / "हटाएँ".
+ * List render — har fasal ke saamne "डाउनलोड" / "सेव है" / "हटाएँ".
  * ------------------------------------------------------------------------- */
 async function renderOfflineManager() {
   if (!el.downloadList) return;
@@ -9268,12 +9152,12 @@ async function renderOfflineManager() {
     const n = (crop.labels || []).length;
     return [
       '<li class="dl-item" data-crop="', escapeHtml(id), '">',
-        '<span class="dl-icon" aria-hidden="true">', crop.icon, '</span>',
+        '<span class="dl-icon" aria-hidden="true">', icon(crop.icon, 'ic ic--crop'), '</span>',
         '<span class="dl-body">',
           '<span class="dl-name">', escapeHtml(crop.nameHi),
             ' <small>', escapeHtml(crop.nameEn), '</small></span>',
           '<span class="dl-meta" data-role="meta">',
-            have ? '✓ फ़ोन में सेव है — बिना इंटरनेट चलेगा'
+            have ? 'फ़ोन में सेव है, बिना इंटरनेट चलेगा'
                  : ('लगभग 2.2 MB · ' + n + ' रोग'),
           '</span>',
           '<span class="dl-bar" data-role="bar" hidden><i></i></span>',
@@ -9289,16 +9173,16 @@ async function renderOfflineManager() {
   if (el.aiStatusLine) {
     if (state.aiConfigured === true) {
       el.aiStatusLine.textContent =
-        '🌐 ऑनलाइन AI चालू है (' + ((state.aiModels || [])[0] || 'free model') + ')।';
+        'ऑनलाइन AI चालू है (' + ((state.aiModels || [])[0] || 'free model') + ')।';
     } else if (state.aiReason === 'no_api') {
       el.aiStatusLine.textContent =
-        '🌐 ऑनलाइन AI यहाँ नहीं चलेगा — लोकल सर्वर पर /api फंक्शन नहीं होता। ' +
+        'ऑनलाइन AI यहाँ नहीं चलेगा, लोकल सर्वर पर /api फंक्शन नहीं होता। ' +
         'Vercel वाले लिंक पर चलेगा।';
     } else if (state.aiConfigured === false) {
       el.aiStatusLine.textContent =
-        '🌐 ऑनलाइन AI बंद है — Vercel में OPENROUTER_API_KEY सेट करके redeploy करें।';
+        'ऑनलाइन AI बंद है। Vercel में OPENROUTER_API_KEY सेट करके redeploy करें।';
     } else {
-      el.aiStatusLine.textContent = '🌐 ऑनलाइन AI: इंटरनेट आने पर जाँचा जाएगा।';
+      el.aiStatusLine.textContent = 'ऑनलाइन AI: इंटरनेट आने पर जाँचा जाएगा।';
     }
   }
 
@@ -9306,8 +9190,8 @@ async function renderOfflineManager() {
      yeh suraksha bina internet bhi lagi hui hai. */
   if (el.gateStatusLine) {
     el.gateStatusLine.textContent = CONFIG.LEAF_GATE.ENABLED
-      ? '🌿 पत्ती-जाँच चालू है — बिना इंटरनेट भी काम करती है। पौधे/पत्ती के अलावा किसी फोटो पर रोग नहीं बताया जाएगा।'
-      : '⚠️ पत्ती-जाँच बंद है — किसी भी फोटो पर रोग बताया जा सकता है (script.js में LEAF_GATE.ENABLED देखें)।';
+      ? 'पत्ती-जाँच चालू है, बिना इंटरनेट भी काम करती है। पौधे या पत्ती के अलावा किसी फोटो पर रोग नहीं बताया जाएगा।'
+      : 'पत्ती-जाँच बंद है, किसी भी फोटो पर रोग बताया जा सकता है (script.js में LEAF_GATE.ENABLED देखें)।';
   }
 
   renderStorageLine();
@@ -9337,7 +9221,7 @@ async function handleDownloadClick(li, action) {
       if (fill) fill.style.width = Math.round(p * 100) + '%';
       meta.textContent = 'डाउनलोड हो रहा है… ' + Math.round(p * 100) + '%';
     });
-    meta.textContent = '✓ हो गया';
+    meta.textContent = 'हो गया';
   } catch (err) {
     console.warn('[offline] download fail:', err.message);
     meta.textContent = 'डाउनलोड नहीं हो पाया — इंटरनेट जाँचकर दोबारा कोशिश करें।';
@@ -9423,7 +9307,7 @@ function renderInstallCard() {
 
   /* 3) Note + haath se jodne ke steps */
   if (isAppInstalled()) {
-    el.installNote.textContent = '✅ ऐप पहले से इंस्टॉल है — आप अभी उसी में हैं।';
+    el.installNote.textContent = 'ऐप पहले से इंस्टॉल है, आप अभी उसी में हैं।';
     hide(el.installSteps);
     return;
   }
@@ -9506,7 +9390,7 @@ function wireInstallPrompt() {
 /* ============================================================================
  * SECTION 11 — WEATHER + SMART SPRAY WARNING
  *
- * ⚠️ Yeh app ka EK-MAATRA feature hai jise INTERNET chahiye.
+ * ZAROORI: Yeh app ka EK-MAATRA feature hai jise INTERNET chahiye.
  *    Disease detection isse bilkul alag hai aur offline chalti rehti hai —
  *    yahan koi bhi error aaye, baaki app par asar nahi padta.
  * ========================================================================= */
@@ -9608,7 +9492,7 @@ async function applyManualPlace(query) {
         msg   = 'जगह ढूँढने में दिक्कत हुई (इंटरनेट या सर्वर की समस्या)। दोबारा कोशिश करें।';
         msgEn = 'Could not look up that place (an internet or server problem). Please try again.';
     }
-    renderWeatherMessage(msg, { icon: '📍', en: msgEn, form: true, value: typed, retry: false });
+    renderWeatherMessage(msg, { icon: 'pin', en: msgEn, form: true, value: typed, retry: false });
   }
 }
 
@@ -9618,7 +9502,7 @@ function askForPlace() {
   renderWeatherMessage(
     'अपना गाँव/शहर का नाम या 6 अंक का PIN कोड लिखें — मौसम वहीं का दिखेगा।',
     {
-      icon: '📍', form: true, value: saved ? saved.label : '',
+      icon: 'pin', form: true, value: saved ? saved.label : '',
       en: 'Type your village/city name or 6-digit PIN code — the weather will be shown for that place.',
       retryLabel: 'मेरी लोकेशन से / Use my location',
     }
@@ -9692,7 +9576,7 @@ function buildWeatherModel(current, forecast) {
   if (m.rainSoon) {
     m.warnings.push({
       kind: 'rain',
-      icon: '🌧️',
+      icon: 'rain',
       titleHi: 'बारिश हो सकती है — अभी स्प्रे/दवा न छिड़कें',
       bodyHi: 'अगले ' + m.rainInHours + ' घंटे में बारिश की संभावना ' +
               Math.round(m.rainPop * 100) + '% है। अभी दवा छिड़केंगे तो पानी के साथ बह जाएगी और पैसा बर्बाद होगा। ' +
@@ -9707,7 +9591,7 @@ function buildWeatherModel(current, forecast) {
   if (m.maxHumidity > WEATHER_CONFIG.HUMIDITY_THRESHOLD) {
     m.warnings.push({
       kind: 'humid',
-      icon: '💧',
+      icon: 'drop',
       titleHi: 'फंगल रोग का खतरा बढ़ गया है',
       bodyHi: 'हवा में नमी ' + m.maxHumidity + '% है। इतनी नमी में फफूंद वाले रोग (झुलसा, रतुआ, ब्लास्ट) ' +
               'तेज़ी से फैलते हैं। आज ही खेत में 10 जगह घूमकर पत्तियाँ जाँचें और इस ऐप से स्कैन करें।',
@@ -9749,7 +9633,7 @@ function renderWeatherMessage(text, opts) {
   const o = opts || {};
   el.weatherBody.innerHTML = [
     '<div class="weather-msg">',
-      '<span class="weather-msg__icon" aria-hidden="true">', (o.icon || 'ℹ️'), '</span>',
+      '<span class="weather-msg__icon" aria-hidden="true">', icon(o.icon || 'info'), '</span>',
       '<p>', escapeHtml(text), '</p>',
       (o.en ? '<p class="weather-msg__en">' + escapeHtml(o.en) + '</p>' : ''),
 
@@ -9830,9 +9714,9 @@ function renderWeather() {
 
     m.warnings.map((w) => [
       '<div class="warn warn--', w.kind, '">',
-        '<span class="warn__icon" aria-hidden="true">', w.icon, '</span>',
+        '<span class="warn__icon" aria-hidden="true">', icon(w.icon), '</span>',
         '<div>',
-          '<strong>⚠️ ', escapeHtml(w.titleHi), '</strong>',
+          '<strong>', escapeHtml(w.titleHi), '</strong>',
           '<p>', escapeHtml(w.bodyHi), '</p>',
           '<p class="muted-sm">', escapeHtml(w.bodyEn), '</p>',
         '</div>',
@@ -9841,7 +9725,7 @@ function renderWeather() {
 
     (m.warnings.length ? '' :
       '<div class="warn warn--ok">' +
-        '<span class="warn__icon" aria-hidden="true">✅</span>' +
+        '<span class="warn__icon" aria-hidden="true">' + icon('check') + '</span>' +
         '<div><strong>मौसम ठीक है</strong>' +
         '<p>अभी कोई चेतावनी नहीं। छिड़काव करना हो तो सुबह या शाम का समय चुनें।</p></div>' +
       '</div>'),
@@ -9850,8 +9734,9 @@ function renderWeather() {
        purana (stale) data dikhta hai — tab bhi user ko nikalne ka raasta chahiye. */
     '<div class="wplace-row">' +
       (manualPlace
-        ? '<span>📍 ' + escapeHtml(manualPlace.label) + ' — आपकी चुनी हुई जगह</span>'
-        : '<span>📍 आपकी लोकेशन से / From your location</span>') +
+        ? '<span>' + icon('pin', 'ic ic--xs') + ' ' + escapeHtml(manualPlace.label) +
+          ' · आपकी चुनी हुई जगह</span>'
+        : '<span>' + icon('pin', 'ic ic--xs') + ' आपकी लोकेशन से / From your location</span>') +
       '<button type="button" class="btn btn--ghost btn--sm" id="weatherChangePlaceBtn">' +
       (manualPlace ? 'जगह बदलें / Change place' : 'जगह खुद चुनें / Set place') +
       '</button>' +
@@ -9890,7 +9775,7 @@ async function refreshWeather(opts) {
       'मौसम देखने के लिए OpenWeatherMap की मुफ़्त API key चाहिए। ' +
       'js/script.js में सबसे ऊपर WEATHER_API_KEY = "PASTE_KEY_HERE" में अपनी key paste करें।',
       {
-        icon: '🔑', retry: false,
+        icon: 'key', retry: false,
         en: 'Weather needs a free OpenWeatherMap API key. Paste your key into ' +
             'WEATHER_API_KEY = "PASTE_KEY_HERE" near the top of js/script.js.',
       }
@@ -9916,7 +9801,7 @@ async function refreshWeather(opts) {
       renderWeatherMessage(
         'मौसम के लिए इंटरनेट चाहिए। बाकी ऐप (रोग पहचान) बिना इंटरनेट के काम करता रहेगा।',
         {
-          icon: '📴',
+          icon: 'wifi-off',
           en: 'Weather needs an internet connection. The rest of the app (disease detection) ' +
               'keeps working offline.',
         }
@@ -9957,28 +9842,28 @@ async function refreshWeather(opts) {
       return;
     }
 
-    let msg, msgEn, ic = '⚠️', form = false;
+    let msg, msgEn, ic = 'alert', form = false;
     switch (err.message) {
       case 'GEO_DENIED':
         msg   = 'लोकेशन की अनुमति नहीं मिली। नीचे अपना गाँव/शहर या PIN कोड लिख दें — ' +
-                'मौसम वहीं का दिखेगा। (या address bar में 🔒 → Location → Allow करें।)';
+                'मौसम वहीं का दिखेगा। (या address bar के ताले पर टैप करके Location को Allow करें।)';
         msgEn = 'Location permission was denied. Type your village/city or PIN code below instead — ' +
-                'or allow location from the 🔒 icon in the address bar.';
-        ic = '📍'; form = true; break;
+                'or allow location from the lock icon in the address bar.';
+        ic = 'pin'; form = true; break;
       case 'GEO_UNSUPPORTED':
         msg   = 'इस ब्राउज़र में लोकेशन की सुविधा नहीं है। नीचे अपना गाँव/शहर या PIN कोड लिख दें।';
         msgEn = 'This browser does not support location. Type your village/city or PIN code below.';
-        ic = '📍'; form = true; break;
+        ic = 'pin'; form = true; break;
       case 'GEO_FAILED':
         msg   = 'लोकेशन नहीं मिल पाई। GPS चालू करके दोबारा कोशिश करें, ' +
                 'या नीचे अपना गाँव/शहर या PIN कोड लिख दें।';
         msgEn = 'Your location could not be determined. Turn on GPS and try again, ' +
                 'or type your village/city or PIN code below.';
-        ic = '📍'; form = true; break;
+        ic = 'pin'; form = true; break;
       case 'BAD_KEY':
         msg   = 'API key गलत है या अभी चालू नहीं हुई। नई key को चालू होने में ~1 घंटा लगता है।';
         msgEn = 'The API key is wrong or not active yet. A new key takes about an hour to activate.';
-        ic = '🔑'; break;
+        ic = 'key'; break;
       default:
         msg   = 'मौसम की जानकारी नहीं मिल पाई (इंटरनेट या सर्वर की दिक्कत)। ' +
                 'बाकी ऐप बिना इंटरनेट के काम करता रहेगा।';
@@ -10224,9 +10109,9 @@ function speakText(text, btn, hostForNote) {
     const note = document.createElement('p');
     note.className = 'voice-note';
     note.textContent = voice
-      ? 'ℹ️ इस फ़ोन में हिंदी आवाज़ नहीं मिली, इसलिए "' + voice.name + '" आवाज़ से पढ़ा जा रहा है। ' +
+      ? 'इस फ़ोन में हिंदी आवाज़ नहीं मिली, इसलिए "' + voice.name + '" आवाज़ से पढ़ा जा रहा है। ' +
         'बेहतर उच्चारण के लिए Settings → Language & input → Text-to-speech में हिंदी वॉइस डाउनलोड करें।'
-      : 'ℹ️ इस फ़ोन में हिंदी आवाज़ इंस्टॉल नहीं है। Settings → Language & input → Text-to-speech ' +
+      : 'इस फ़ोन में हिंदी आवाज़ इंस्टॉल नहीं है। Settings → Language & input → Text-to-speech ' +
         'में जाकर हिंदी वॉइस डाउनलोड करें, तब आवाज़ साफ़ सुनाई देगी।';
     hostForNote.appendChild(note);
   }
@@ -10296,7 +10181,7 @@ function speakText(text, btn, hostForNote) {
       stopSpeaking();
     };
 
-    /* ⚠️ CHROME KA SABSE BADA BUG — YEH LINE HATANA MAT ⚠️
+    /* CHROME KA SABSE BADA BUG — YEH LINE HATANA MAT
        Utterance ka reference kahin na kahin rakhna PADTA hai. Agar sirf local
        variable me rahe, to Chrome ka garbage collector use beech me utha leta
        hai aur awaaz chupchaap band ho jaati hai — na 'end' aata hai, na 'error'.
@@ -10357,7 +10242,7 @@ function renderVoiceStatus() {
 
   if (info.reason === 'unsupported') {
     el.voiceStatusLine.textContent =
-      '⚠️ इस ब्राउज़र में आवाज़ की सुविधा नहीं है। Chrome इस्तेमाल करें।';
+      'इस ब्राउज़र में आवाज़ की सुविधा नहीं है। Chrome इस्तेमाल करें।';
     if (el.voiceTestBtn) el.voiceTestBtn.disabled = true;
     showSteps(false);
     return;
@@ -10365,16 +10250,16 @@ function renderVoiceStatus() {
 
   if (info.reason === 'hindi') {
     el.voiceStatusLine.textContent =
-      '✅ हिंदी आवाज़ फ़ोन में मौजूद है (' + info.voice.name + ') — बिना इंटरनेट भी बोलेगी।';
+      'हिंदी आवाज़ फ़ोन में मौजूद है (' + info.voice.name + ') — बिना इंटरनेट भी बोलेगी।';
     showSteps(false);
   } else if (info.reason === 'other-lang') {
     el.voiceStatusLine.textContent =
-      'ℹ️ फ़ोन में आवाज़ तो है (' + info.voice.name + ') पर हिंदी नहीं। बिना इंटरनेट बोलेगी, ' +
+      'फ़ोन में आवाज़ तो है (' + info.voice.name + ') पर हिंदी नहीं। बिना इंटरनेट बोलेगी, ' +
       'लेकिन उच्चारण साफ़ नहीं होगा। हिंदी वॉइस ऐसे डाउनलोड करें:';
     showSteps(true);
   } else if (info.reason === 'network-only') {
     el.voiceStatusLine.textContent =
-      '⚠️ इस फ़ोन में सिर्फ़ इंटरनेट वाली आवाज़ मिली — बिना नेटवर्क कुछ सुनाई नहीं देगा। ' +
+      'इस फ़ोन में सिर्फ़ इंटरनेट वाली आवाज़ मिली — बिना नेटवर्क कुछ सुनाई नहीं देगा। ' +
       'हिंदी वॉइस ऐसे डाउनलोड करें:';
     showSteps(true);
   } else {
@@ -10399,7 +10284,7 @@ function wireSpeakButton(btn, hostForNote) {
 
 
 /* ============================================================================
- * SECTION 14 — कृषि विभाग से जुड़ाव (report + advisory)  📡
+ * SECTION 14 — कृषि विभाग से जुड़ाव (report + advisory)
  *
  * DO TARAF KA RASTA:
  *
@@ -10411,7 +10296,7 @@ function wireSpeakButton(btn, hostForNote) {
  *   2. VIBHAG -> KISAN  (GET /api/advisories)
  *      Adhikari koi chetavni bhejein to wo kisan ki app me upar dikh jaati hai.
  *
- * ⚠️ NIJTA — yeh sabse zaroori niyam hai:
+ * NIJTA — yeh sabse zaroori niyam hai:
  *   - Bhejna DEFAULT ME BAND hai. Kisan "Offline & Help" me khud chालू kare
  *     tabhi kuch jaata hai.
  *   - Naam aur phone number KABHI nahi jaate.
@@ -10440,7 +10325,7 @@ function renderReportToggle() {
   const on = state.reportOptIn;
   el.reportToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
   el.reportToggle.classList.toggle('is-on', on);
-  el.reportToggle.textContent = on ? '✅ भेजना चालू है' : 'भेजना चालू करें';
+  el.reportToggle.textContent = on ? 'भेजना चालू है' : 'भेजना चालू करें';
   if (el.reportNote) {
     el.reportNote.textContent = on
       ? 'हर जाँच का नतीजा, फसल और पत्ती का छोटा फोटो कृषि विभाग को जाता है। ' +
@@ -10493,7 +10378,7 @@ async function reportScanToDept(top) {
       console.info('[report] vibhag ko bhej di:', data.id, '| storage:', data.storage);
       if (el.reportNote) {
         el.reportNote.textContent =
-          '✅ पिछली जाँच कृषि विभाग को भेज दी गई (' + data.id + ')।';
+          'पिछली जाँच कृषि विभाग को भेज दी गई (' + data.id + ')।';
       }
     } else {
       console.warn('[report] nahi bheji ja saki:', data && data.error);
@@ -10545,23 +10430,26 @@ function renderAdvisoryAlert() {
   const a = list[0];                                  // sabse nayi
   const cls = a.severity === 'critical' ? 'critical'
             : a.severity === 'warning' ? 'warning' : 'info';
-  const icon = a.severity === 'critical' ? '🚨' : a.severity === 'warning' ? '⚠️' : '📢';
+  // NOTE: is variable ka naam `icon` NAHI rakh sakte — wo global icon() helper
+  // ko dhak deta hai. Isliye alertIcon.
+  const alertIcon = a.severity === 'info' ? 'info' : 'alert';
 
   el.advisoryAlert.className = 'card dept-alert dept-alert--' + cls;
   el.advisoryAlert.innerHTML = [
     '<div class="dept-alert__row">',
-      '<span class="dept-alert__icon" aria-hidden="true">', icon, '</span>',
+      '<span class="dept-alert__icon" aria-hidden="true">', icon(alertIcon), '</span>',
       '<div class="dept-alert__body">',
         '<p class="dept-alert__tag">कृषि विभाग की चेतावनी',
           a.district && a.district !== 'all' ? ' · ' + escapeHtml(a.district) : '', '</p>',
         '<p class="dept-alert__title">', escapeHtml(a.titleHi || ''), '</p>',
         '<p class="dept-alert__msg">', escapeHtml(a.messageHi || ''), '</p>',
-        a.chemical ? '<p class="dept-alert__chem">💊 ' + escapeHtml(a.chemical) +
+        a.chemical ? '<p class="dept-alert__chem">' + icon('pill', 'ic ic--xs') + ' ' +
+          escapeHtml(a.chemical) +
           (a.cibrcApproved ? ' <strong>(CIBRC अनुमोदित)</strong>' : '') + '</p>' : '',
         a.issuedBy ? '<p class="dept-alert__by">— ' + escapeHtml(a.issuedBy) + '</p>' : '',
       '</div>',
       '<button type="button" class="dept-alert__close" id="advisoryDismiss" ',
-        'aria-label="चेतावनी बंद करें">✕</button>',
+        'aria-label="चेतावनी बंद करें">' + icon('close', 'ic ic--xs') + '</button>',
     '</div>',
   ].join('');
 
@@ -10675,7 +10563,7 @@ function wireEvents() {
       renderWeatherMessage(
         'इंटरनेट चला गया। मौसम अभी नहीं मिलेगा, पर रोग पहचान बिना इंटरनेट के चलती रहेगी।',
         {
-          icon: '📴',
+          icon: 'wifi-off',
           en: 'The internet connection dropped. Weather is unavailable right now, but disease ' +
               'detection keeps working offline.',
         }
@@ -10691,7 +10579,7 @@ function wireEvents() {
 
   /* dropzone: click + keyboard + drag&drop */
   el.dropzone.addEventListener('click', (e) => {
-    if (e.target.closest('.preview-clear')) return;     // ✕ ka apna kaam hai
+    if (e.target.closest('.preview-clear')) return;     // hatane wale button ka apna kaam hai
     el.galleryInput.click();
   });
   el.dropzone.addEventListener('keydown', (e) => {
