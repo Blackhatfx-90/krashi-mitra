@@ -242,8 +242,8 @@ module.exports = async function handler(req, res) {
     return res.status(503).json({
       ok: false,
       error: 'not_configured',
-      messageHi: 'ऑनलाइन मोड अभी चालू नहीं है — सर्वर पर OPENROUTER_API_KEY सेट नहीं है।',
-      messageEn: 'Online mode is not configured: OPENROUTER_API_KEY is missing on the server.',
+      messageHi: 'ऑनलाइन मोड अभी चालू नहीं है — सर्वर पर GEMINI_API_KEY या OPENROUTER_API_KEY सेट नहीं है।',
+      messageEn: 'Online mode is not configured: GEMINI_API_KEY or OPENROUTER_API_KEY is missing on the server.',
     });
   }
 

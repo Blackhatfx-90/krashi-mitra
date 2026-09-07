@@ -1,0 +1,7 @@
+{
+  "rice": {"germination":["Use certified seed and clean nursery water."],"vegetative":["Keep field weed-free and avoid standing excess water."],"flowering":["Monitor stem borer and blast twice weekly."],"harvest":["Harvest when most grains are hard and straw is yellow."]},
+  "wheat": {"germination":["Sow certified seed in a well-prepared, moist seedbed."],"vegetative":["Irrigate at crown-root initiation and control weeds early."],"flowering":["Monitor rust and aphids; avoid unnecessary nitrogen."],"harvest":["Harvest when grains are hard and crop moisture is safe for storage."]},
+  "cotton": {"germination":["Use treated seed and maintain uniform plant spacing."],"vegetative":["Scout the underside of leaves and growing points for sucking pests."],"flowering":["Monitor bollworm traps and follow registered product labels."],"harvest":["Pick clean, dry kapas in multiple rounds."]},
+  "maize": {"germination":["Plant into moist soil with uniform spacing."],"vegetative":["Keep the root zone weed-free and check fall armyworm."],"flowering":["Maintain moisture during tasseling and silking."],"harvest":["Harvest when husks dry and kernels are firm."]},
+  "tomato": {"germination":["Use healthy seedlings and raised, well-drained beds."],"vegetative":["Stake plants and avoid wetting leaves during irrigation."],"flowering":["Scout for whitefly, leaf curl and fruit borer."],"harvest":["Pick at the market-appropriate maturity and keep fruit shaded."]}
+}
