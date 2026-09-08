@@ -35,7 +35,7 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_MODELS = [
   'google/gemma-4-31b-it:free',      // Google DeepMind 31B multimodal — best default
   'thinkingmachines/inkling:free',   // 975B MoE — sabse gehri reasoning
-  'minimax/minimax-m3:free',         // MiniMax M3 multimodal
+  'thinkingmachines/inkling-small:free', // halka/tez variant, wahi 1M context
   'google/gemma-4-26b-a4b-it:free',  // halka/tez MoE variant
   'openrouter/free',                 // last resort: OpenRouter ka free router
 ];
@@ -177,7 +177,7 @@ async function callModel(model, apiKey, imageDataUrl, prompt, referer) {
 
     let data;
     try { data = JSON.parse(bodyText); }
-    catch (_) { return { ok: false, status: 502, error: 'bad JSON from OpenRouter' }; }
+    catch (_) { return { ok: false, status: 502, error: 'bad_json_from_provider' }; }
 
     const msg = data && data.choices && data.choices[0] && data.choices[0].message;
     const content = msg && (typeof msg.content === 'string'
@@ -228,8 +228,10 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       configured: Boolean(geminiKey || apiKey),
-      provider: geminiKey ? 'gemini' : (apiKey ? 'openrouter' : null),
-      models: geminiKey ? ['gemini-2.0-flash'] : models(),
+      /* Yahan pehle provider aur model ke asli naam jaate the. Client ko unki
+         zaroorat nahi hai aur browser ka network tab koi bhi khol sakta hai,
+         isliye ab sirf ginti bhejte hain. */
+      engines: geminiKey ? 1 : models().length,
     });
   }
 
@@ -242,8 +244,11 @@ module.exports = async function handler(req, res) {
     return res.status(503).json({
       ok: false,
       error: 'not_configured',
-      messageHi: 'ऑनलाइन मोड अभी चालू नहीं है — सर्वर पर GEMINI_API_KEY या OPENROUTER_API_KEY सेट नहीं है।',
-      messageEn: 'Online mode is not configured: GEMINI_API_KEY or OPENROUTER_API_KEY is missing on the server.',
+      /* Kisan ko dikhne wale sandesh me kisi bhi bahari service ka naam nahi
+         jaata — wo hamara andaruni intezaam hai. Team ke liye asli wajah
+         `error: 'not_configured'` field me hai. */
+      messageHi: 'ऑनलाइन जाँच अभी चालू नहीं है। फ़ोन का अपना मॉडल काम करता रहेगा।',
+      messageEn: 'Online checking is not enabled right now. The on-device model keeps working.',
     });
   }
 
@@ -301,8 +306,8 @@ module.exports = async function handler(req, res) {
       if (out.status === 401 || out.status === 402 || out.status === 403) {
         return res.status(502).json({
           ok: false, error: 'auth_failed', detail: out.error, tried: tried,
-          messageHi: 'OpenRouter key काम नहीं कर रही (या क्रेडिट नहीं है)।',
-          messageEn: 'The OpenRouter key was rejected (invalid key or no credits).',
+          messageHi: 'ऑनलाइन जाँच अभी नहीं हो पा रही। फ़ोन का अपना मॉडल काम कर रहा है।',
+          messageEn: 'Online checking is unavailable right now. The on-device model is being used.',
         });
       }
       continue;

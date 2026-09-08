@@ -6590,10 +6590,14 @@ const state = {
   weatherBusy: false,
 
   /* --- online AI (double-check) --- */
+  /* Aakhri jaanch ka SAMAAN jawab (SECTION 7A). Offline ho ya online — dono
+     ka natija bilkul ek hi shakl me yahan milta hai. */
+  unified: null,
+
   netMode: 'auto',       // 'auto' | 'online' | 'offline' — kisan ka chuna hua tarika
   aiConfigured: null,    // true = server par key lagi hai | false = nahi | null = pata nahi
   aiReason: null,        // 'no_api' (local server) | 'no_key' | 'error'
-  aiModels: [],          // server par kaunse free models set hain
+  aiEngines: 0,          // server par kitne online engine lage hain (naam nahi)
   aiBusy: false,
   aiResult: null,        // aakhri online jawab
 };
@@ -7316,6 +7320,13 @@ async function runBatchScan() {
         damage: feat.damage,
         switched: !!checked.switchedToHealthy,
       };
+
+      /* Har photo ka SAMAAN jawab bhi bana lete hain (SECTION 7A). Single-photo
+         path me yeh pehle se hota hai — batch me bhi hona chahiye, warna
+         "aakhri jaanch" ka contract batch scan ke baad khali reh jaata tha. */
+      p.unified = unifyFromDevice(top, results);
+      state.unified = p.unified;               // aakhri jaanchi gayi photo
+
       good.push(p.result);
 
     } catch (err) {
@@ -7991,6 +8002,9 @@ async function runPrediction() {
     if (!recognition.ok && !scanAnyway) {
       console.info('[ood] roka — top', (recognition.top && recognition.top.prob || 0).toFixed(3),
                    '| entropy', (recognition.entropy || 0).toFixed(3));
+      state.unified = unifyRejected('low_confidence',
+        'फसल की पहचान नहीं हो पाई — कृपया पत्ती की साफ, नज़दीक की फोटो लें।',
+        'Crop not recognized', 'device');
       showNotPlant({
         reasonHi: 'यह फोटो चुनी हुई फसल की साफ पहचान वाली फोटो नहीं लगती। कृपया पत्ती की नज़दीक और साफ फोटो लें।',
         reasonEn: 'This photo is not a confident match for the selected crop. Please take a clear, close photo of the leaf.'
@@ -8003,6 +8017,14 @@ async function runPrediction() {
     // History me wahi jaye jo kisan ko dikhaya gaya (health-check ke baad wala),
     // warna "swasth" dikhakar history me "रतुआ" likh dena galat hoga.
     const finalTop = renderResults(results);
+
+    /* Phone ke model ka jawab samaan shakl me — baaki features (awaaz,
+       notification, report) isi ko padhte hain, kachche results ko nahi. */
+    state.unified = unifyFromDevice(finalTop || results[0], results);
+    console.info('[unified:device]', state.unified.recognized
+      ? state.unified.disease + ' @ ' + pct(state.unified.confidence, 1)
+      : 'NOT RECOGNIZED (' + state.unified.reason + ')');
+
     saveToHistory(finalTop || results[0]);
 
     // Offline jawab dikh chuka hai. Ab (agar internet hai) bade AI se dobara
@@ -8028,6 +8050,138 @@ async function runPrediction() {
     state.isPredicting = false;
     renderBatchTray();
   }
+}
+
+
+/* ============================================================================
+ * SECTION 7A — SAMAAN JAWAB (unified result shape)
+ *
+ * SAMASYA: do alag-alag jagah se jawab aata hai —
+ *   1. phone ka apna model (offline)   -> { label, prob } ki list
+ *   2. bada AI (online)                -> { label, confidence, evidence, ... }
+ * Dono ki shakl alag hai. Isse har naya feature (voice, notification, admin
+ * report) ko dono ka alag-alag hisaab rakhna padta hai — aur wahin galti hoti hai.
+ *
+ * HAL: dono ko EK HI shakl me badal dete hain. UI ko isse koi farq nahi padta
+ * (wo pehle jaisa hi chalta hai) — yeh bas ek saaf contract hai jise baaki
+ * features seedha use kar sakte hain:
+ *
+ *   {
+ *     recognized : true/false     // false = "Crop not recognized"
+ *     reason     : 'ok' | 'not_plant' | 'wrong_crop' | 'unclear' | 'low_confidence'
+ *     message    : English sandesh   (recognized=false hone par)
+ *     messageHi  : wahi Hindi me
+ *     disease    : 'Rice_Blast'   (label id — recognized=false par '')
+ *     diseaseHi  : 'झोंका रोग'
+ *     diseaseEn  : 'Rice Blast'
+ *     confidence : 0.0 - 1.0
+ *     treatment  : { actions[], organic[], chemical[], prevention[] }
+ *     source     : 'device' (phone ka model) | 'cloud' (bada AI)
+ *     evidence   : AI ne photo me kya dekha (sirf cloud se aata hai)
+ *   }
+ *
+ * Aakhri jawab hamesha state.unified me milta hai.
+ * ========================================================================= */
+
+/** Khali dhancha — har field hamesha maujood rehti hai, undefined kabhi nahi. */
+function emptyUnified() {
+  return {
+    recognized: false, reason: 'unclear',
+    message: 'Crop not recognized', messageHi: 'फसल की पहचान नहीं हो पाई',
+    disease: '', diseaseHi: '', diseaseEn: '',
+    confidence: 0,
+    treatment: { actions: [], organic: [], chemical: [], prevention: [] },
+    source: 'device', evidence: '',
+    /* Model ke top-5 jawab. Cloud path me yeh khali rehta hai, par field
+       HAMESHA maujood rehti hai — dono ki shakl bilkul ek jaisi honi chahiye,
+       warna baaki code ko har baar `if (u.all)` likhna padta. */
+    all: [],
+  };
+}
+
+/** Label se ilaaj ki jaankari nikaalta hai (wahi ADVISORY jo card me dikhti hai). */
+function treatmentFor(label) {
+  const a = getAdvisory(label) || {};
+  return {
+    actions:    Array.isArray(a.actions)    ? a.actions.slice()    : [],
+    organic:    Array.isArray(a.organic)    ? a.organic.slice()    : [],
+    chemical:   Array.isArray(a.chemical)   ? a.chemical.slice()   : [],
+    prevention: Array.isArray(a.prevention) ? a.prevention.slice() : [],
+  };
+}
+
+/**
+ * Jab photo hi pehchani na gayi ho (patti nahi hai / dusri fasal / dhundhli /
+ * model ka bharosa kam) — tab yeh banta hai.
+ * @param {string} reason  'not_plant' | 'wrong_crop' | 'unclear' | 'low_confidence'
+ */
+function unifyRejected(reason, messageHi, messageEn, source) {
+  const u = emptyUnified();
+  u.reason = reason || 'unclear';
+  u.source = source || 'device';
+  if (messageHi) u.messageHi = messageHi;
+  if (messageEn) u.message = messageEn;
+  return u;
+}
+
+/** Phone ke apne model ka jawab -> samaan shakl. */
+function unifyFromDevice(top, allResults) {
+  if (!top) return unifyRejected('unclear', null, null, 'device');
+
+  const a = getAdvisory(top.label) || {};
+  const conf = Number(top.prob) || 0;
+  const u = emptyUnified();
+
+  u.recognized = conf >= CONFIG.CONFIDENCE_THRESHOLD;
+  u.reason     = u.recognized ? 'ok' : 'low_confidence';
+  u.source     = 'device';
+  u.confidence = conf;
+  u.disease    = top.label || '';
+  u.diseaseHi  = a.nameHi || '';
+  u.diseaseEn  = a.nameEn || '';
+  u.treatment  = treatmentFor(top.label);
+
+  if (!u.recognized) {
+    u.message   = 'Crop not recognized';
+    u.messageHi = 'फसल की पहचान नहीं हो पाई';
+  }
+  u.all = (allResults || []).slice(0, 5).map((r) => ({ label: r.label, prob: r.prob }));
+  return u;
+}
+
+/** Bade AI ka jawab -> bilkul wahi shakl. */
+function unifyFromCloud(ai) {
+  if (!ai || !ai.ok || !ai.label) {
+    return unifyRejected('unclear', null, null, 'cloud');
+  }
+  if (ai.label === 'not_plant') {
+    return unifyRejected('not_plant',
+      'यह फोटो किसी पौधे या पत्ती की नहीं लगती।',
+      'Crop not recognized: this photo does not show a plant.', 'cloud');
+  }
+  if (ai.label === 'wrong_crop') {
+    return unifyRejected('wrong_crop',
+      'यह चुनी हुई फसल की फोटो नहीं लगती।',
+      'Crop not recognized: this is a different crop than the one selected.', 'cloud');
+  }
+  if (ai.label === 'unclear') {
+    return unifyRejected('unclear',
+      'फोटो साफ नहीं है — कृपया नज़दीक से दोबारा लें।',
+      'Crop not recognized: the photo is not clear enough.', 'cloud');
+  }
+
+  const a = getAdvisory(ai.label) || {};
+  const u = emptyUnified();
+  u.recognized = true;
+  u.reason     = 'ok';
+  u.source     = 'cloud';
+  u.confidence = Number(ai.confidence) || 0;
+  u.disease    = ai.label;
+  u.diseaseHi  = a.nameHi || '';
+  u.diseaseEn  = a.nameEn || '';
+  u.treatment  = treatmentFor(ai.label);
+  u.evidence   = ai.evidenceHi || ai.evidence || '';
+  return u;
 }
 
 
@@ -8103,7 +8257,10 @@ function renderNetMode() {
   } else if (state.aiReason === 'no_api') {
     txt = 'यह लोकल सर्वर है, यहाँ ऑनलाइन AI नहीं चलता। Vercel वाले लिंक पर चलेगा।';
   } else if (state.aiConfigured === false) {
-    txt = 'ऑनलाइन AI अभी उपलब्ध नहीं है (सर्वर पर OPENROUTER_API_KEY सेट नहीं है)। ऑफ़लाइन मॉडल चलेगा।';
+    // NOTE (team ke liye): yahan jaan-boojhkar kisi service ka naam nahi likha.
+    // Kisan ko bas itna pata hona chahiye ki online jaanch abhi band hai.
+    // Key kahan lagti hai, wo README aur api/diagnose.js ke comment me likha hai.
+    txt = 'ऑनलाइन जाँच अभी उपलब्ध नहीं है। फ़ोन का अपना मॉडल पहले जैसा काम करेगा।';
   } else if (!navigator.onLine) {
     txt = 'इंटरनेट नहीं है, अभी ऑफ़लाइन मॉडल से ही जाँच होगी।';
   } else if (state.netMode === 'online') {
@@ -8150,10 +8307,12 @@ async function checkAiEndpoint() {
     } else if (res.ok) {
       const data = await res.json();
       state.aiConfigured = Boolean(data && data.configured);
-      state.aiModels = (data && data.models) || [];
+      // Server ab engine ke naam nahi bhejta (dekhein api/diagnose.js) —
+      // sirf ginti. Client ko isse zyada kuch chahiye bhi nahi.
+      state.aiEngines = (data && data.engines) || 0;
       state.aiReason = state.aiConfigured ? null : 'no_key';
       console.info('[ai] online mode:', state.aiConfigured ? 'ON' : 'key missing',
-                   state.aiModels);
+                   state.aiEngines);
     } else {
       state.aiConfigured = false;
       state.aiReason = 'error';
@@ -8233,7 +8392,10 @@ function renderAiCard(kind, data) {
           data.evidenceHi ? '<p class="ai-ev">' + icon('eye', 'ic ic--xs') + ' ' + escapeHtml(data.evidenceHi) + '</p>' : '',
         '</div>',
       '</div>',
-      '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
+      /* Pehle yahan asli model ka naam (jaise 'google/gemma-4-31b-it:free')
+         dikhta tha. Kisan ke liye wo bekaar hai aur hamara andaruni intezaam
+         bahar nahi jana chahiye — isliye ab sirf itna likhte hain. */
+      '<p class="ai-model">उन्नत ऑनलाइन जाँच से पुष्टि</p>',
     ].join('');
 
   } else if (kind === 'differ') {
@@ -8251,7 +8413,10 @@ function renderAiCard(kind, data) {
             '</strong> — दोनों में शक हो तो पत्ती की एक और साफ फोटो लें, या KVK से पूछें।</p>',
         '</div>',
       '</div>',
-      '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
+      /* Pehle yahan asli model ka naam (jaise 'google/gemma-4-31b-it:free')
+         dikhta tha. Kisan ke liye wo bekaar hai aur hamara andaruni intezaam
+         bahar nahi jana chahiye — isliye ab sirf itna likhte hain. */
+      '<p class="ai-model">उन्नत ऑनलाइन जाँच से पुष्टि</p>',
     ].join('');
 
   } else if (kind === 'wrongcrop') {
@@ -8270,7 +8435,10 @@ function renderAiCard(kind, data) {
             'दोबारा जाँचें।</p>',
         '</div>',
       '</div>',
-      '<p class="ai-model">जाँचा गया: ', escapeHtml(data.model || '—'), '</p>',
+      /* Pehle yahan asli model ka naam (jaise 'google/gemma-4-31b-it:free')
+         dikhta tha. Kisan ke liye wo bekaar hai aur hamara andaruni intezaam
+         bahar nahi jana chahiye — isliye ab sirf itna likhte hain. */
+      '<p class="ai-model">उन्नत ऑनलाइन जाँच से पुष्टि</p>',
     ].join('');
 
   } else if (kind === 'unclear') {
@@ -8306,6 +8474,9 @@ function renderAiCard(kind, data) {
 
 /** AI ka jawab lekar result card ko update karta hai. */
 function applyAiVerdict(ai, results) {
+  /* Bade AI ka jawab bhi bilkul usi shakl me — UI pehle jaisa hi chalta hai,
+     bas state.unified ab cloud wala (zyada bharosemand) jawab rakhta hai. */
+  if (ai && ai.ok) state.unified = unifyFromCloud(ai);
   state.aiResult = ai;
 
   if (!ai || !ai.ok) { renderAiCard('fail', ai); return; }
@@ -9230,14 +9401,14 @@ async function renderOfflineManager() {
   if (el.aiStatusLine) {
     if (state.aiConfigured === true) {
       el.aiStatusLine.textContent =
-        'ऑनलाइन AI चालू है (' + ((state.aiModels || [])[0] || 'free model') + ')।';
+        'ऑनलाइन जाँच चालू है — इंटरनेट होने पर हर फोटो दोबारा जाँची जाएगी।';
     } else if (state.aiReason === 'no_api') {
       el.aiStatusLine.textContent =
         'ऑनलाइन AI यहाँ नहीं चलेगा, लोकल सर्वर पर /api फंक्शन नहीं होता। ' +
         'Vercel वाले लिंक पर चलेगा।';
     } else if (state.aiConfigured === false) {
       el.aiStatusLine.textContent =
-        'ऑनलाइन AI बंद है। Vercel में OPENROUTER_API_KEY सेट करके redeploy करें।';
+        'ऑनलाइन जाँच बंद है। फ़ोन का अपना मॉडल पहले जैसा काम कर रहा है।';
     } else {
       el.aiStatusLine.textContent = 'ऑनलाइन AI: इंटरनेट आने पर जाँचा जाएगा।';
     }
