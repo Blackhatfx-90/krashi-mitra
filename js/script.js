@@ -6571,7 +6571,7 @@ const state = {
   forceScan: false,      // kisan ne "फिर भी जाँचें" dabaya — leaf-gate ek baar chhodo
   imageFeatures: null,   // photo ka rang/banawat vishleshan (gate + health dono use karte hain)
 
-  /* --- batch scan (5 se 40 photo) --- */
+  /* --- batch scan (2 se 40 photo) --- */
   batch: [],             // [{ id, name, url, img, status, result, reasonHi }]
   batchSeq: 0,
   batchSummary: null,    // sab milakar nateeja
@@ -7061,7 +7061,7 @@ function clearImage() {
 
 
 /* ============================================================================
- * SECTION 6C — BATCH SCAN (5 se 40 photo ek saath)
+ * SECTION 6C — BATCH SCAN (2 se 40 photo ek saath)
  *
  * KYUN: ek patti se poore khet ka haal pata nahi chalta. Ho sakta hai kisan ne
  * galti se sabse kharab patti chun li ho, ya sabse achhi. Isliye ab kam se kam
@@ -7083,7 +7083,10 @@ function clearImage() {
  * ========================================================================= */
 
 const BATCH = {
-  MIN: 5,
+  /* Kam se kam kitni photo chahiye. 5 se ghata kar 2 kiya gaya — chhote
+     kisan ke paas har baar 5 alag-alag pattiyan nahi hoti, aur 2 photo se
+     bhi ek theek-thaak andaza mil jaata hai. */
+  MIN: 2,
   MAX: 40,
 };
 
@@ -7955,6 +7958,11 @@ async function runPrediction() {
         }
       }
     }
+    /* "फिर भी जाँचें" ek baar ki chhoot hai. Use yahan padh kar rakh lete hain,
+       kyunki neeche recognitionGate() ko bhi yahi chhoot chahiye — warna kisan
+       "फिर भी जाँचें" dabata tha, patti-jaanch to bypass ho jaati thi, par OOD
+       gate use phir bhi rok deta tha aur nikalne ka koi rasta nahi bachta tha. */
+    const scanAnyway = state.forceScan;
     state.forceScan = false;                     // ek baar ka chhoot, agli photo par phir jaanch
 
     inputTensor = preprocess(canvas);
@@ -7971,8 +7979,18 @@ async function runPrediction() {
       .map((p, i) => ({ label: state.labels[i] || ('Class ' + i), prob: p, index: i }))
       .sort((a, b) => b.prob - a.prob);
 
+    /* ---- TEESRI JAANCH: model khud kitna pakka hai? --------------------
+     * Do cheezein dekhte hain (CONFIG.OOD me):
+     *   1. sabse upar wale jawab ka bharosa  >= MIN_TOP_CONFIDENCE
+     *   2. normalized entropy               <= MAX_NORMALIZED_ENTROPY
+     * Entropy batati hai ki model ka jawab "chapta" to nahi — yaani sab
+     * classes lagbhag barabar. Aisa tab hota hai jab photo model ke liye
+     * bilkul anjaan (out-of-distribution) ho. Sirf confidence dekhna kaafi
+     * nahi, kyunki closed-set model kisi bhi photo par ek class chun hi leta hai. */
     const recognition = recognitionGate(results);
-    if (!recognition.ok && !state.forceScan) {
+    if (!recognition.ok && !scanAnyway) {
+      console.info('[ood] roka — top', (recognition.top && recognition.top.prob || 0).toFixed(3),
+                   '| entropy', (recognition.entropy || 0).toFixed(3));
       showNotPlant({
         reasonHi: 'यह फोटो चुनी हुई फसल की साफ पहचान वाली फोटो नहीं लगती। कृपया पत्ती की नज़दीक और साफ फोटो लें।',
         reasonEn: 'This photo is not a confident match for the selected crop. Please take a clear, close photo of the leaf.'
@@ -10654,7 +10672,7 @@ function wireEvents() {
 
   if (el.clearBtn) el.clearBtn.addEventListener('click', (e) => { e.stopPropagation(); clearImage(); });
 
-  /* ---- BATCH SCAN (5 se 40 photo) ---- */
+  /* ---- BATCH SCAN (2 se 40 photo) ---- */
   if (el.batchScanBtn) el.batchScanBtn.addEventListener('click', runBatchScan);
   if (el.batchClearBtn) el.batchClearBtn.addEventListener('click', clearBatch);
   if (el.batchGrid) {
