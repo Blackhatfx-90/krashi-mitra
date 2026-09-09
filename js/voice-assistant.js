@@ -487,6 +487,19 @@
     toggle() { this.listening ? this.stop() : this.start(); }
 
     start() {
+      /* ================================================================
+       * PEHLE OFFLINE (Vosk) — kyunki browser ka SpeechRecognition aawaaz
+       * Google ke server bhejta hai aur khet me network kamzor hone par
+       * wahin fail hota hai jahan kisan ko sabse zyada zaroorat hoti hai.
+       * Vosk ka model pada ho to poori pehchan phone ke andar hoti hai.
+       * Model na ho / kaam na kare -> chup-chaap neeche wale purane
+       * tareeke par chale jaate hain. Kuch tootta nahi.
+       * ================================================================ */
+      if (window.kmVosk && !this._voskOff) {
+        this._startVosk();
+        return;
+      }
+
       /* Support hi nahi hai */
       if (!this.supported) {
         this._setState('off');
@@ -585,7 +598,105 @@
       }
     }
 
+    /* ---------------------------------------------------------------
+     * OFFLINE SUNNA (Vosk). Command samajhne wala hissa BILKUL wahi hai —
+     * sirf aawaaz kahan se aa rahi hai, wo badla hai.
+     * ------------------------------------------------------------- */
+    async _startVosk() {
+      const lang = (window.kmLang && window.kmLang.current)
+        ? window.kmLang.current().code : 'hi-IN';
+
+      // Model taiyaar nahi? Ek baar taiyaar karne ki koshish.
+      if (!window.kmVosk.isReady()) {
+        const present = await window.kmVosk.modelPresent(lang);
+        if (!present) {
+          // Model rakha hi nahi gaya — purane tareeke par chale jao
+          this._voskOff = true;
+          this._noteOnce('offline आवाज़ के लिए vosk/ फ़ोल्डर में मॉडल रखना बाकी है — ' +
+                         'अभी इंटरनेट वाली पहचान चल रही है।');
+          this.start();
+          return;
+        }
+
+        this._setState('listening');
+        this._cap({
+          heard: 'आवाज़ सहायक इंस्टॉल हो रहा है…',
+          action: 'Setting up offline voice — this happens only once',
+          kind: 'listening', sticky: true,
+        });
+
+        const ok = await window.kmVosk.install(lang, (p) => {
+          this._cap({
+            heard: 'आवाज़ सहायक इंस्टॉल हो रहा है… ' + Math.round(p * 100) + '%',
+            action: 'One-time setup, then it works without internet',
+            kind: 'listening', sticky: true,
+          });
+        });
+
+        if (!ok) {                       // download/load fail — purana tareeka
+          this._voskOff = true;
+          this._setState('idle');
+          this._noteOnce('offline आवाज़ तैयार नहीं हो पाई — इंटरनेट वाली पहचान चल रही है।');
+          this.start();
+          return;
+        }
+      }
+
+      // Vosk ke paas sirf Hindi/English hain — dusri bhasha par bata dete hain
+      const used = window.kmVosk.modelKeyFor(lang);
+      const wanted = String(lang).toLowerCase().split('-')[0];
+      const mismatchNote = (used !== wanted)
+        ? 'इस भाषा के लिए offline आवाज़ पहचान अभी नहीं है — हिंदी में सुन रहे हैं।'
+        : null;
+
+      hush();
+      this.listening = true;
+      this._setState('listening');
+      this._errored = false;
+      this._cap({
+        heard: 'सुन रहा हूँ… बोलिए', action: 'Listening… speak now',
+        kind: 'listening', sticky: true,
+        tips: ['कैमरा खोलो', 'मौसम बताओ', 'सलाह पढ़ो', 'धान चुनो', 'जाँच करो', 'रुको'],
+        note: mismatchNote || 'यह पहचान आपके फ़ोन के अंदर हो रही है — इंटरनेट की ज़रूरत नहीं।',
+      });
+
+      const started = await window.kmVosk.start({
+        onPartial: (t) => {
+          if (t) this._cap({ heard: t, action: 'सुन रहा हूँ…', kind: 'listening', sticky: true });
+        },
+        onFinal: (said) => {
+          this.listening = false;
+          this._setState('idle');
+          const heard = norm(said);
+          if (heard) this._handle(heard, said);
+          else this._respond('कुछ सुनाई नहीं दिया। कृपया दोबारा बोलिए।', {
+            heard: 'कुछ सुनाई नहीं दिया',
+            action: 'Nothing heard. Tap the mic and try again.',
+            kind: 'error', icon: 'micOff',
+          });
+        },
+        onError: (code) => {
+          this.listening = false;
+          this._setState('idle');
+          this._handleError(code);
+        },
+      });
+
+      if (!started) {                    // mic nahi mila wagairah
+        this.listening = false;
+        this._setState('idle');
+      }
+    }
+
+    /** Ek hi note baar-baar na dikhe. */
+    _noteOnce(text) {
+      if (this._notedText === text) return;
+      this._notedText = text;
+      this._cap({ heard: text, action: '', kind: 'error', icon: 'info', hold: 8000 });
+    }
+
     stop() {
+      try { if (window.kmVosk && window.kmVosk.isListening()) window.kmVosk.finish(); } catch (_) {}
       try { if (this.rec) this.rec.stop(); } catch (_) {}
       this.listening = false;
       this._setState('idle');

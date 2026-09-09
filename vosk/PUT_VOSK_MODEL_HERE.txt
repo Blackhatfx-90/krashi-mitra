@@ -1,0 +1,38 @@
+OFFLINE AAWAAZ PEHCHAN (Vosk) KE MODEL YAHAN RAKHEIN
+=====================================================
+
+Yeh folder khali hai. Model ki file (~42 MB) repo me jaan-boojhkar nahi
+rakhi gayi — warna har clone aur deploy bhaari ho jaata.
+
+KYA KARNA HAI
+-------------
+1. https://alphacephei.com/vosk/models kholein
+
+2. Ye do file utaarein (jo bhasha chahiye):
+     vosk-model-small-hi-0.22.zip      Hindi    ~42 MB
+     vosk-model-small-en-us-0.15.zip   English  ~40 MB
+
+3. Zip ko KHOLNA NAHI hai. Jaise ka waisa isi folder me rakh dein:
+     vosk/vosk-model-small-hi-0.22.zip
+     vosk/vosk-model-small-en-us-0.15.zip
+
+4. Bas. App khud dhoondh legi.
+
+AGAR MODEL NA RAKHEIN
+---------------------
+Kuch tootega nahi. App purane tareeke (browser ka SpeechRecognition) par
+chali jaayegi — wo kaam karta hai par INTERNET maangta hai. UI me ek chhoti
+line likhi aayegi ki offline aawaaz ke liye model daalna hai.
+
+VOSK KI SEEMA
+-------------
+Vosk ke paas Bharat ki sirf DO bhashaon ke model hain — Hindi aur English.
+Marathi, Tamil, Telugu, Bangla wagairah ke offline model abhi bane hi nahi.
+Un bhashaon me bolne par app Hindi wale model se sunti hai (aur UI me
+bata deti hai). Likha hua text aur salah apni bhasha me hi rehti hai.
+
+DEPLOY KA DHYAN
+---------------
+Ye file git me commit karenge to repo ~42 MB bada ho jaayega. Agar ye
+theek na lage, to model Vercel Blob ya kisi aur storage par rakh kar
+js/vosk-stt.js me CFG.MODEL_DIR badal dein — bas CORS chaalu hona chahiye.
