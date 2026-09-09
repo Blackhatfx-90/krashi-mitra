@@ -1,0 +1,94 @@
+/* ============================================================================
+   SARKARI-SHAILI THEME — sirf landing page (index.html) ke liye
+   css/landing.css ke BAAD load hoti hai, isliye uske rang badal deti hai.
+   Andar ke app screens (app.html) bilkul nahi chhue gaye.
+
+   ── EK ZAROORI BAAT ────────────────────────────────────────────────────────
+   Yahan RASHTRIYA CHIHN (Lion Capital) JAAN-BOOJHKAR NAHI lagaya gaya.
+   State Emblem of India (Prohibition of Improper Use) Act, 2005 ke tehat wo
+   sirf sarkari sansthaon ke liye hai. Aur "Government of India" likhna kisan
+   ko yeh bharosa de dega ki dawa ki salah sarkari roop se manzoor hai — jo
+   sach nahi hai aur khatarnak ho sakta hai.
+
+   Iske badle: tirangi patti, Ashok Chakra ka motif (jo humne khud SVG me
+   banaya hai), aur sarkari portal jaisi formal banawat. Look mil jaata hai,
+   galat daawa kiye bina.
+   ========================================================================= */
+
+:root{
+  --gov-saffron:#FF9933;
+  --gov-white:#FFFFFF;
+  --gov-green:#138808;
+  --gov-navy:#000080;
+  --gov-ink:#1a1a1a;
+  --gov-strip:#f5f3ef;
+  --gov-line:#d9d4ca;
+}
+
+/* ---------- sabse upar tirangi patti ---------- */
+.gov-stripe{height:4px;display:flex}
+.gov-stripe i{flex:1;display:block}
+.gov-stripe i:nth-child(1){background:var(--gov-saffron)}
+.gov-stripe i:nth-child(2){background:var(--gov-white)}
+.gov-stripe i:nth-child(3){background:var(--gov-green)}
+
+/* ---------- sarkari-shaili header patti ---------- */
+.gov-bar{
+  background:var(--gov-strip);border-bottom:1px solid var(--gov-line);
+  font-size:12px;color:#4a4a4a;
+}
+.gov-bar__in{
+  max-width:1200px;margin:0 auto;padding:7px 20px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.gov-bar__chakra{width:20px;height:20px;flex:0 0 auto}
+.gov-bar__txt{font-weight:600;color:var(--gov-ink);letter-spacing:.01em}
+.gov-bar__sub{color:#6b6b6b}
+.gov-bar__right{margin-left:auto;display:flex;gap:14px;align-items:center}
+.gov-bar__right a{color:#4a4a4a;text-decoration:none;font-size:11.5px}
+.gov-bar__right a:hover{text-decoration:underline}
+
+/* ---------- landing ke rang sarkari palette par ---------- */
+body{
+  --color-primary:#0b6623;
+  --color-primary-dark:#08491a;
+  --color-primary-light:#eaf3ea;
+  --color-primary-soft:#f4f8f3;
+  --color-accent:var(--gov-green);
+}
+
+/* Formal typography — thoda tight aur gambhir */
+.navbar__brand-name,.hero__title,.section-title,h1,h2{letter-spacing:-.015em}
+.hero__title{font-weight:800}
+
+/* Navbar ko sarkari portal jaisa saada aur solid */
+.navbar{
+  background:#fff;border-bottom:2px solid var(--gov-green);
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+
+/* Primary button — tirange ka hara */
+.btn--primary{background:var(--gov-green);border-color:var(--gov-green)}
+.btn--primary:hover{background:#0f6b06}
+
+/* Section ke sirhaane par chhoti kesari lakeer — sarkari portal ka andaz */
+.section-title,.features__title,.ai-section__title{position:relative;padding-top:14px}
+.section-title::before,.features__title::before,.ai-section__title::before{
+  content:"";position:absolute;top:0;left:0;width:44px;height:3px;
+  background:linear-gradient(90deg,var(--gov-saffron) 0 33%,#fff 33% 66%,var(--gov-green) 66% 100%);
+}
+.hero{border-bottom:1px solid var(--gov-line)}
+
+/* ---------- neeche saaf-saaf disclaimer ---------- */
+.gov-disclaimer{
+  background:#fffdf5;border-top:2px solid var(--gov-saffron);
+  padding:16px 20px;font-size:12px;color:#5c4a1a;line-height:1.7;
+}
+.gov-disclaimer__in{max-width:1200px;margin:0 auto}
+.gov-disclaimer strong{color:#7a5c1a}
+
+@media (max-width:600px){
+  .gov-bar__in{padding:7px 14px;gap:8px}
+  .gov-bar__right{width:100%;margin-left:0;padding-top:4px}
+  .gov-bar__sub{display:none}
+}
