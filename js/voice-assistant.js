@@ -348,11 +348,29 @@
     /* --- Table se milaao --- */
     for (let i = 0; i < COMMANDS.length; i++) {
       const c = COMMANDS[i];
-      for (let j = 0; j < c.words.length; j++) {
-        if (text.indexOf(norm(c.words[j])) !== -1) return c;
+      const list = wordsFor(c);                 // Hindi + chuni hui bhasha, dono
+      for (let j = 0; j < list.length; j++) {
+        if (text.indexOf(norm(list[j])) !== -1) return c;
       }
     }
     return null;
+  }
+
+  /**
+   * Ek hukm ke saare shabd: table wale (Hindi + Hinglish) AUR chuni hui
+   * bhasha wale (js/voice-commands-lang.js se), dono.
+   *
+   * Hindi ke shabd JODTE hain, badalte nahi — kisan aksar do bhashayein mila
+   * kar bolta hai ("camera kholo" Marathi chunne par bhi chalna chahiye).
+   * Bhasha ka block na ho to sirf Hindi ke shabd chalte hain, kuch tootta nahi.
+   */
+  function wordsFor(cmd) {
+    const code = (window.kmLang && window.kmLang.current)
+      ? window.kmLang.current().code : 'hi-IN';
+    const extra = (window.KM_VOICE_LANG_WORDS &&
+                   window.KM_VOICE_LANG_WORDS[code] &&
+                   window.KM_VOICE_LANG_WORDS[code][cmd.id]) || [];
+    return extra.length ? cmd.words.concat(extra) : cmd.words;
   }
 
   /** App ka apna selectCrop() call karta hai — koi nayi logic nahi. */
