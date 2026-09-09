@@ -38,6 +38,18 @@
   const STRINGS = {
 
     'hi-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'धान',
+      'crop.wheat':'गेहूँ',
+      'crop.sugarcane':'गन्ना',
+      'crop.cotton':'कपास',
+      'crop.onion':'प्याज',
+      'crop.maize':'मक्का',
+      'crop.potato':'आलू',
+      'crop.tomato':'टमाटर',
+      'crop.mango':'आम',
+      'crop.apple':'सेब',
       'nav.crops':        'फसल चुनें',
       'nav.scan':         'फोटो से जाँच',
       'nav.history':      'पुरानी जाँचें',
@@ -86,6 +98,18 @@
     },
 
     'en-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'Rice',
+      'crop.wheat':'Wheat',
+      'crop.sugarcane':'Sugarcane',
+      'crop.cotton':'Cotton',
+      'crop.onion':'Onion',
+      'crop.maize':'Maize',
+      'crop.potato':'Potato',
+      'crop.tomato':'Tomato',
+      'crop.mango':'Mango',
+      'crop.apple':'Apple',
       'nav.crops':'Choose crop','nav.scan':'Scan & Detect','nav.history':'History',
       'nav.advisory':'Advisory','nav.handbook':'Crop Guide','nav.about':'Offline & Help',
       'nav.download':'Download app',
@@ -107,6 +131,18 @@
     },
 
     'mr-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'भात',
+      'crop.wheat':'गहू',
+      'crop.sugarcane':'ऊस',
+      'crop.cotton':'कापूस',
+      'crop.onion':'कांदा',
+      'crop.maize':'मका',
+      'crop.potato':'बटाटा',
+      'crop.tomato':'टोमॅटो',
+      'crop.mango':'आंबा',
+      'crop.apple':'सफरचंद',
       'nav.crops':'पीक निवडा','nav.scan':'फोटोवरून तपासा','nav.history':'जुन्या तपासण्या',
       'nav.advisory':'सल्ला','nav.handbook':'रोग पुस्तिका','nav.about':'ऑफलाइन व मदत',
       'nav.download':'अ‍ॅप डाउनलोड करा',
@@ -128,6 +164,18 @@
     },
 
     'gu-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'ડાંગર',
+      'crop.wheat':'ઘઉં',
+      'crop.sugarcane':'શેરડી',
+      'crop.cotton':'કપાસ',
+      'crop.onion':'ડુંગળી',
+      'crop.maize':'મકાઈ',
+      'crop.potato':'બટાટા',
+      'crop.tomato':'ટામેટા',
+      'crop.mango':'કેરી',
+      'crop.apple':'સફરજન',
       'nav.crops':'પાક પસંદ કરો','nav.scan':'ફોટોથી તપાસો','nav.history':'જૂની તપાસ',
       'nav.advisory':'સલાહ','nav.handbook':'રોગ પુસ્તિકા','nav.about':'ઓફલાઇન અને મદદ',
       'nav.download':'એપ ડાઉનલોડ કરો',
@@ -149,6 +197,18 @@
     },
 
     'pa-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'ਝੋਨਾ',
+      'crop.wheat':'ਕਣਕ',
+      'crop.sugarcane':'ਗੰਨਾ',
+      'crop.cotton':'ਕਪਾਹ',
+      'crop.onion':'ਪਿਆਜ਼',
+      'crop.maize':'ਮੱਕੀ',
+      'crop.potato':'ਆਲੂ',
+      'crop.tomato':'ਟਮਾਟਰ',
+      'crop.mango':'ਅੰਬ',
+      'crop.apple':'ਸੇਬ',
       'nav.crops':'ਫ਼ਸਲ ਚੁਣੋ','nav.scan':'ਫੋਟੋ ਤੋਂ ਜਾਂਚ','nav.history':'ਪੁਰਾਣੀਆਂ ਜਾਂਚਾਂ',
       'nav.advisory':'ਸਲਾਹ','nav.handbook':'ਰੋਗ ਪੁਸਤਿਕਾ','nav.about':'ਆਫ਼ਲਾਈਨ ਤੇ ਮਦਦ',
       'nav.download':'ਐਪ ਡਾਊਨਲੋਡ ਕਰੋ',
@@ -170,6 +230,18 @@
     },
 
     'bn-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'ধান',
+      'crop.wheat':'গম',
+      'crop.sugarcane':'আখ',
+      'crop.cotton':'তুলা',
+      'crop.onion':'পেঁয়াজ',
+      'crop.maize':'ভুট্টা',
+      'crop.potato':'আলু',
+      'crop.tomato':'টমেটো',
+      'crop.mango':'আম',
+      'crop.apple':'আপেল',
       'nav.crops':'ফসল বাছুন','nav.scan':'ছবি থেকে পরীক্ষা','nav.history':'পুরনো পরীক্ষা',
       'nav.advisory':'পরামর্শ','nav.handbook':'রোগ পুস্তিকা','nav.about':'অফলাইন ও সাহায্য',
       'nav.download':'অ্যাপ ডাউনলোড করুন',
@@ -191,6 +263,18 @@
     },
 
     'ta-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'நெல்',
+      'crop.wheat':'கோதுமை',
+      'crop.sugarcane':'கரும்பு',
+      'crop.cotton':'பருத்தி',
+      'crop.onion':'வெங்காயம்',
+      'crop.maize':'மக்காச்சோளம்',
+      'crop.potato':'உருளைக்கிழங்கு',
+      'crop.tomato':'தக்காளி',
+      'crop.mango':'மாம்பழம்',
+      'crop.apple':'ஆப்பிள்',
       'nav.crops':'பயிரைத் தேர்வு செய்','nav.scan':'படத்தில் இருந்து சோதனை','nav.history':'பழைய சோதனைகள்',
       'nav.advisory':'ஆலோசனை','nav.handbook':'நோய் கையேடு','nav.about':'ஆஃப்லைன் & உதவி',
       'nav.download':'செயலியைப் பதிவிறக்கு',
@@ -212,6 +296,18 @@
     },
 
     'te-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'వరి',
+      'crop.wheat':'గోధుమ',
+      'crop.sugarcane':'చెరకు',
+      'crop.cotton':'పత్తి',
+      'crop.onion':'ఉల్లిపాయ',
+      'crop.maize':'మొక్కజొన్న',
+      'crop.potato':'బంగాళదుంప',
+      'crop.tomato':'టమాటా',
+      'crop.mango':'మామిడి',
+      'crop.apple':'యాపిల్',
       'nav.crops':'పంట ఎంచుకోండి','nav.scan':'ఫోటోతో పరీక్ష','nav.history':'పాత పరీక్షలు',
       'nav.advisory':'సలహా','nav.handbook':'వ్యాధి పుస్తకం','nav.about':'ఆఫ్‌లైన్ & సహాయం',
       'nav.download':'యాప్ డౌన్‌లోడ్ చేయండి',
@@ -233,6 +329,18 @@
     },
 
     'kn-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'ಭತ್ತ',
+      'crop.wheat':'ಗೋಧಿ',
+      'crop.sugarcane':'ಕಬ್ಬು',
+      'crop.cotton':'ಹತ್ತಿ',
+      'crop.onion':'ಈರುಳ್ಳಿ',
+      'crop.maize':'ಜೋಳ',
+      'crop.potato':'ಆಲೂಗಡ್ಡೆ',
+      'crop.tomato':'ಟೊಮೆಟೊ',
+      'crop.mango':'ಮಾವು',
+      'crop.apple':'ಸೇಬು',
       'nav.crops':'ಬೆಳೆ ಆಯ್ಕೆ ಮಾಡಿ','nav.scan':'ಫೋಟೋದಿಂದ ಪರೀಕ್ಷೆ','nav.history':'ಹಳೆಯ ಪರೀಕ್ಷೆಗಳು',
       'nav.advisory':'ಸಲಹೆ','nav.handbook':'ರೋಗ ಪುಸ್ತಿಕೆ','nav.about':'ಆಫ್‌ಲೈನ್ ಮತ್ತು ಸಹಾಯ',
       'nav.download':'ಆ್ಯಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
@@ -254,6 +362,18 @@
     },
 
     'ml-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'നെല്ല്',
+      'crop.wheat':'ഗോതമ്പ്',
+      'crop.sugarcane':'കരിമ്പ്',
+      'crop.cotton':'പരുത്തി',
+      'crop.onion':'സവാള',
+      'crop.maize':'ചോളം',
+      'crop.potato':'ഉരുളക്കിഴങ്ങ്',
+      'crop.tomato':'തക്കാളി',
+      'crop.mango':'മാങ്ങ',
+      'crop.apple':'ആപ്പിൾ',
       'nav.crops':'വിള തിരഞ്ഞെടുക്കുക','nav.scan':'ഫോട്ടോയിൽ നിന്ന് പരിശോധന','nav.history':'പഴയ പരിശോധനകൾ',
       'nav.advisory':'ഉപദേശം','nav.handbook':'രോഗ പുസ്തിക','nav.about':'ഓഫ്‌ലൈൻ & സഹായം',
       'nav.download':'ആപ്പ് ഡൗൺലോഡ് ചെയ്യുക',
@@ -275,6 +395,18 @@
     },
 
     'or-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'ଧାନ',
+      'crop.wheat':'ଗହମ',
+      'crop.sugarcane':'ଆଖୁ',
+      'crop.cotton':'କପା',
+      'crop.onion':'ପିଆଜ',
+      'crop.maize':'ମକା',
+      'crop.potato':'ଆଳୁ',
+      'crop.tomato':'ଟମାଟୋ',
+      'crop.mango':'ଆମ୍ବ',
+      'crop.apple':'ସେଓ',
       'nav.crops':'ଫସଲ ବାଛନ୍ତୁ','nav.scan':'ଫଟୋରୁ ଯାଞ୍ଚ','nav.history':'ପୁରୁଣା ଯାଞ୍ଚ',
       'nav.advisory':'ପରାମର୍ଶ','nav.handbook':'ରୋଗ ପୁସ୍ତିକା','nav.about':'ଅଫଲାଇନ ଓ ସାହାଯ୍ୟ',
       'nav.download':'ଆପ ଡାଉନଲୋଡ କରନ୍ତୁ',
@@ -296,6 +428,18 @@
     },
 
     'ur-IN': {
+
+      /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
+      'crop.rice':'دھان',
+      'crop.wheat':'گندم',
+      'crop.sugarcane':'گنا',
+      'crop.cotton':'کپاس',
+      'crop.onion':'پیاز',
+      'crop.maize':'مکئی',
+      'crop.potato':'آلو',
+      'crop.tomato':'ٹماٹر',
+      'crop.mango':'آم',
+      'crop.apple':'سیب',
       'nav.crops':'فصل منتخب کریں','nav.scan':'تصویر سے جانچ','nav.history':'پرانی جانچیں',
       'nav.advisory':'مشورہ','nav.handbook':'بیماری کی کتاب','nav.about':'آف لائن اور مدد',
       'nav.download':'ایپ ڈاؤن لوڈ کریں',

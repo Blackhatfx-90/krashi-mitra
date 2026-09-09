@@ -60,7 +60,7 @@
   function tilesHtml() {
     const crop = appState() && appState().cropId ? appCrops()[appState().cropId] : null;
     const tiles = [
-      { view:'crops', ic:'camera', hi:'फसल की जाँच', sub: crop ? ('अभी: ' + crop.nameHi) : 'फोटो से रोग पहचानें', big:true },
+      { view:'crops', ic:'camera', hi:'फसल की जाँच', sub: crop ? ('अभी: ' + (typeof cropName==='function' ? cropName(crop.id) : crop.nameHi)) : 'फोटो से रोग पहचानें', big:true },
       { view:'advisory', ic:'bulb', hi:'सलाह', sub:'आख़िरी जाँच की सलाह' },
       { view:'handbook', ic:'book', hi:'रोग पुस्तिका', sub:'सभी रोगों की जानकारी' },
       { view:'history', ic:'clock', hi:'पुरानी जाँचें', sub:'पहले क्या मिला था' },

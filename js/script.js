@@ -6602,6 +6602,23 @@ const state = {
   aiResult: null,        // aakhri online jawab
 };
 
+/**
+ * Fasal ka naam KISAN KI CHUNI HUI BHASHA me.
+ *
+ * Pehle har jagah "धान · Rice · चावल" jaisa dono/teenon naam ek saath dikhte
+ * the, chahe kisan ne koi bhi bhasha chuni ho. Tamil chunne wale ko bhi Hindi
+ * dikhta tha. Ab sirf uski bhasha ka naam jaata hai.
+ * Us bhasha me naam na ho to i18n khud Hindi par gir jaata hai.
+ */
+function cropName(cropId) {
+  const c = CROPS[cropId];
+  if (window.kmI18n) {
+    const v = window.kmI18n.t('crop.' + cropId);
+    if (v && v !== 'crop.' + cropId) return v;
+  }
+  return c ? c.nameHi : cropId;
+}
+
 /** Abhi chuni hui fasal ka poora config (na chuni ho to null). */
 function activeCrop() {
   return state.cropId ? CROPS[state.cropId] : null;
@@ -6721,7 +6738,7 @@ function switchView(name) {
   const crop = activeCrop();
   if (crop && (name === 'scan' || name === 'handbook')) {
     el.viewSubtitle.innerHTML =
-      icon(crop.icon, 'cropart cropart--sm') + ' ' + escapeHtml(crop.nameHi) +
+      icon(crop.icon, 'cropart cropart--sm') + ' ' + escapeHtml(cropName(crop.id)) +
       ' · ' + VIEW_META[name].sub;
   }
 
@@ -8515,7 +8532,7 @@ function applyAiVerdict(ai, results) {
      shakal-rang se dhaan aur gehu me farq karna offline sambhav nahi. */
   if (ai.label === 'wrong_crop') {
     const crop = activeCrop();
-    renderAiCard('wrongcrop', Object.assign({}, ai, { cropHi: crop ? crop.nameHi : '' }));
+    renderAiCard('wrongcrop', Object.assign({}, ai, { cropHi: crop ? cropName(crop.id) : '' }));
     hide(el.advisoryCard);
     hide(el.lowConfidenceBox);
     el.advisoryHost.innerHTML = '';
@@ -8777,7 +8794,7 @@ function checkCropFamily(features) {
   if (!dikha || dikha === want) return null;
 
   const crop = CROPS[state.cropId];
-  const cropHi = crop ? crop.nameHi : 'चुनी हुई फसल';
+  const cropHi = crop ? cropName(crop.id) : 'चुनी हुई फसल';
 
   return {
     ok: false,
@@ -9065,7 +9082,7 @@ function detectItemHtml(entry) {
   const unknown = !entry.confident;
   const name = unknown ? 'पहचान नहीं हो पाई' : a.nameHi;
   const crop = CROPS[entry.cropId || a.cropId];
-  const cropTag = crop ? (crop.nameHi + ' · ') : '';
+  const cropTag = crop ? (cropName(crop.id) + ' · ') : '';
   const sub  = cropTag + (unknown ? ('सबसे करीब: ' + a.nameEn) : a.nameEn);
 
   return [
@@ -9183,12 +9200,12 @@ function renderCropCards() {
     return [
       '<button type="button" class="crop-card', (ready ? '' : ' is-disabled'), '"',
         ' data-crop="', escapeHtml(id), '"', (ready ? '' : ' disabled'),
-        ' aria-label="', escapeHtml(c.nameHi + ' / ' + c.nameEn), '">',
+        ' aria-label="', escapeHtml(cropName(id)), '">',
 
         '<span class="crop-card__icon" aria-hidden="true">', icon(c.icon, 'cropart'), '</span>',
         '<span class="crop-card__text">',
-          '<span class="crop-card__name">', escapeHtml(c.nameHi), '</span>',
-          '<small>', escapeHtml(c.nameEn), ' · ', escapeHtml(c.altHi), '</small>',
+          '<span class="crop-card__name">', escapeHtml(cropName(id)), '</span>',
+          '<small>', escapeHtml(c.seasonHi || ''), '</small>',
         '</span>',
         '<span class="crop-card__badge crop-card__badge--', badgeCls, '">',
           escapeHtml(badge), '</span>',
@@ -9242,20 +9259,18 @@ function updateCropChip() {
   const crop = activeCrop();
   if (el.cropChip) {
     el.cropChip.innerHTML = crop
-      ? icon(crop.icon, 'cropart cropart--sm') + ' ' + escapeHtml(crop.nameHi)
+      ? icon(crop.icon, 'cropart cropart--sm') + ' ' + escapeHtml(cropName(crop.id))
       : icon('sprout', 'ic ic--inline') + ' फसल चुनें';
   }
   if (el.handbookCropName) {
-    el.handbookCropName.textContent = crop
-      ? (crop.nameHi + ' / ' + crop.nameEn)
-      : '—';
+    el.handbookCropName.textContent = crop ? cropName(crop.id) : '—';
   }
   // Scan card ka hint bhi chuni hui fasal ke hisaab se badle (pehle "धान" fix tha).
   if (el.scanCropHint) {
     // Har fasal apna hint de sakti hai (photoHintHi). Aloo jaise crop me model
     // KAND ka hai, patti ka nahi — wahan "patti ki photo" likhna galat hoga.
     el.scanCropHint.textContent = crop
-      ? (crop.photoHintHi || (crop.nameHi + ' की पत्ती की साफ फोटो अपलोड करें'))
+      ? (crop.photoHintHi || (cropName(crop.id) + ' की पत्ती की साफ फोटो अपलोड करें'))
       : 'चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें';
   }
 }
@@ -9400,8 +9415,7 @@ async function renderOfflineManager() {
       '<li class="dl-item" data-crop="', escapeHtml(id), '">',
         '<span class="dl-icon" aria-hidden="true">', icon(crop.icon, 'cropart'), '</span>',
         '<span class="dl-body">',
-          '<span class="dl-name">', escapeHtml(crop.nameHi),
-            ' <small>', escapeHtml(crop.nameEn), '</small></span>',
+          '<span class="dl-name">', escapeHtml(cropName(id)), '</span>',
           '<span class="dl-meta" data-role="meta">',
             have ? 'फ़ोन में सेव है, बिना इंटरनेट चलेगा'
                  : ('लगभग 2.2 MB · ' + n + ' रोग'),
@@ -10746,9 +10760,15 @@ window.addEventListener('km:language', (e) => {
   stopSpeaking();                    // purani bhasha ka bacha hua vaakya band
   refreshVoices();
 
-  // Topbar ki heading turant nayi bhasha me
-  try { const v = document.querySelector('.view.is-active');
-        if (v) switchView(v.id.replace('view-', '')); } catch (_) {}
+  // Topbar, fasal ke card aur handbook — sab turant nayi bhasha me
+  try {
+    renderCropCards();
+    renderLibrary();
+    updateCropChip();
+    if (typeof renderOfflineManager === 'function') renderOfflineManager();
+    const v = document.querySelector('.view.is-active');
+    if (v) switchView(v.id.replace('view-', ''));
+  } catch (_) {}
   console.info('[lang] awaaz ab:', speakCode, state.langNote ? '(' + state.langNote + ')' : '');
 
   if (state.langNote) showInfo(state.langNote, 'Voice for this language is not installed on this phone.');
