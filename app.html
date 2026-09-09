@@ -318,27 +318,27 @@
     <nav class="nav" aria-label="मुख्य मेन्यू">
       <p class="nav__group">DETECTION</p>
       <button type="button" class="nav__item" data-view="crops">
-        <svg class="ic"><use href="#i-sprout"/></svg><span>फसल चुनें / Crop</span>
+        <svg class="ic"><use href="#i-sprout"/></svg><span data-i18n="nav.crops">फसल चुनें / Crop</span>
       </button>
       <button type="button" class="nav__item is-active" data-view="scan">
-        <svg class="ic"><use href="#i-camera"/></svg><span>Scan &amp; Detect</span>
+        <svg class="ic"><use href="#i-camera"/></svg><span data-i18n="nav.scan">Scan &amp; Detect</span>
       </button>
       <button type="button" class="nav__item" data-view="history">
-        <svg class="ic"><use href="#i-clock"/></svg><span>History</span>
+        <svg class="ic"><use href="#i-clock"/></svg><span data-i18n="nav.history">History</span>
         <span class="nav__badge" id="historyBadge" hidden>0</span>
       </button>
 
       <p class="nav__group">ADVISORY</p>
       <button type="button" class="nav__item" data-view="advisory">
-        <svg class="ic"><use href="#i-bulb"/></svg><span>Smart Advisory</span>
+        <svg class="ic"><use href="#i-bulb"/></svg><span data-i18n="nav.advisory">Smart Advisory</span>
       </button>
       <button type="button" class="nav__item" data-view="handbook">
-        <svg class="ic"><use href="#i-book"/></svg><span>Crop Guide</span>
+        <svg class="ic"><use href="#i-book"/></svg><span data-i18n="nav.handbook">Crop Guide</span>
       </button>
 
       <p class="nav__group">RESOURCES</p>
       <button type="button" class="nav__item" data-view="about">
-        <svg class="ic"><use href="#i-shield"/></svg><span>Offline &amp; Help</span>
+        <svg class="ic"><use href="#i-shield"/></svg><span data-i18n="nav.about">Offline &amp; Help</span>
       </button>
 
       <!-- HAMESHA dikhta hai — kisan ko app phone me lene ka seedha rasta -->
@@ -420,7 +420,7 @@
       <section class="view is-active" id="view-crops">
         <article class="card">
           <div class="card__head">
-            <h2>आपकी फसल कौन सी है?</h2>
+            <h2 data-i18n="head.chooseCrop">आपकी फसल कौन सी है?</h2>
             <p>Which is your crop? — फसल चुनते ही सिर्फ उसी का AI मॉडल लोड होगा (तेज़ और हल्का)</p>
           </div>
           <div class="crop-grid" id="cropGrid"></div>
@@ -438,7 +438,7 @@
         <article class="card weather-card" id="weatherCard">
           <div class="card__head card__head--row">
             <div>
-              <h2>आज का मौसम / Weather</h2>
+              <h2 data-i18n="head.weather">आज का मौसम / Weather</h2>
               <p id="weatherPlace">आपके खेत के पास</p>
             </div>
             <div class="weather-actions">
@@ -463,7 +463,7 @@
         <article class="card mandi-card" id="mandiCard">
           <div class="card__head card__head--row">
             <div>
-              <h2>आस-पास की मंडी का भाव</h2>
+              <h2 data-i18n="head.mandi">आस-पास की मंडी का भाव</h2>
               <p>अपनी फसल कहाँ बेचने पर सबसे अच्छा दाम मिलेगा</p>
             </div>
             <div class="mandi-actions">
@@ -485,7 +485,7 @@
           <!-- Upload / capture -->
           <article class="card">
             <div class="card__head">
-              <h2>Scan &amp; Detect Disease</h2>
+              <h2 data-i18n="head.scan">Scan &amp; Detect Disease</h2>
               <p id="scanCropHint">चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें</p>
             </div>
 
@@ -557,7 +557,7 @@
           <article class="card">
             <div class="card__head card__head--row">
               <div>
-                <h2>Recent Detections</h2>
+                <h2 data-i18n="head.recent">Recent Detections</h2>
                 <p>पिछली जाँचें (इसी फ़ोन में सुरक्षित)</p>
               </div>
               <button type="button" class="link-btn" data-view="history">View All</button>
@@ -616,7 +616,7 @@
           <!-- Sab photo milakar nateeja -->
           <article class="card" id="batchSummaryCard" hidden>
             <div class="card__head">
-              <h2>पूरे खेत का नतीजा</h2>
+              <h2 data-i18n="head.result">पूरे खेत का नतीजा</h2>
               <p>सभी फोटो मिलाकर</p>
             </div>
             <div id="batchSummary"></div>
@@ -653,7 +653,7 @@
           <!-- Smart advisory (confident) -->
           <article class="card advisory-card" id="advisoryCard" hidden>
             <div class="card__head">
-              <h2>AI Smart Advisory</h2>
+              <h2 data-i18n="head.advisory">AI Smart Advisory</h2>
               <p>आपकी फसल के लिए सुझाई गई कार्रवाई</p>
             </div>
             <div class="advisory-body" id="advisoryHost"></div>
@@ -663,7 +663,7 @@
           <article class="card">
             <div class="card__head card__head--row">
               <div>
-                <h2>Confidence Scores</h2>
+                <h2 data-i18n="head.scores">Confidence Scores</h2>
                 <p id="scoresSub">सभी श्रेणियों की संभावना</p>
               </div>
               <span class="muted-sm">threshold 75%</span>
@@ -683,7 +683,7 @@
         <article class="card">
           <div class="card__head card__head--row">
             <div>
-              <h2>Detection History</h2>
+              <h2 data-i18n="head.history">Detection History</h2>
               <p>सभी पिछली जाँचें — सिर्फ इसी फ़ोन में सुरक्षित, कहीं अपलोड नहीं होतीं</p>
             </div>
             <button type="button" class="link-btn link-btn--danger" id="clearHistoryBtn">
@@ -725,7 +725,7 @@
         <!-- App download / install — HAMESHA dikhta hai (sidebar se yahin aate hain) -->
         <article class="card install-card" id="installCard">
           <div class="card__head">
-            <h2>ऐप फ़ोन में लें</h2>
+            <h2 data-i18n="head.install">ऐप फ़ोन में लें</h2>
             <p>होम स्क्रीन पर आइकॉन बन जाएगा, ऐप बिना ब्राउज़र के खुलेगी और बिना
                इंटरनेट भी चलेगी।</p>
           </div>
@@ -825,6 +825,7 @@
 </div><!-- /layout -->
 
 <script src="js/language-picker.js?v=2"></script>
+<script src="js/i18n.js?v=1"></script>
 <script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
 <script src="js/script.js?v=32"></script>
 <!-- Guided tour + voice assistant.

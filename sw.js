@@ -24,7 +24,7 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v41';
+const CACHE_VERSION = 'krashi-mitra-v42';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* Sarkari officer ka Regional Admin dashboard (alag React app) yahan rehta hai.
@@ -67,6 +67,7 @@ const APP_SHELL = [
   './js/voice-assistant.js',
   './js/mandi.js',
   './js/language-picker.js',
+  './js/i18n.js',
   './css/language-picker.css',
   './css/mandi.css',
   './js/offline-agriculture.js',
