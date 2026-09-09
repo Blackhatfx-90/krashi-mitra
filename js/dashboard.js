@@ -207,6 +207,7 @@
         if (!r.ok) { err.textContent = o.error || 'सेव नहीं हुआ।'; btn.disabled = false; return; }
         D.profile = o.profile || data;
         if (D.user) D.user.name = data.name;
+        cachePrefs();
         wrap.remove();
         render();
       } catch (_) {
@@ -222,6 +223,22 @@
   }
 
   /* ---------- data ---------- */
+  /* Naam/jagah ko prefs me bhi rakh dete hain, taaki AWAAZ WALA SAHAYAK
+     offline rehte hue bhi kisan ko naam se bula sake — wo har baar
+     /api/auth?action=session nahi maar sakta. */
+  function cachePrefs() {
+    try {
+      const p = JSON.parse(localStorage.getItem('km.preferences.v1') || '{}');
+      if (D.user && D.user.name) p.name = D.user.name;
+      if (D.profile) {
+        if (D.profile.state)    p.state = D.profile.state;
+        if (D.profile.district) p.district = D.profile.district;
+        if (D.profile.village)  p.village = D.profile.village;
+      }
+      localStorage.setItem('km.preferences.v1', JSON.stringify(p));
+    } catch (_) { /* private mode — koi baat nahi */ }
+  }
+
   async function loadSession() {
     try {
       const r = await fetch('/api/auth?action=session');
@@ -229,6 +246,7 @@
       const d = await r.json();
       D.user = d.user || null;
       D.profile = d.profile || null;
+      cachePrefs();
     } catch (_) { /* offline — dashboard phir bhi dikhega */ }
   }
 

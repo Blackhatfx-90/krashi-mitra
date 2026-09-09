@@ -41,6 +41,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'धान',
+      'voice.hello':'नमस्ते',
       'net.offline':'इंटरनेट नहीं',
       'net.weak':'बहुत धीमा इंटरनेट',
       'net.ok':'ठीक-ठाक इंटरनेट',
@@ -105,6 +106,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'Rice',
+      'voice.hello':'Namaste',
       'net.offline':'No internet',
       'net.weak':'Very slow internet',
       'net.ok':'Fair internet',
@@ -142,6 +144,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'भात',
+      'voice.hello':'नमस्कार',
       'net.offline':'इंटरनेट नाही',
       'net.weak':'खूप संथ इंटरनेट',
       'net.ok':'बऱ्यापैकी इंटरनेट',
@@ -179,6 +182,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ડાંગર',
+      'voice.hello':'નમસ્તે',
       'net.offline':'ઇન્ટરનેટ નથી',
       'net.weak':'ખૂબ ધીમું ઇન્ટરનેટ',
       'net.ok':'ઠીક-ઠાક ઇન્ટરનેટ',
@@ -216,6 +220,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ਝੋਨਾ',
+      'voice.hello':'ਸਤ ਸ੍ਰੀ ਅਕਾਲ',
       'net.offline':'ਇੰਟਰਨੈੱਟ ਨਹੀਂ',
       'net.weak':'ਬਹੁਤ ਹੌਲੀ ਇੰਟਰਨੈੱਟ',
       'net.ok':'ਠੀਕ-ਠਾਕ ਇੰਟਰਨੈੱਟ',
@@ -253,6 +258,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ধান',
+      'voice.hello':'নমস্কার',
       'net.offline':'ইন্টারনেট নেই',
       'net.weak':'খুব ধীর ইন্টারনেট',
       'net.ok':'মোটামুটি ইন্টারনেট',
@@ -290,6 +296,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'நெல்',
+      'voice.hello':'வணக்கம்',
       'net.offline':'இணையம் இல்லை',
       'net.weak':'மிக மெதுவான இணையம்',
       'net.ok':'சுமாரான இணையம்',
@@ -327,6 +334,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'వరి',
+      'voice.hello':'నమస్కారం',
       'net.offline':'ఇంటర్నెట్ లేదు',
       'net.weak':'చాలా నెమ్మది ఇంటర్నెట్',
       'net.ok':'ఫర్వాలేదు ఇంటర్నెట్',
@@ -364,6 +372,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ಭತ್ತ',
+      'voice.hello':'ನಮಸ್ಕಾರ',
       'net.offline':'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ',
       'net.weak':'ತುಂಬಾ ನಿಧಾನ ಇಂಟರ್ನೆಟ್',
       'net.ok':'ಪರವಾಗಿಲ್ಲ ಇಂಟರ್ನೆಟ್',
@@ -401,6 +410,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'നെല്ല്',
+      'voice.hello':'നമസ്കാരം',
       'net.offline':'ഇന്റർനെറ്റ് ഇല്ല',
       'net.weak':'വളരെ പതുക്കെയുള്ള ഇന്റർനെറ്റ്',
       'net.ok':'സാമാന്യം ഇന്റർനെറ്റ്',
@@ -438,6 +448,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ଧାନ',
+      'voice.hello':'ନମସ୍କାର',
       'net.offline':'ଇଣ୍ଟରନେଟ୍ ନାହିଁ',
       'net.weak':'ବହୁତ ଧୀର ଇଣ୍ଟରନେଟ୍',
       'net.ok':'ମୋଟାମୋଟି ଇଣ୍ଟରନେଟ୍',
@@ -475,6 +486,7 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'دھان',
+      'voice.hello':'السلام علیکم',
       'net.offline':'انٹرنیٹ نہیں',
       'net.weak':'بہت سست انٹرنیٹ',
       'net.ok':'ٹھیک ٹھاک انٹرنیٹ',

@@ -399,6 +399,52 @@
   /* ==========================================================================
    * 4. KMVoice — mic button + sunna + jawab dena
    * ======================================================================= */
+  /* ------------------------------------------------------------------
+   * Kisan ka naam — profile se prefs me aata hai (js/dashboard.js).
+   * Naam pata ho to sahayak "Ramesh ji, ..." kehkar baat shuru karta hai.
+   * Na pata ho to bina naam ke, saaf-suthra — koi khaali jagah nahi.
+   * ---------------------------------------------------------------- */
+  function farmerFirstName() {
+    try {
+      if (window.KrashiMitraOffline && window.KrashiMitraOffline.farmerName) {
+        return window.KrashiMitraOffline.farmerName();
+      }
+      const p = JSON.parse(localStorage.getItem('km.preferences.v1') || '{}');
+      return String(p.name || '').trim().split(/\s+/)[0] || '';
+    } catch (_) { return ''; }
+  }
+
+  /* "ji" sirf Hindi/Marathi jaisi bhashaon me natural lagta hai. Tamil ya
+     Bengali me wo thopa hua lagega — wahan sirf naam. */
+  const JI_LANGS = ['hi-IN', 'mr-IN', 'brx-IN', 'doi-IN', 'mai-IN', 'ne-IN', 'kok-IN', 'sa-IN'];
+
+  function lang() {
+    try {
+      if (window.kmI18n && window.kmI18n.current) return window.kmI18n.current();
+      return JSON.parse(localStorage.getItem('km.preferences.v1') || '{}').language || 'hi-IN';
+    } catch (_) { return 'hi-IN'; }
+  }
+
+  function honorific(n) {
+    return JI_LANGS.indexOf(lang()) >= 0 ? n + ' जी' : n;
+  }
+
+  function greetPrefix() {
+    const n = farmerFirstName();
+    return n ? honorific(n) + ', ' : '';
+  }
+
+  /* "Namaste Ramesh ji" — chuni hui bhasha me, i18n se. */
+  function greeting() {
+    const n = farmerFirstName();
+    let hello = 'नमस्ते';
+    if (window.kmI18n) {
+      const v = window.kmI18n.t('voice.hello');
+      if (v && v !== 'voice.hello') hello = v;
+    }
+    return n ? hello + ' ' + honorific(n) : hello;
+  }
+
   class KMVoice {
     constructor() {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -505,6 +551,13 @@
     toggle() { this.listening ? this.stop() : this.start(); }
 
     start() {
+      /* Pehli baar mic dabate hi naam se namaste — kisan ko lagta hai ki
+         app use pehchanti hai. Baar-baar nahi, sirf ek baar per session. */
+      if (!this._greeted) {
+        this._greeted = true;
+        this._cap({ heard: greeting(), action: 'बोलिए…', kind: 'listening', sticky: true });
+      }
+
       /* ================================================================
        * PEHLE OFFLINE (Vosk) — kyunki browser ka SpeechRecognition aawaaz
        * Google ke server bhejta hai aur khet me network kamzor hone par
@@ -775,8 +828,11 @@ if (!cmd) {
         if (navigator.onLine) onlineAnswer(raw).then(text => respond(text, false)).catch(() => respond(answer, true));
         else respond(answer, true);
       } else {
-        this._respond('समझ नहीं आया। कृपया फसल, रोग, कीट, दवा, मौसम या मंडी भाव से जुड़ा सवाल पूछिए।', {
-          heard: '“' + raw + '”', action: 'कृषि विषय पूछिए / Ask an agriculture question', kind: 'error', hold: 9000,
+        /* Pehle yahan sawal thukra diya jata tha ("kheti ka sawal poochiye").
+           Sahayak ab har vishay par jawab deta hai, isliye ab hum sirf itna
+           kehte hain ki abhi jawab nahi mil paya. */
+        this._respond(greetPrefix() + 'अभी इसका जवाब नहीं मिल पाया। ज़रा दोबारा पूछिए।', {
+          heard: '“' + raw + '”', action: 'दोबारा पूछिए', kind: 'error', hold: 8000,
         });
       }
       return;

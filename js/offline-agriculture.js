@@ -38,18 +38,45 @@
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   }
+  /* Kisan ka pehla naam — greeting ke liye. Profile se prefs me aata hai. */
+  function farmerName() {
+    const n = String(getPrefs().name || '').trim();
+    return n ? n.split(/\s+/)[0] : '';
+  }
+
   function offlineAnswer(query) {
     const text = String(query || '').toLowerCase();
     const hit = KNOWLEDGE.find(item => item.words.some(word => text.includes(word.toLowerCase())));
-    return hit ? hit.answer : 'यह सवाल अभी मेरे कृषि ज्ञान क्षेत्र में नहीं है। कृपया फसल, रोग, कीट, दवा, मौसम, मंडी भाव या खेती की देखभाल से जुड़ा सवाल पूछें।';
+    if (hit) return hit.answer;
+    /* Pehle yahan "ye mere gyaan-kshetra me nahi hai" likha tha — yani app
+       sawal thukra deti thi. Ab hum sirf itna kehte hain ki net chahiye,
+       kyunki sahayak ab har vishay par jawab de sakta hai. */
+    const n = farmerName();
+    return (n ? n + ' जी, ' : '') + 'इसका पूरा जवाब देने के लिए इंटरनेट चाहिए। नेट आने पर यही सवाल दोबारा पूछिए।';
   }
   function officialFallback(query) {
     const p = getPrefs();
-    const url = '/api/agriculture?q=' + encodeURIComponent(query) + '&crop=' + encodeURIComponent(p.crop || '') + '&state=' + encodeURIComponent(p.state || '') + '&district=' + encodeURIComponent(p.district || '') + '&mandi=' + encodeURIComponent(p.mandi || '');
-    return fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error('offline'))).then(data => data.answer || data.message).catch(() => offlineAnswer(query));
+    /* Sawal + kisan ka sandarbh (naam, bhasha, fasal, jagah) — taaki jawab
+       uski bhasha me aur uske naam se aaye. POST isliye ki sawal lamba ho
+       sakta hai, aur naam URL ke log me na jaye. */
+    return fetch('/api/agriculture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        q: query,
+        name: p.name || '',
+        lang: (p.language || 'hi-IN'),
+        crop: p.crop || '',
+        state: p.state || '',
+        district: p.district || ''
+      })
+    })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('offline')))
+      .then(data => data.answer || data.message)
+      .catch(() => offlineAnswer(query));
   }
 
-  window.KrashiMitraOffline = { LANGUAGES, LOCATIONS, getPrefs, savePrefs, language, speak, offlineAnswer, officialFallback };
+  window.KrashiMitraOffline = { LANGUAGES, LOCATIONS, getPrefs, savePrefs, language, speak, offlineAnswer, officialFallback, farmerName };
 
   function addOnboarding() {
     const form = document.getElementById('signup-form');
