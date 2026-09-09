@@ -47,6 +47,32 @@ module.exports = async function handler(req, res) {
         rows = rows.filter((a) => a.issuedAt > since);
       }
 
+      /* ---- Kisan ki apni bhasha me ----------------------------------------
+       * App ?lang=ta-IN bhejti hai. Admin ne Hindi me likha hota hai, isliye
+       * yahan anuvaad karke bhejte hain. Sirf sabse nayi 3 chetavni ka
+       * anuvaad karte hain — baaki purani hain aur har ek ka anuvaad karna
+       * dher saara samay aur API call le lega.
+       * Anuvaad na ho paye to ASLI Hindi text hi jaata hai (translated:false)
+       * — kisan ko adhoora anuvaad dene se behtar hai sahi Hindi dena. */
+      const lang = clean(q.lang, 10);
+      if (lang && lang !== 'hi-IN' && rows.length) {
+        try {
+          const { translateCached } = require('./translate');
+          const head = rows.slice(0, 3);
+          await Promise.all(head.map(async (a) => {
+            const t = await translateCached(a.messageHi, lang);
+            const ti = a.titleHi ? await translateCached(a.titleHi, lang) : null;
+            a.message = t.text;
+            a.title = ti ? ti.text : a.titleHi;
+            a.lang = lang;
+            a.translated = t.translated;
+          }));
+        } catch (e) {
+          console.error('[advisories] anuvaad fail:', e && e.message);
+          // kuch nahi — neeche asli Hindi hi chala jayega
+        }
+      }
+
       return res.status(200).json({
         ok: true,
         storage: store.storageKind(),
@@ -58,6 +84,19 @@ module.exports = async function handler(req, res) {
 
     /* ---------------- POST: admin dashboard se ---------------------------- */
     if (req.method === 'POST') {
+      /* ================================================================
+       * SIRF LOGGED-IN ADMIN. Pehle yahan koi jaanch NAHI thi — matlab
+       * internet par koi bhi POST karke sab kisano ko sandesh bhej sakta
+       * tha, farzi dawa ki salah bhi. Yeh sabse badi suraksha kami thi.
+       * ================================================================ */
+      let admin = null;
+      try { admin = await require('./admin').adminFor(req); }
+      catch (e) { console.error('[advisories] admin check fail:', e && e.message); }
+      if (!admin) {
+        return res.status(401).json({ ok: false, error: 'admin_login_zaroori',
+          messageHi: 'चेतावनी भेजने के लिए एडमिन लॉगिन ज़रूरी है।' });
+      }
+
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch (_) { body = null; } }
       if (!body || typeof body !== 'object') {
@@ -72,6 +111,7 @@ module.exports = async function handler(req, res) {
       const advisory = {
         id: store.newId('ADV'),
         issuedAt: new Date().toISOString(),
+        issuedByPortalId: admin.portalId || '',   // jawabdehi ke liye
         crop: clean(body.crop, 40).toLowerCase() || 'all',
         cropNameHi: clean(body.cropNameHi, 60),
         district: clean(body.district, 80) || 'all',

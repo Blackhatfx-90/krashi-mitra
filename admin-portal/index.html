@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>कृषि विभाग पोर्टल — Krashi Mitra</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;
+    background:#f7f8fa;color:#101828;
+    font-family:"Inter","Noto Sans Devanagari",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  .card{background:#fff;border:1px solid #eaecf0;border-radius:16px;padding:26px 22px;
+    width:100%;max-width:400px;box-shadow:0 2px 12px rgba(16,24,40,.06)}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .brand img{width:34px;height:34px}
+  .brand b{font-size:18px;letter-spacing:-.01em}
+  h1{font-size:17px;margin:14px 0 4px}
+  p.sub{font-size:12.5px;color:#667085;margin:0 0 18px}
+  label{display:block;font-size:12.5px;font-weight:600;color:#344054;margin:12px 0 5px}
+  input{width:100%;min-height:44px;padding:0 12px;border:1px solid #d0d5dd;border-radius:9px;
+    font-size:15px;font-family:inherit}
+  input:focus{outline:2px solid #16a34a;outline-offset:1px;border-color:#16a34a}
+  button{width:100%;min-height:46px;margin-top:18px;border:none;border-radius:9px;
+    background:#15803d;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  button:hover:not(:disabled){background:#14682f}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .msg{margin-top:14px;padding:10px 12px;border-radius:9px;font-size:13px;display:none}
+  .msg.err{display:block;background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d}
+  .msg.ok{display:block;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+  .note{margin-top:16px;padding-top:14px;border-top:1px dashed #eaecf0;
+    font-size:11.5px;color:#98a2b3;line-height:1.6}
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <img src="/assets/logo.svg" alt="" width="34" height="34" />
+      <b>Krashi Mitra</b>
+    </div>
+    <h1>कृषि विभाग पोर्टल</h1>
+    <p class="sub">क्षेत्रीय अधिकारी लॉगिन — किसानों को चेतावनी भेजने के लिए</p>
+
+    <form id="f" autocomplete="off">
+      <label for="pid">पोर्टल आईडी</label>
+      <input id="pid" name="portalId" required autocomplete="username" inputmode="text" />
+
+      <label for="pw">पासवर्ड</label>
+      <input id="pw" name="password" type="password" required autocomplete="current-password" />
+
+      <button type="submit" id="btn">लॉगिन करें</button>
+    </form>
+
+    <p class="msg" id="m"></p>
+
+    <p class="note">
+      यह पन्ना सिर्फ़ कृषि विभाग के अधिकारियों के लिए है। यहाँ से भेजी गई चेतावनी
+      सभी किसानों तक उनकी अपनी भाषा में पहुँचती है — इसलिए भेजने से पहले
+      दवा का नाम और मात्रा दोबारा जाँच लें।
+    </p>
+  </main>
+
+<script>
+/* Chhota sa page — koi framework nahi. Session bante hi dashboard par bhej dete hain. */
+const f = document.getElementById('f'), m = document.getElementById('m'), btn = document.getElementById('btn');
+function say(text, kind){ m.textContent = text; m.className = 'msg ' + kind; }
+
+/* Pehle se logged in ho to seedha dashboard */
+fetch('/api/admin?action=session').then(r => r.ok && (location.href = '/regional-admin/')).catch(()=>{});
+
+f.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  btn.disabled = true; say('जाँच रहे हैं…', 'ok');
+  try {
+    const r = await fetch('/api/admin?action=login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ portalId: f.portalId.value.trim(), password: f.password.value }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) { say(d.error || 'लॉगिन नहीं हो पाया।', 'err'); btn.disabled = false; return; }
+    say('स्वागत है — पोर्टल खोल रहे हैं…', 'ok');
+    location.href = '/regional-admin/';
+  } catch (_) {
+    say('सर्वर से बात नहीं हो पाई। इंटरनेट जाँचें।', 'err');
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

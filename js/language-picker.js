@@ -147,6 +147,37 @@
 
     updateChip();
     if (!(opts && opts.silent)) console.info('[lang] chuni gayi:', lang.code, lang.en);
+
+    /* Logged-in kisan ki bhasha account ke saath bhi sambhal do — naye phone
+       par ya dobara login karne par phir se chunni na pade.
+       Fail ho jaye (offline / logged out) to koi baat nahi, localStorage me
+       to hai hi. Isliye chup-chaap ignore karte hain. */
+    if (!(opts && opts.fromServer)) {
+      try {
+        fetch('/api/auth?action=language', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ language: lang.code }),
+        }).catch(() => {});
+      } catch (_) {}
+    }
+  }
+
+  /**
+   * Login ke baad server par sambhali hui bhasha uthao.
+   * Sirf tab lagate hain jab is phone par kisan ne khud kuch chuna hi na ho —
+   * warna abhi ka chunav server wale purane chunav se badal jaata.
+   */
+  async function syncFromServer() {
+    try {
+      const r = await fetch('/api/auth?action=session');
+      if (!r.ok) return;
+      const s = await r.json();
+      if (!s || !s.language) return;
+      const already = prefs().language;
+      if (already) return;                       // is phone par pehle se chuni hui hai
+      apply(s.language, { silent: true, fromServer: true });
+      close();                                   // picker khula ho to band kar do
+    } catch (_) { /* offline — koi baat nahi */ }
   }
 
   /* ---------------------------------------------------------------------
@@ -242,10 +273,11 @@
     mountChip();
 
     if (neverPicked()) {
-      // Pehli baar — landing/login se bhi pehle poora screen
-      open({ firstRun: true });
+      /* Ho sakta hai kisan pehle kisi aur phone par bhasha chun chuka ho —
+         pehle wo dekh lete hain, tabhi poochhte hain. */
+      syncFromServer().then(() => { if (neverPicked()) open({ firstRun: true }); });
     } else {
-      apply(current().code, { silent: true });   // sambhali hui bhasha lagao
+      apply(current().code, { silent: true, fromServer: true });   // sambhali hui bhasha lagao
     }
 
     // voices baad me load hoti hain — tab fallback dobara jaanch lo
@@ -270,6 +302,7 @@
     open: open,
     close: close,
     resolveVoice: resolveVoice,
+    syncFromServer: syncFromServer,
     titleFor: (code) => PICKER_TITLE[code] || PICKER_TITLE['en-IN'],
   };
 

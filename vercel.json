@@ -85,6 +85,10 @@
   },
   "rewrites": [
     {
+      "source": "/admin",
+      "destination": "/admin-portal/index.html"
+    },
+    {
       "source": "/regional-admin",
       "destination": "/regional-admin/index.html"
     },

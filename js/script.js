@@ -10655,7 +10655,11 @@ async function fetchAdvisories() {
   if (!navigator.onLine || !state.cropId) return;
 
   try {
-    const url = CONFIG.REPORT.ADVISORIES + '?crop=' + encodeURIComponent(state.cropId);
+    /* Kisan ki chuni hui bhasha bhi bhej dete hain — server wahin anuvaad
+       karke bhejta hai. Anuvaad na ho paye to asli Hindi aata hai. */
+    const lang = (window.kmLang && window.kmLang.current) ? window.kmLang.current().code : '';
+    const url = CONFIG.REPORT.ADVISORIES + '?crop=' + encodeURIComponent(state.cropId) +
+                (lang ? '&lang=' + encodeURIComponent(lang) : '');
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) return;
     const data = await res.json();
@@ -10690,8 +10694,8 @@ function renderAdvisoryAlert() {
       '<div class="dept-alert__body">',
         '<p class="dept-alert__tag">कृषि विभाग की चेतावनी',
           a.district && a.district !== 'all' ? ' · ' + escapeHtml(a.district) : '', '</p>',
-        '<p class="dept-alert__title">', escapeHtml(a.titleHi || ''), '</p>',
-        '<p class="dept-alert__msg">', escapeHtml(a.messageHi || ''), '</p>',
+        '<p class="dept-alert__title">', escapeHtml(a.title || a.titleHi || ''), '</p>',
+        '<p class="dept-alert__msg">', escapeHtml(a.message || a.messageHi || ''), '</p>',
         a.chemical ? '<p class="dept-alert__chem">' + icon('pill', 'ic ic--xs') + ' ' +
           escapeHtml(a.chemical) +
           (a.cibrcApproved ? ' <strong>(CIBRC अनुमोदित)</strong>' : '') + '</p>' : '',

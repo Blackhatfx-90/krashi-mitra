@@ -5,5 +5,25 @@ function showAuthMsg(form,text,kind='error'){if(!form)return;let b=form.querySel
 function value(form,id){return String(form.querySelector('#'+id)?.value||'').trim()}
 async function submitAuth(form, action){const email=value(form,action==='signup'?'signup-email':'login-email').toLowerCase(), password=value(form,action==='signup'?'signup-password':'login-password'); if(!email||!email.includes('@')) return showAuthMsg(form,'कृपया सही ईमेल भरें।'); if(password.length<8) return showAuthMsg(form,'पासवर्ड कम से कम 8 अक्षर का रखें।'); if(action==='signup'){const name=value(form,'signup-name'),phone=value(form,'signup-phone').replace(/\D/g,''); if(!name||phone.length!==10)return showAuthMsg(form,'नाम और 10 अंकों का मोबाइल नंबर जरूरी है।'); if(password!==value(form,'signup-confirm-password'))return showAuthMsg(form,'दोनों पासवर्ड एक जैसे नहीं हैं।');}
  try{const out=await api(action,{method:'POST',body:JSON.stringify({name:value(form,'signup-name'),phone:value(form,'signup-phone'),email,password})});showAuthMsg(form,'सफलता! प्रोफ़ाइल पूरी करने के लिए ऐप खुल रहा है…','ok');setTimeout(()=>location.href=APP_URL,400)}catch(e){showAuthMsg(form,e.message)}}
-function init(){const signup=document.getElementById('signup-form'),login=document.getElementById('login-form'); signup?.addEventListener('submit',e=>{e.preventDefault();submitAuth(signup,'signup')}); login?.addEventListener('submit',e=>{e.preventDefault();submitAuth(login,'login')}); document.querySelectorAll('.form-group__toggle-password').forEach(b=>b.addEventListener('click',()=>{const i=b.closest('.form-group__input-wrapper').querySelector('input');i.type=i.type==='password'?'text':'password'})); document.querySelectorAll('[id$="-google-btn"]').forEach(b=>b.addEventListener('click',()=>showAuthMsg(b.closest('form'),'Google sign-in अभी configured नहीं है। पहले Google OAuth client connect करना होगा।','info')));}
+function init(){const signup=document.getElementById('signup-form'),login=document.getElementById('login-form'); signup?.addEventListener('submit',e=>{e.preventDefault();submitAuth(signup,'signup')}); login?.addEventListener('submit',e=>{e.preventDefault();submitAuth(login,'login')}); document.querySelectorAll('.form-group__toggle-password').forEach(b=>b.addEventListener('click',()=>{const i=b.closest('.form-group__input-wrapper').querySelector('input');i.type=i.type==='password'?'text':'password'})); /* Google se login — /api/google par bhej dete hain. Wahan se Google ke
+   login page par jaata hai aur wapas aakar session bana deta hai.
+   Server par key na lagi ho to wo khud /login?error=... par wapas bhej dega. */
+document.querySelectorAll('[id$="-google-btn"]').forEach(b=>b.addEventListener('click',()=>{
+  b.disabled=true; b.style.opacity='.6';
+  showAuthMsg(b.closest('form'),'Google पर ले जा रहे हैं…','info');
+  window.location.href='/api/google';
+}));
+
+/* Google se wapas aane par agar kuch gadbad hui to yahan message dikhta hai */
+(function(){
+  const why=new URLSearchParams(location.search).get('error'); if(!why) return;
+  const msg={ google_not_configured:'Google लॉगिन अभी चालू नहीं है (सर्वर पर सेटिंग बाकी है)।',
+              state_mismatch:'सुरक्षा जाँच विफल — कृपया दोबारा कोशिश करें।',
+              token_exchange_failed:'Google से बात नहीं हो पाई — दोबारा कोशिश करें।',
+              email_not_verified:'इस Google खाते का ईमेल सत्यापित नहीं है।',
+              no_email:'Google खाते से ईमेल नहीं मिला।' }[why]
+            || 'लॉगिन पूरा नहीं हो पाया — दोबारा कोशिश करें।';
+  const form=document.getElementById('login-form')||document.getElementById('signup-form');
+  if(form) showAuthMsg(form,msg,'error');
+})();}
 document.addEventListener('DOMContentLoaded',init);
