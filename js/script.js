@@ -6700,7 +6700,17 @@ function switchView(name) {
   $$('.view').forEach((v) => v.classList.toggle('is-active', v.id === 'view-' + name));
   $$('.nav__item').forEach((b) => b.classList.toggle('is-active', b.dataset.view === name));
 
-  el.viewTitle.innerHTML    = VIEW_META[name].title;
+  /* Topbar ki heading bhi chuni hui bhasha me. js/i18n.js me key na ho to
+     wahi purana Hindi text dikhta hai — kuch tootta nahi. */
+  const T = (key, fallback) =>
+    (window.kmI18n && window.kmI18n.t(key) !== key) ? window.kmI18n.t(key) : fallback;
+
+  const TITLE_KEY = { crops:'head.chooseCrop', scan:'nav.scan', history:'head.history',
+                      advisory:'head.advisory', handbook:'head.guide', about:'nav.about' };
+
+  el.viewTitle.innerHTML    = TITLE_KEY[name]
+    ? escapeHtml(T(TITLE_KEY[name], VIEW_META[name].title))
+    : VIEW_META[name].title;
   el.viewSubtitle.innerHTML = VIEW_META[name].sub;
 
   // scan / handbook par chuni hui fasal ka naam bhi dikha do
@@ -10726,6 +10736,10 @@ window.addEventListener('km:language', (e) => {
 
   stopSpeaking();                    // purani bhasha ka bacha hua vaakya band
   refreshVoices();
+
+  // Topbar ki heading turant nayi bhasha me
+  try { const v = document.querySelector('.view.is-active');
+        if (v) switchView(v.id.replace('view-', '')); } catch (_) {}
   console.info('[lang] awaaz ab:', speakCode, state.langNote ? '(' + state.langNote + ')' : '');
 
   if (state.langNote) showInfo(state.langNote, 'Voice for this language is not installed on this phone.');
