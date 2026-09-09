@@ -41,6 +41,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'धान',
+      'net.offline':'इंटरनेट नहीं',
+      'net.weak':'बहुत धीमा इंटरनेट',
+      'net.ok':'ठीक-ठाक इंटरनेट',
+      'net.good':'अच्छा इंटरनेट',
       'crop.wheat':'गेहूँ',
       'crop.sugarcane':'गन्ना',
       'crop.cotton':'कपास',
@@ -101,6 +105,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'Rice',
+      'net.offline':'No internet',
+      'net.weak':'Very slow internet',
+      'net.ok':'Fair internet',
+      'net.good':'Good internet',
       'crop.wheat':'Wheat',
       'crop.sugarcane':'Sugarcane',
       'crop.cotton':'Cotton',
@@ -134,6 +142,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'भात',
+      'net.offline':'इंटरनेट नाही',
+      'net.weak':'खूप संथ इंटरनेट',
+      'net.ok':'बऱ्यापैकी इंटरनेट',
+      'net.good':'चांगले इंटरनेट',
       'crop.wheat':'गहू',
       'crop.sugarcane':'ऊस',
       'crop.cotton':'कापूस',
@@ -167,6 +179,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ડાંગર',
+      'net.offline':'ઇન્ટરનેટ નથી',
+      'net.weak':'ખૂબ ધીમું ઇન્ટરનેટ',
+      'net.ok':'ઠીક-ઠાક ઇન્ટરનેટ',
+      'net.good':'સારું ઇન્ટરનેટ',
       'crop.wheat':'ઘઉં',
       'crop.sugarcane':'શેરડી',
       'crop.cotton':'કપાસ',
@@ -200,6 +216,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ਝੋਨਾ',
+      'net.offline':'ਇੰਟਰਨੈੱਟ ਨਹੀਂ',
+      'net.weak':'ਬਹੁਤ ਹੌਲੀ ਇੰਟਰਨੈੱਟ',
+      'net.ok':'ਠੀਕ-ਠਾਕ ਇੰਟਰਨੈੱਟ',
+      'net.good':'ਵਧੀਆ ਇੰਟਰਨੈੱਟ',
       'crop.wheat':'ਕਣਕ',
       'crop.sugarcane':'ਗੰਨਾ',
       'crop.cotton':'ਕਪਾਹ',
@@ -233,6 +253,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ধান',
+      'net.offline':'ইন্টারনেট নেই',
+      'net.weak':'খুব ধীর ইন্টারনেট',
+      'net.ok':'মোটামুটি ইন্টারনেট',
+      'net.good':'ভালো ইন্টারনেট',
       'crop.wheat':'গম',
       'crop.sugarcane':'আখ',
       'crop.cotton':'তুলা',
@@ -266,6 +290,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'நெல்',
+      'net.offline':'இணையம் இல்லை',
+      'net.weak':'மிக மெதுவான இணையம்',
+      'net.ok':'சுமாரான இணையம்',
+      'net.good':'நல்ல இணையம்',
       'crop.wheat':'கோதுமை',
       'crop.sugarcane':'கரும்பு',
       'crop.cotton':'பருத்தி',
@@ -299,6 +327,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'వరి',
+      'net.offline':'ఇంటర్నెట్ లేదు',
+      'net.weak':'చాలా నెమ్మది ఇంటర్నెట్',
+      'net.ok':'ఫర్వాలేదు ఇంటర్నెట్',
+      'net.good':'మంచి ఇంటర్నెట్',
       'crop.wheat':'గోధుమ',
       'crop.sugarcane':'చెరకు',
       'crop.cotton':'పత్తి',
@@ -332,6 +364,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ಭತ್ತ',
+      'net.offline':'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ',
+      'net.weak':'ತುಂಬಾ ನಿಧಾನ ಇಂಟರ್ನೆಟ್',
+      'net.ok':'ಪರವಾಗಿಲ್ಲ ಇಂಟರ್ನೆಟ್',
+      'net.good':'ಒಳ್ಳೆಯ ಇಂಟರ್ನೆಟ್',
       'crop.wheat':'ಗೋಧಿ',
       'crop.sugarcane':'ಕಬ್ಬು',
       'crop.cotton':'ಹತ್ತಿ',
@@ -365,6 +401,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'നെല്ല്',
+      'net.offline':'ഇന്റർനെറ്റ് ഇല്ല',
+      'net.weak':'വളരെ പതുക്കെയുള്ള ഇന്റർനെറ്റ്',
+      'net.ok':'സാമാന്യം ഇന്റർനെറ്റ്',
+      'net.good':'നല്ല ഇന്റർനെറ്റ്',
       'crop.wheat':'ഗോതമ്പ്',
       'crop.sugarcane':'കരിമ്പ്',
       'crop.cotton':'പരുത്തി',
@@ -398,6 +438,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ଧାନ',
+      'net.offline':'ଇଣ୍ଟରନେଟ୍ ନାହିଁ',
+      'net.weak':'ବହୁତ ଧୀର ଇଣ୍ଟରନେଟ୍',
+      'net.ok':'ମୋଟାମୋଟି ଇଣ୍ଟରନେଟ୍',
+      'net.good':'ଭଲ ଇଣ୍ଟରନେଟ୍',
       'crop.wheat':'ଗହମ',
       'crop.sugarcane':'ଆଖୁ',
       'crop.cotton':'କପା',
@@ -431,6 +475,10 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'دھان',
+      'net.offline':'انٹرنیٹ نہیں',
+      'net.weak':'بہت سست انٹرنیٹ',
+      'net.ok':'ٹھیک ٹھاک انٹرنیٹ',
+      'net.good':'اچھا انٹرنیٹ',
       'crop.wheat':'گندم',
       'crop.sugarcane':'گنا',
       'crop.cotton':'کپاس',
