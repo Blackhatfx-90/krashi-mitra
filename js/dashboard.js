@@ -115,6 +115,7 @@
       row(t('prof.pin', 'PIN'), p.pin) +
       row(t('prof.land', 'ज़मीन'), p.landAmount ? (p.landAmount + ' ' + (p.landUnit || 'acre')) : '') +
       row(t('prof.lang', 'भाषा'), (window.kmLang && window.kmLang.current().native) || '') +
+      alertRowHtml() +
       '<div class="dash-pactions">' +
         '<button type="button" class="btn btn--ghost btn--sm" id="dashEditProfile">' +
           esc(t('prof.edit', 'जानकारी बदलें')) + '</button>' +
@@ -123,6 +124,28 @@
         '<button type="button" class="btn btn--ghost btn--sm dash-logout" id="dashLogout">' +
           esc(t('prof.logout', 'लॉग आउट')) + '</button>' +
       '</div></div>';
+  }
+
+  /* ---------- chetavni ki ghanti ---------- */
+  /* Anumati apne aap nahi maangte — wo dabav lagta hai aur log ghabrakar
+     "Block" dabate hain, jiske baad browser dobara poochta hi nahi. Kisan
+     khud yahan se chalu karta hai. */
+  function alertRowHtml() {
+    if (!window.kmAlerts) return '';
+    const st = window.kmAlerts.status();
+    const on = st.on && st.permission === 'granted';
+    const blocked = st.permission === 'denied';
+
+    return '<div class="dash-prow dash-prow--act"><span>' +
+      esc(t('alert.title', 'चेतावनी की घंटी')) +
+      '<small>' + esc(blocked
+        ? t('alert.blocked', 'ब्राउज़र में बंद है — सेटिंग से चालू करें')
+        : t('alert.note', 'ओला, कीट या रोग की चेतावनी पर फ़ोन बजेगा')) + '</small></span>' +
+      (blocked ? '' :
+        '<button type="button" class="btn btn--ghost btn--sm" id="dashAlerts">' +
+        esc(on ? t('alert.test', 'बजाकर देखें') : t('alert.on', 'चालू करें')) +
+        '</button>') +
+      '</div>';
   }
 
   /* ---------- poora dashboard ---------- */
@@ -157,6 +180,15 @@
 
     const edit = host.querySelector('#dashEditProfile');
     if (edit) edit.addEventListener('click', editProfile);
+
+    const al = host.querySelector('#dashAlerts');
+    if (al) al.addEventListener('click', async () => {
+      const st = window.kmAlerts.status();
+      if (st.on && st.permission === 'granted') { window.kmAlerts.test(); return; }
+      al.disabled = true;
+      await window.kmAlerts.enable();
+      render();
+    });
 
     const out = host.querySelector('#dashLogout');
     if (out) out.addEventListener('click', logout);
@@ -260,6 +292,7 @@
       if (!r.ok) return;
       const d = await r.json();
       D.news = (d && d.advisories) || d.rows || [];
+      if (window.kmAlerts) window.kmAlerts.alertMany(D.news);
     } catch (_) { /* offline */ }
   }
 

@@ -24,7 +24,7 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v53';
+const CACHE_VERSION = 'krashi-mitra-v54';
 const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
 
 /* Sarkari officer ka Regional Admin dashboard (alag React app) yahan rehta hai.
@@ -76,6 +76,7 @@ const APP_SHELL = [
   './js/language-picker.js',
   './js/i18n.js',
   './js/connectivity.js',
+  './js/alerts.js',
   './js/landing-lang.js',
   './css/language-picker.css',
   './css/mandi.css',
@@ -254,5 +255,63 @@ self.addEventListener('fetch', (event) => {
       status: 503,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     });
+  })());
+});
+
+/* ===========================================================================
+ * PUSH — krishi vibhag ki chetavni, app band hone par bhi
+ *
+ * Server se push tabhi aayega jab VAPID keys set ki jayengi. Tab tak yeh
+ * hissa chup pada rehta hai — kuch tootta nahi. App khuli ho to ghanti aur
+ * kampan js/alerts.js karta hai; yahan hum sirf notification dikhate hain
+ * aur khuli hui app ko khabar bhej dete hain.
+ *
+ * DHYAN: notification ki AWAAZ OS ke haath me hai — SW use tez nahi kar
+ * sakta. Kampan ka namoona hum de sakte hain, aur wahi diya gaya hai.
+ * ======================================================================== */
+
+const BUZZ = {
+  critical: [400, 120, 400, 120, 400, 120, 700],
+  warning:  [300, 150, 300, 150, 500],
+  info:     [200, 120, 200],
+};
+
+self.addEventListener('push', (event) => {
+  let a = {};
+  try { a = event.data ? event.data.json() : {}; } catch (_) { a = {}; }
+
+  const severity = a.severity === 'critical' ? 'critical'
+                 : a.severity === 'warning'  ? 'warning' : 'info';
+  const title = a.title || a.titleHi || 'कृषि विभाग की चेतावनी';
+
+  event.waitUntil((async () => {
+    await self.registration.showNotification(title, {
+      body: String(a.message || a.messageHi || '').slice(0, 180),
+      icon: './assets/icon-192.png',
+      badge: './assets/icon-192.png',
+      tag: 'km-advisory-' + (a.id || ''),
+      vibrate: BUZZ[severity],
+      requireInteraction: severity === 'critical',
+      renotify: true,
+      data: { url: './app', id: a.id || '' },
+    });
+
+    /* App khuli ho to usse bhi bolo — wahan ghanti bajti hai. */
+    const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    clientList.forEach((c) => c.postMessage({ type: 'km:advisory', advisory: a }));
+  })());
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || './app';
+
+  event.waitUntil((async () => {
+    const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    /* App pehle se khuli hai to nayi tab mat kholo — usi ko saamne lao. */
+    for (const c of list) {
+      if (c.url.indexOf('/app') !== -1 && 'focus' in c) return c.focus();
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(target);
   })());
 });

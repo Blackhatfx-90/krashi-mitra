@@ -89,3 +89,9 @@
   .dash-tiles{grid-template-columns:1fr;}
   .dash-hello{font-size:19px;}
 }
+
+/* Chetavni ki ghanti wali row — dono taraf jagah, button daayein. */
+.dash-prow--act{align-items:center;gap:12px;}
+.dash-prow--act span{display:flex;flex-direction:column;gap:2px;}
+.dash-prow--act small{font-size:11.5px;color:var(--ink-3);font-weight:400;}
+.dash-prow--act .btn{flex:0 0 auto;}

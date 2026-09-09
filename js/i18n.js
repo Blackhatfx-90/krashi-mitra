@@ -41,6 +41,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'धान',
+      'alert.title':'चेतावनी की घंटी',
+      'alert.note':'ओला, कीट या रोग की चेतावनी पर फ़ोन बजेगा',
+      'alert.on':'चालू करें',
+      'alert.test':'बजाकर देखें',
+      'alert.blocked':'ब्राउज़र में बंद है — सेटिंग से चालू करें',
       'voice.hello':'नमस्ते',
       'net.offline':'इंटरनेट नहीं',
       'net.weak':'बहुत धीमा इंटरनेट',
@@ -106,6 +111,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'Rice',
+      'alert.title':'Alert ringtone',
+      'alert.note':'Phone will ring for hail, pest or disease alerts',
+      'alert.on':'Turn on',
+      'alert.test':'Try it',
+      'alert.blocked':'Blocked in browser — enable in settings',
       'voice.hello':'Namaste',
       'net.offline':'No internet',
       'net.weak':'Very slow internet',
@@ -144,6 +154,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'भात',
+      'alert.title':'इशारा घंटी',
+      'alert.note':'गारपीट, कीड किंवा रोगाच्या इशाऱ्यावर फोन वाजेल',
+      'alert.on':'चालू करा',
+      'alert.test':'वाजवून पाहा',
+      'alert.blocked':'ब्राउझरमध्ये बंद आहे — सेटिंगमधून चालू करा',
       'voice.hello':'नमस्कार',
       'net.offline':'इंटरनेट नाही',
       'net.weak':'खूप संथ इंटरनेट',
@@ -182,6 +197,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ડાંગર',
+      'alert.title':'ચેતવણીની ઘંટી',
+      'alert.note':'કરા, જીવાત કે રોગની ચેતવણી પર ફોન વાગશે',
+      'alert.on':'ચાલુ કરો',
+      'alert.test':'વગાડીને જુઓ',
+      'alert.blocked':'બ્રાઉઝરમાં બંધ છે — સેટિંગમાંથી ચાલુ કરો',
       'voice.hello':'નમસ્તે',
       'net.offline':'ઇન્ટરનેટ નથી',
       'net.weak':'ખૂબ ધીમું ઇન્ટરનેટ',
@@ -220,6 +240,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ਝੋਨਾ',
+      'alert.title':'ਚੇਤਾਵਨੀ ਦੀ ਘੰਟੀ',
+      'alert.note':'ਗੜੇ, ਕੀੜੇ ਜਾਂ ਰੋਗ ਦੀ ਚੇਤਾਵਨੀ ਤੇ ਫ਼ੋਨ ਵੱਜੇਗਾ',
+      'alert.on':'ਚਾਲੂ ਕਰੋ',
+      'alert.test':'ਵਜਾ ਕੇ ਦੇਖੋ',
+      'alert.blocked':'ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ ਬੰਦ ਹੈ — ਸੈਟਿੰਗ ਤੋਂ ਚਾਲੂ ਕਰੋ',
       'voice.hello':'ਸਤ ਸ੍ਰੀ ਅਕਾਲ',
       'net.offline':'ਇੰਟਰਨੈੱਟ ਨਹੀਂ',
       'net.weak':'ਬਹੁਤ ਹੌਲੀ ਇੰਟਰਨੈੱਟ',
@@ -258,6 +283,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ধান',
+      'alert.title':'সতর্কতার ঘণ্টা',
+      'alert.note':'শিলাবৃষ্টি, পোকা বা রোগের সতর্কতায় ফোন বাজবে',
+      'alert.on':'চালু করুন',
+      'alert.test':'বাজিয়ে দেখুন',
+      'alert.blocked':'ব্রাউজারে বন্ধ — সেটিংস থেকে চালু করুন',
       'voice.hello':'নমস্কার',
       'net.offline':'ইন্টারনেট নেই',
       'net.weak':'খুব ধীর ইন্টারনেট',
@@ -296,6 +326,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'நெல்',
+      'alert.title':'எச்சரிக்கை மணி',
+      'alert.note':'ஆலங்கட்டி, பூச்சி அல்லது நோய் எச்சரிக்கையில் தொலைபேசி ஒலிக்கும்',
+      'alert.on':'இயக்கு',
+      'alert.test':'ஒலிக்கச் செய்',
+      'alert.blocked':'உலாவியில் தடுக்கப்பட்டுள்ளது — அமைப்பில் இயக்கவும்',
       'voice.hello':'வணக்கம்',
       'net.offline':'இணையம் இல்லை',
       'net.weak':'மிக மெதுவான இணையம்',
@@ -334,6 +369,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'వరి',
+      'alert.title':'హెచ్చరిక గంట',
+      'alert.note':'వడగళ్లు, పురుగు లేదా వ్యాధి హెచ్చరికకు ఫోన్ మోగుతుంది',
+      'alert.on':'ఆన్ చేయండి',
+      'alert.test':'మోగించి చూడండి',
+      'alert.blocked':'బ్రౌజర్‌లో నిలిపివేయబడింది — సెట్టింగ్‌లలో ఆన్ చేయండి',
       'voice.hello':'నమస్కారం',
       'net.offline':'ఇంటర్నెట్ లేదు',
       'net.weak':'చాలా నెమ్మది ఇంటర్నెట్',
@@ -372,6 +412,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ಭತ್ತ',
+      'alert.title':'ಎಚ್ಚರಿಕೆ ಗಂಟೆ',
+      'alert.note':'ಆಲಿಕಲ್ಲು, ಕೀಟ ಅಥವಾ ರೋಗದ ಎಚ್ಚರಿಕೆಗೆ ಫೋನ್ ಸದ್ದು ಮಾಡುತ್ತದೆ',
+      'alert.on':'ಆನ್ ಮಾಡಿ',
+      'alert.test':'ಬಾರಿಸಿ ನೋಡಿ',
+      'alert.blocked':'ಬ್ರೌಸರ್‌ನಲ್ಲಿ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ — ಸೆಟ್ಟಿಂಗ್‌ನಲ್ಲಿ ಆನ್ ಮಾಡಿ',
       'voice.hello':'ನಮಸ್ಕಾರ',
       'net.offline':'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ',
       'net.weak':'ತುಂಬಾ ನಿಧಾನ ಇಂಟರ್ನೆಟ್',
@@ -410,6 +455,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'നെല്ല്',
+      'alert.title':'മുന്നറിയിപ്പ് മണി',
+      'alert.note':'ആലിപ്പഴം, കീടം അല്ലെങ്കിൽ രോഗ മുന്നറിയിപ്പിൽ ഫോൺ ശബ്ദിക്കും',
+      'alert.on':'ഓണാക്കുക',
+      'alert.test':'മുഴക്കി നോക്കൂ',
+      'alert.blocked':'ബ്രൗസറിൽ തടഞ്ഞിരിക്കുന്നു — സെറ്റിംഗ്സിൽ ഓണാക്കുക',
       'voice.hello':'നമസ്കാരം',
       'net.offline':'ഇന്റർനെറ്റ് ഇല്ല',
       'net.weak':'വളരെ പതുക്കെയുള്ള ഇന്റർനെറ്റ്',
@@ -448,6 +498,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ଧାନ',
+      'alert.title':'ସତର୍କତା ଘଣ୍ଟି',
+      'alert.note':'ଶିଳାବୃଷ୍ଟି, ପୋକ କିମ୍ବା ରୋଗ ସତର୍କତାରେ ଫୋନ୍ ବାଜିବ',
+      'alert.on':'ଚାଲୁ କରନ୍ତୁ',
+      'alert.test':'ବଜାଇ ଦେଖନ୍ତୁ',
+      'alert.blocked':'ବ୍ରାଉଜରରେ ବନ୍ଦ — ସେଟିଂରୁ ଚାଲୁ କରନ୍ତୁ',
       'voice.hello':'ନମସ୍କାର',
       'net.offline':'ଇଣ୍ଟରନେଟ୍ ନାହିଁ',
       'net.weak':'ବହୁତ ଧୀର ଇଣ୍ଟରନେଟ୍',
@@ -486,6 +541,11 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'دھان',
+      'alert.title':'انتباہی گھنٹی',
+      'alert.note':'اولے، کیڑے یا بیماری کی وارننگ پر فون بجے گا',
+      'alert.on':'چالو کریں',
+      'alert.test':'بجا کر دیکھیں',
+      'alert.blocked':'براؤزر میں بند ہے — سیٹنگ سے چالو کریں',
       'voice.hello':'السلام علیکم',
       'net.offline':'انٹرنیٹ نہیں',
       'net.weak':'بہت سست انٹرنیٹ',

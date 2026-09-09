@@ -10686,6 +10686,10 @@ async function fetchAdvisories() {
 
     state.advisories = data.advisories || [];
     renderAdvisoryAlert();
+
+    /* Card dikhana kaafi nahi — phone jeb me ho to wo kabhi nahi dikhta.
+       Isliye nayi chetavni par ghanti + kampan + notification bhi. */
+    if (window.kmAlerts) window.kmAlerts.alertMany(state.advisories);
   } catch (err) {
     console.warn('[advisory] nahi mili:', err.message);
   }
