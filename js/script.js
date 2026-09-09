@@ -10221,7 +10221,15 @@ function pickVoice(opts) {
   const localOnly = !!(opts && opts.localOnly);
   const pool = localOnly ? speech.voices.filter(isLocalVoice) : speech.voices;
 
+  /* Kisan ne jo bhasha chuni hai wo sabse pehle. Us bhasha ki awaaz phone me
+     na ho to hi हिन्दी, aur wo bhi na ho to English — yahi fallback chain
+     js/language-picker.js me bhi likhi hai. */
+  const want = (CONFIG.SPEECH_LANG || 'hi-IN').toLowerCase();
+  const wantBase = want.split('-')[0];
+
   const tiers = [
+    (l) => l === want,
+    (l) => l.indexOf(wantBase) === 0,
     (l) => l === 'hi-in',
     (l) => l.indexOf('hi') === 0,
     (l) => l === 'en-in',
@@ -10695,6 +10703,30 @@ function renderAdvisoryAlert() {
 /* ============================================================================
  * SECTION 13 — INIT (events + service worker)
  * ========================================================================= */
+
+/* ---------------------------------------------------------------------------
+ * BHASHA BADALNE PAR AWAAZ BHI BADLE
+ * js/language-picker.js `km:language` event bhejta hai. Yahan use pakad kar
+ * CONFIG.SPEECH_LANG badal dete hain, taaki agli baar bolne par awaaz nayi
+ * bhasha me ho. Jis bhasha ki awaaz phone me nahi hai, uske liye picker khud
+ * hi Hindi/English par gir jaata hai aur note bhi bhej deta hai.
+ * ------------------------------------------------------------------------- */
+window.addEventListener('km:language', (e) => {
+  const d = e.detail || {};
+  if (!d.code) return;
+
+  // Bolne ke liye wahi code jispar fallback ruka (na ki jo chuna gaya tha) —
+  // warna browser un-installed bhasha par chup reh jaata hai.
+  const speakCode = (d.voice && d.voice.code) || d.code;
+  CONFIG.SPEECH_LANG = speakCode;
+  state.langNote = (d.voice && d.voice.note) || '';
+
+  stopSpeaking();                    // purani bhasha ka bacha hua vaakya band
+  refreshVoices();
+  console.info('[lang] awaaz ab:', speakCode, state.langNote ? '(' + state.langNote + ')' : '');
+
+  if (state.langNote) showInfo(state.langNote, 'Voice for this language is not installed on this phone.');
+});
 
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;

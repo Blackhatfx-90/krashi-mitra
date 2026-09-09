@@ -277,6 +277,8 @@
      * @param {object} [opts] { only:'scan' } — sirf scan-screen wale step chalao
      */
     start(opts) {
+      // Bhasha abhi tak nahi chuni gayi to tour ruka rahe (language picker upar hai).
+      if (document.querySelector('.kml-overlay')) return;
       if (this.running) return;
       const o = opts || {};
 
@@ -567,6 +569,14 @@
   let autoStarted = false;
 
   function maybeAutoStart() {
+    /* BHASHA PEHLE — pehli baar js/language-picker.js poore screen par bhasha
+       poochhta hai. Tour us par chadh na jaaye, aur narration bhi sahi bhasha
+       me jaaye, isliye picker band hone tak ruk jaate hain. */
+    if (document.querySelector('.kml-overlay')) {
+      window.addEventListener('km:language', () => setTimeout(maybeAutoStart, 700), { once: true });
+      return;
+    }
+
     if (autoStarted) return;
 
     /* Permission wala modal abhi khula hai to ruk jao — warna tour uske

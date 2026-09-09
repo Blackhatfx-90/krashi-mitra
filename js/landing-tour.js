@@ -148,6 +148,8 @@
   }
 
   function start() {
+    // Bhasha abhi tak nahi chuni gayi to tour ruka rahe.
+    if (document.querySelector('.kml-overlay')) return;
     const kind = pageKind();
     if (!kind) return;
     steps = STEPS_BY_PAGE[kind] || [];
@@ -167,7 +169,18 @@
     try { seen = localStorage.getItem(SEEN_KEY) === '1'; } catch (_) {}
     if (seen) return;
 
+    /* BHASHA PEHLE. Pehli baar app khulne par js/language-picker.js poore
+       screen par bhasha chunne ko kehta hai. Tour us par chadh jaata tha,
+       isliye ab uske band hone ka intezaar karte hain — tabhi tour ki
+       narration bhi sahi bhasha me jaayegi. */
+    const pickerOpen = () => !!document.querySelector('.kml-overlay');
+
+    if (pickerOpen()) {
+      window.addEventListener('km:language', () => setTimeout(start, 700), { once: true });
+      return;
+    }
+
     // Page settle hone ke baad — warna ring galat jagah banti hai
-    setTimeout(start, 1200);
+    setTimeout(() => { if (!pickerOpen()) start(); }, 1200);
   });
 })();
