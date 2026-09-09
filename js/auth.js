@@ -18,6 +18,9 @@ document.querySelectorAll('[id$="-google-btn"]').forEach(b=>b.addEventListener('
 (function(){
   const why=new URLSearchParams(location.search).get('error'); if(!why) return;
   const msg={ google_not_configured:'Google लॉगिन अभी चालू नहीं है (सर्वर पर सेटिंग बाकी है)।',
+              google_disabled_client:'यह Google OAuth client बंद कर दिया गया है। Google Cloud Console में नया client बनाना होगा।',
+              google_invalid_client:'Google client ID या secret गलत है।',
+              google_redirect_uri_mismatch:'Google Console में redirect URI इस पते से मेल नहीं खाता।',
               state_mismatch:'सुरक्षा जाँच विफल — कृपया दोबारा कोशिश करें।',
               token_exchange_failed:'Google से बात नहीं हो पाई — दोबारा कोशिश करें।',
               email_not_verified:'इस Google खाते का ईमेल सत्यापित नहीं है।',

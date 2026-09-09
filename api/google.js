@@ -105,8 +105,15 @@ module.exports = async function handler(req, res) {
   const state = req.query && req.query.state;
   const err   = req.query && req.query.error;
 
-  /* Kisan ne Google ke page par "Cancel" daba diya */
-  if (err) return redirectTo(res, origin(req) + '/login');
+  /* Google ne khud koi gadbad batai.
+     Pehle hum ise chup-chaap gira dete the aur kisan ko kuch pata hi nahi
+     chalta tha. Ab wajah aage bhej dete hain taaki login page par saaf
+     dikhe ki hua kya. "access_denied" ka matlab kisan ne khud Cancel dabaya
+     — usme koi gadbad nahi, isliye chup-chaap wapas bhej dete hain. */
+  if (err) {
+    if (err === 'access_denied') return redirectTo(res, origin(req) + '/login');
+    return failBack(req, res, 'google_' + String(err).slice(0, 40));
+  }
 
   /* ---------- 1. SHURUAAT — Google ke login page par bhejo ---------- */
   if (!code) {
