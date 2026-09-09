@@ -79,6 +79,24 @@ module.exports = async function handler(req, res) {
   const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
   const REDIRECT_URI  = origin(req) + '/api/google';
 
+  /* ---------------------------------------------------------------------
+   * JAANCH ka raasta:  /api/google?check=1
+   * Sirf yeh batata hai ki setting lagi hai ya nahi — VALUE kabhi nahi
+   * bhejta. Isse pata chal jaata hai ki dikkat env var me hai ya kahin aur.
+   * ------------------------------------------------------------------- */
+  if (req.query && req.query.check) {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(200).end(JSON.stringify({
+      clientIdSet:     Boolean(CLIENT_ID),
+      clientSecretSet: Boolean(CLIENT_SECRET),
+      mongoSet:        Boolean(process.env.MONGODB_URI),
+      // Google Console me BILKUL yahi URI daalna hai
+      redirectUriToRegister: REDIRECT_URI,
+      ready: Boolean(CLIENT_ID && CLIENT_SECRET && process.env.MONGODB_URI),
+    }, null, 2));
+  }
+
   if (!CLIENT_ID || !CLIENT_SECRET) {
     return failBack(req, res, 'google_not_configured');
   }
