@@ -32,21 +32,46 @@
 .gov-stripe i:nth-child(2){background:var(--gov-white)}
 .gov-stripe i:nth-child(3){background:var(--gov-green)}
 
-/* ---------- sarkari-shaili header patti ---------- */
-.gov-bar{
-  background:var(--gov-strip);border-bottom:1px solid var(--gov-line);
-  font-size:12px;color:#4a4a4a;
-}
+/* ---------- pehchan patti (logo + naam + helpline + bhasha) ----------
+   Banawat sarkari portal jaisi hai: baayein pehchan, daayein helpline.
+   Rashtriya chihn yahan NAHI hai (upar wajah likhi hai) — apna logo hai. */
+.gov-bar{background:var(--gov-strip);border-bottom:1px solid var(--gov-line);}
 .gov-bar__in{
-  max-width:1200px;margin:0 auto;padding:7px 20px;
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  max-width:1200px;margin:0 auto;padding:9px 20px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
 }
-.gov-bar__chakra{width:20px;height:20px;flex:0 0 auto}
-.gov-bar__txt{font-weight:600;color:var(--gov-ink);letter-spacing:.01em}
-.gov-bar__sub{color:#6b6b6b}
-.gov-bar__right{margin-left:auto;display:flex;gap:14px;align-items:center}
-.gov-bar__right a{color:#4a4a4a;text-decoration:none;font-size:11.5px}
-.gov-bar__right a:hover{text-decoration:underline}
+.gov-bar__logo{width:44px;height:44px;flex:0 0 auto;}
+
+.gov-bar__id{display:flex;flex-direction:column;line-height:1.28;min-width:0;}
+.gov-bar__dept{
+  font-size:15px;font-weight:800;color:var(--gov-ink);letter-spacing:-.01em;
+}
+.gov-bar__sub{font-size:11.5px;color:#5f5f5f;}
+
+/* Helpline — reference site jaisi, header me numaayan */
+.gov-bar__helpline{
+  margin-left:auto;display:flex;align-items:center;gap:8px;
+  text-decoration:none;color:var(--gov-ink);
+  background:#fff;border:1px solid var(--gov-line);border-radius:10px;
+  padding:6px 12px;
+}
+.gov-bar__helpline:hover{border-color:var(--gov-green);}
+.gov-bar__helpline svg{width:19px;height:19px;color:var(--gov-green);flex:0 0 auto;}
+.gov-bar__helpline b{display:block;font-size:10.5px;font-weight:600;color:#5f5f5f;}
+.gov-bar__helpline i{display:block;font-style:normal;font-size:14px;font-weight:800;letter-spacing:.01em;}
+
+/* हिंदी | English */
+.ll-switch{display:flex;border:1px solid var(--gov-line);border-radius:999px;overflow:hidden;background:#fff;}
+.ll-switch__btn{
+  min-height:32px;padding:0 13px;border:none;background:none;cursor:pointer;
+  font-size:12.5px;font-weight:700;color:#5f5f5f;font-family:inherit;
+}
+.ll-switch__btn + .ll-switch__btn{border-left:1px solid var(--gov-line);}
+.ll-switch__btn.is-on{background:var(--gov-green);color:#fff;}
+
+.gov-bar__right{display:flex;gap:14px;align-items:center;}
+.gov-bar__right a{color:#4a4a4a;text-decoration:none;font-size:11.5px;}
+.gov-bar__right a:hover{text-decoration:underline;}
 
 /* ---------- landing ke rang sarkari palette par ---------- */
 body{
@@ -87,8 +112,16 @@ body{
 .gov-disclaimer__in{max-width:1200px;margin:0 auto}
 .gov-disclaimer strong{color:#7a5c1a}
 
-@media (max-width:600px){
-  .gov-bar__in{padding:7px 14px;gap:8px}
-  .gov-bar__right{width:100%;margin-left:0;padding-top:4px}
-  .gov-bar__sub{display:none}
+@media (max-width:760px){
+  .gov-bar__in{padding:8px 14px;gap:10px;}
+  .gov-bar__sub{display:none;}
+  .gov-bar__helpline{margin-left:auto;padding:5px 9px;}
+  .gov-bar__helpline b{display:none;}          /* chhoti screen par sirf number */
+  .gov-bar__right{width:100%;margin-left:0;padding-top:2px;order:5;}
+  .ll-switch{order:4;}
+}
+@media (max-width:420px){
+  .gov-bar__logo{width:36px;height:36px;}
+  .gov-bar__dept{font-size:13.5px;}
+  .gov-bar__helpline i{font-size:12.5px;}
 }
