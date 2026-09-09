@@ -5,7 +5,7 @@ function showAuthMsg(form,text,kind='error'){if(!form)return;let b=form.querySel
 function value(form,id){return String(form.querySelector('#'+id)?.value||'').trim()}
 async function submitAuth(form, action){const email=value(form,action==='signup'?'signup-email':'login-email').toLowerCase(), password=value(form,action==='signup'?'signup-password':'login-password'); if(!email||!email.includes('@')) return showAuthMsg(form,'कृपया सही ईमेल भरें।'); if(password.length<8) return showAuthMsg(form,'पासवर्ड कम से कम 8 अक्षर का रखें।'); if(action==='signup'){const name=value(form,'signup-name'),phone=value(form,'signup-phone').replace(/\D/g,''); if(!name||phone.length!==10)return showAuthMsg(form,'नाम और 10 अंकों का मोबाइल नंबर जरूरी है।'); if(password!==value(form,'signup-confirm-password'))return showAuthMsg(form,'दोनों पासवर्ड एक जैसे नहीं हैं।');}
  try{const out=await api(action,{method:'POST',body:JSON.stringify({name:value(form,'signup-name'),phone:value(form,'signup-phone'),email,password})});showAuthMsg(form,'सफलता! प्रोफ़ाइल पूरी करने के लिए ऐप खुल रहा है…','ok');setTimeout(()=>location.href=APP_URL,400)}catch(e){showAuthMsg(form,e.message)}}
-function init(){const signup=document.getElementById('signup-form'),login=document.getElementById('login-form'); signup?.addEventListener('submit',e=>{e.preventDefault();submitAuth(signup,'signup')}); login?.addEventListener('submit',e=>{e.preventDefault();submitAuth(login,'login')}); document.querySelectorAll('.form-group__toggle-password').forEach(b=>b.addEventListener('click',()=>{const i=b.closest('.form-group__input-wrapper').querySelector('input');i.type=i.type==='password'?'text':'password'})); /* Google se login — /api/google par bhej dete hain. Wahan se Google ke
+function init(){const signup=document.getElementById('signup-form'),login=document.getElementById('login-form'); signup?.addEventListener('submit',e=>{e.preventDefault();submitAuth(signup,'signup')}); login?.addEventListener('submit',e=>{e.preventDefault();submitAuth(login,'login')});  /* Google se login — /api/google par bhej dete hain. Wahan se Google ke
    login page par jaata hai aur wapas aakar session bana deta hai.
    Server par key na lagi ho to wo khud /login?error=... par wapas bhej dega. */
 document.querySelectorAll('[id$="-google-btn"]').forEach(b=>b.addEventListener('click',()=>{
@@ -30,3 +30,13 @@ document.querySelectorAll('[id$="-google-btn"]').forEach(b=>b.addEventListener('
   if(form) showAuthMsg(form,msg,'error');
 })();}
 document.addEventListener('DOMContentLoaded',init);
+
+/* ---------------------------------------------------------------------------
+ * NOTE — password dikhane/chhupane wala "aankh" button yahan JAAN-BOOJHKAR
+ * nahi hai. Wo js/landing.js ke initPasswordToggles() me pehle se maujood hai
+ * aur poora sahi kaam karta hai (type, dono icon, aria-label).
+ *
+ * Pehle yahan uski ek NAKAL thi. Dono handler ek hi click par chalte the —
+ * ek password ko dikha deta, doosra turant wapas chhupa deta. Isliye user ko
+ * lagta tha ki button toota hua hai. Ek hi jagah rakhna zaroori hai.
+ * ------------------------------------------------------------------------- */

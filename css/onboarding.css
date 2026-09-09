@@ -1,0 +1,73 @@
+/* ============================================================================
+   NAYE KHATE KA SETUP — js/profile-onboarding.js ke saath.
+   Pehle iska koi CSS tha hi nahi, isliye form bina kisi banawat ke bikhra
+   hua dikhta tha. Sab "km-profile-" / "km-step" / "km-land-row" par hai.
+   ========================================================================= */
+
+.km-profile-modal{
+  position:fixed;inset:0;z-index:9500;
+  background:rgba(16,24,40,.6);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;overflow-y:auto;
+  font-family:"Inter","Noto Sans Devanagari",-apple-system,BlinkMacSystemFont,
+              "Segoe UI",Roboto,Arial,sans-serif;
+}
+
+.km-profile-card{
+  background:#fff;border-radius:16px;padding:24px 20px;
+  width:100%;max-width:440px;margin:auto;
+  box-shadow:0 20px 50px rgba(16,24,40,.28);
+  color:#101828;
+}
+
+.km-step{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;
+  color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;
+  padding:3px 10px;border-radius:999px;margin:0 0 10px;
+}
+
+.km-profile-card h1{font-size:19px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;}
+.km-profile-card > p{font-size:13px;color:#475467;line-height:1.6;margin:0 0 16px;}
+
+.km-profile-card label{
+  display:block;font-size:12.5px;font-weight:600;color:#344054;margin:0 0 12px;
+}
+.km-profile-card input,
+.km-profile-card select{
+  width:100%;min-height:44px;margin-top:5px;padding:0 12px;
+  border:1px solid #d0d5dd;border-radius:9px;
+  font-size:15px;font-family:inherit;background:#fff;color:#101828;
+}
+.km-profile-card input:focus,
+.km-profile-card select:focus{outline:2px solid #16a34a;outline-offset:1px;border-color:#16a34a;}
+
+/* Zameen ka naap — ginti aur ikai ek hi line me */
+.km-land-row{display:flex;gap:8px;margin-top:5px;}
+.km-land-row input{flex:1;margin-top:0;}
+.km-land-row select{width:auto;min-width:132px;margin-top:0;}
+
+/* "Bolkar bharein" — label ke daayein chhota button */
+#km-speak-land{
+  float:right;min-height:28px;padding:0 10px;margin-top:-2px;
+  border:1px solid #bbf7d0;border-radius:999px;background:#f0fdf4;
+  color:#15803d;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+#km-speak-land:hover{background:#dcfce7;}
+
+.km-profile-error{
+  min-height:18px;margin:2px 0 10px;font-size:12.5px;color:#b42318;font-weight:500;
+}
+
+.km-profile-submit{
+  width:100%;min-height:48px;border:none;border-radius:10px;
+  background:#15803d;color:#fff;font-size:15px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+}
+.km-profile-submit:hover:not(:disabled){background:#14682f;}
+.km-profile-submit:disabled{opacity:.55;cursor:not-allowed;}
+
+@media (max-width:420px){
+  .km-profile-card{padding:20px 16px;}
+  .km-land-row{flex-direction:column;}
+  .km-land-row select{width:100%;min-width:0;}
+}
