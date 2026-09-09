@@ -9213,6 +9213,9 @@ async function selectCrop(cropId) {
   // (js/mandi.js apne aap cache sambhalta hai — har baar API call nahi hoti.)
   if (window.kmMandi) window.kmMandi.load();
 
+  // Khaad ka hisaab aur salah har fasal ke liye alag hai
+  if (window.kmFarmTools) window.kmFarmTools.render();
+
   // Is fasal ke liye vibhag ki koi chetavni hai kya
   fetchAdvisories();
 

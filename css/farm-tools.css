@@ -1,0 +1,84 @@
+/* ============================================================================
+   KHETI SAHAYAK — js/farm-tools.js ke saath. Alag file, sab "ft-" prefix par.
+   Rang app ki style.css ke variables se aate hain.
+   ========================================================================= */
+.ft-card .card__head{margin-bottom:12px;}
+.ft-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.ft-controls label{font-size:12.5px;color:var(--ink-2);}
+.ft-controls input,.ft-controls select{
+  min-height:42px;padding:0 11px;border:1px solid var(--line-strong);
+  border-radius:9px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);
+}
+.ft-controls input{width:88px;}
+
+.ft-block{margin-bottom:16px;}
+.ft-block h3{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--ink-2);margin-bottom:9px;
+}
+
+/* ---- khaad ki boriyan ---- */
+.ft-bags{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ft-bag{
+  border:1px solid var(--green-100);background:var(--green-050);
+  border-radius:12px;padding:11px 8px;text-align:center;
+}
+.ft-bag b{display:block;font-size:24px;font-weight:800;color:var(--green-700);line-height:1.1;}
+.ft-bag span{font-size:10.5px;color:var(--ink-2);}
+.ft-bag small{display:block;font-size:11.5px;font-weight:600;margin-top:4px;}
+.ft-bag em{display:block;font-size:10.5px;color:var(--ink-3);font-style:normal;}
+
+.ft-need{font-size:12px;color:var(--ink-2);margin-top:9px;}
+.ft-warn{
+  display:flex;align-items:flex-start;gap:6px;
+  margin-top:9px;padding:8px 11px;border-radius:9px;
+  background:var(--amber-050);border:1px solid #fde68a;color:var(--amber-600);
+  font-size:11.5px;line-height:1.55;
+}
+.ft-empty{
+  text-align:center;padding:20px 12px;color:var(--ink-3);font-size:13px;
+  border:1px dashed var(--line-strong);border-radius:11px;
+}
+
+/* ---- avastha ---- */
+.ft-stages{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.ft-stage{
+  min-height:34px;padding:0 12px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line-strong);background:var(--surface);
+  font-size:12.5px;font-weight:600;color:var(--ink-2);font-family:inherit;
+}
+.ft-stage:hover{background:var(--bg);}
+.ft-stage.is-on{background:var(--green-700);border-color:var(--green-700);color:#fff;}
+
+.ft-tips{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0;padding:0;}
+.ft-tips li{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;}
+.ft-tips .ic{color:var(--green-600);margin-top:2px;}
+
+/* ---- visheshagya ---- */
+.ft-experts{border-top:1px dashed var(--line);padding-top:12px;}
+.ft-experts>summary{
+  cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:700;color:var(--green-700);min-height:36px;
+}
+.ft-experts>summary::-webkit-details-marker{display:none;}
+.ft-experts>summary::after{content:"▾";margin-left:auto;color:var(--ink-3);}
+.ft-experts[open]>summary::after{content:"▴";}
+.ft-exp-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.ft-exp-list li{
+  display:flex;gap:10px;align-items:flex-start;justify-content:space-between;
+  border:1px solid var(--line);border-radius:11px;padding:10px 12px;
+}
+.ft-exp-name{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ft-exp-note{font-size:11.5px;color:var(--ink-3);margin-top:2px;}
+.ft-exp-fee{text-align:right;flex:0 0 auto;font-size:12.5px;font-weight:700;color:var(--green-700);}
+.ft-exp-fee a{display:block;font-size:11px;font-weight:600;color:var(--blue-600);margin-top:3px;}
+.ft-badge{
+  font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:999px;
+  background:var(--green-100);color:var(--green-700);
+}
+
+@media (max-width:420px){
+  .ft-bags{grid-template-columns:1fr 1fr;}
+  .ft-bag b{font-size:21px;}
+}

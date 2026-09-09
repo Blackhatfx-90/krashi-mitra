@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/tour.css?v=2" />
   <link rel="stylesheet" href="css/voice.css?v=2" />
   <link rel="stylesheet" href="css/mandi.css?v=1" />
+  <link rel="stylesheet" href="css/farm-tools.css?v=1" />
   <link rel="stylesheet" href="css/language-picker.css?v=2" />
 </head>
 
@@ -479,6 +480,28 @@
           <div id="mandiBody"></div>
         </article>
 
+        <!-- ---------- KHETI SAHAYAK (js/farm-tools.js) ---------- -->
+        <article class="card ft-card" id="farmToolsCard">
+          <div class="card__head">
+            <h2>खेती सहायक</h2>
+            <p>खाद का हिसाब, इस समय क्या करें, और किससे सलाह लें — सब बिना इंटरनेट</p>
+          </div>
+
+          <div class="ft-controls">
+            <label for="ftSize">ज़मीन</label>
+            <input type="number" id="ftSize" value="1" min="0.1" step="0.1" inputmode="decimal" />
+            <select id="ftUnit" aria-label="ज़मीन की इकाई">
+              <option value="acre">एकड़</option>
+              <option value="hectare">हेक्टेयर</option>
+              <option value="bigha">बीघा</option>
+              <option value="kanal">कनाल</option>
+            </select>
+            <input type="hidden" id="ftStage" value="vegetative" />
+          </div>
+
+          <div id="farmToolsBody"></div>
+        </article>
+
 
         <div class="grid grid--2">
 
@@ -838,6 +861,7 @@
 <script src="js/vosk-stt.js?v=1"></script>
 <script src="js/voice-assistant.js?v=3"></script>
   <script src="js/mandi.js?v=1"></script>
+<script src="js/farm-tools.js?v=1"></script>
   <script src="js/profile-onboarding.js?v=1"></script>
 </body>
 </html>
