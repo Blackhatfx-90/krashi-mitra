@@ -6609,6 +6609,8 @@ function activeCrop() {
 
 /** Views ki heading — nav badalne par topbar bhi update hota hai. */
 const VIEW_META = {
+  home:     { title: 'कृषि मित्र',
+              sub: 'आपका खेती सहायक — जाँच, सलाह, मंडी भाव और मौसम' },
   crops:    { title: 'फसल चुनें',
               sub: 'Which is your crop? — चुनते ही उसी का मॉडल ��ोड होगा' },
   scan:     { title: 'नमस्ते, किसान भाई',
@@ -6692,10 +6694,12 @@ function formatDate(ts) {
  * ========================================================================= */
 
 function switchView(name) {
-  if (!VIEW_META[name]) name = 'crops';
+  if (!VIEW_META[name]) name = 'home';
 
-  // Fasal chune bina detection/handbook ka koi matlab nahi — crop screen par bhejo
-  if (!state.cropId && name !== 'crops' && name !== 'about') name = 'crops';
+  /* Fasal chune bina detection/handbook ka koi matlab nahi. Par dashboard,
+     madad aur fasal-chunav khud hamesha khule rehne chahiye. */
+  const noCropNeeded = ['home', 'crops', 'about'];
+  if (!state.cropId && noCropNeeded.indexOf(name) === -1) name = 'crops';
 
   $$('.view').forEach((v) => v.classList.toggle('is-active', v.id === 'view-' + name));
   $$('.nav__item').forEach((b) => b.classList.toggle('is-active', b.dataset.view === name));
@@ -6705,7 +6709,7 @@ function switchView(name) {
   const T = (key, fallback) =>
     (window.kmI18n && window.kmI18n.t(key) !== key) ? window.kmI18n.t(key) : fallback;
 
-  const TITLE_KEY = { crops:'head.chooseCrop', scan:'nav.scan', history:'head.history',
+  const TITLE_KEY = { home:'nav.home', crops:'head.chooseCrop', scan:'nav.scan', history:'head.history',
                       advisory:'head.advisory', handbook:'head.guide', about:'nav.about' };
 
   el.viewTitle.innerHTML    = TITLE_KEY[name]
@@ -9225,6 +9229,7 @@ async function selectCrop(cropId) {
 
   // Khaad ka hisaab aur salah har fasal ke liye alag hai
   if (window.kmFarmTools) window.kmFarmTools.render();
+  if (window.kmDashboard) window.kmDashboard.render();
 
   // Is fasal ke liye vibhag ki koi chetavni hai kya
   fetchAdvisories();
@@ -10949,8 +10954,9 @@ async function init() {
   renderBatchTray();
   registerServiceWorker();
 
-  // App hamesha CROP SELECTION screen se shuru hoti hai
-  switchView('crops');
+  /* Login ke baad ghar = DASHBOARD (pehle seedha "fasal chunein" khulta tha).
+     Fasal jaanch wahin se ek tap door hai. */
+  switchView('home');
   setStatus('फसल चुनें / Choose crop', 'loading');
 
   if (location.protocol === 'file:') {
