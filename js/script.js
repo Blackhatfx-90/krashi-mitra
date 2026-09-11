@@ -10869,7 +10869,13 @@ function deptProtocolHtml(a) {
         : '',
       p.cibrcRegNo ? '<p class="dept-reg">CIBRC पंजीकरण: ' + escapeHtml(p.cibrcRegNo) + '</p>' : '',
       p.notes ? '<p class="dept-note">' + escapeHtml(p.notes) + '</p>' : '',
-      '<p class="dept-by">दर्ज करने वाला: ', escapeHtml(p.updatedBy || '—'), '</p>',
+      /* Adhikari ki portal ID ab kisan tak nahi aati — wo uska login
+         username bhi hai, isliye use sarvajanik nahi bhejte. Par kisan ko
+         itna pata hona hi chahiye ki yeh matra APP ne nahi gadhi, vibhag
+         ne likhi hai. Wahi likhte hain. */
+      '<p class="dept-by">', escapeHtml(p.updatedBy
+        ? 'दर्ज करने वाला: ' + p.updatedBy
+        : 'कृषि विभाग द्वारा दर्ज — ऐप का अनुमान नहीं'), '</p>',
     '</div>',
   ].join('');
 }

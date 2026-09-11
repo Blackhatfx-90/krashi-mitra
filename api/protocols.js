@@ -42,14 +42,32 @@ module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
   try {
-    /* ---------------- GET: sabke liye khula ---------------------------- */
-    /* Kisan app ko bhi yahi list chahiye hoti hai, isliye padhna khula hai.
-       Isme koi niji jaankari nahi — sirf dawa aur matra. */
+    /* ---------------- GET ---------------------------------------------- */
+    /* Kisan app ko bhi yahi list chahiye, isliye padhna khula hai — par
+       POORI row khuli NAHI hai.
+       createdBy/updatedBy me adhikari ki PORTAL ID hoti hai, aur wahi uska
+       login username bhi hai (POST /api/admin?action=login me portalId +
+       password). Bina login ke poori row bhejne ka matlab tha: koi bhi
+       internet se `curl /api/protocols` chalakar saare adhikariyon ke
+       login ID utha le, yani password ka aadha kaam muft me. Isliye bahar
+       jaane wale jawab me wo do khane hata dete hain.
+       Adhikari ko (logged-in) poori row milti hai — use jawabdehi dekhni
+       hoti hai ki matra kisne likhi. */
     if (req.method === 'GET') {
       const all = await store.hashAll(KEY);
       const rows = Object.values(all).sort((a, b) =>
         String(a.crop || '').localeCompare(String(b.crop || '')));
-      return res.status(200).json({ ok: true, count: rows.length, protocols: rows });
+
+      let isAdmin = false;
+      try { isAdmin = Boolean(await adminFor(req)); }
+      catch (_) { isAdmin = false; }
+
+      const out = isAdmin ? rows : rows.map((r) => {
+        const { createdBy, updatedBy, ...safe } = r;
+        return safe;
+      });
+
+      return res.status(200).json({ ok: true, count: out.length, protocols: out });
     }
 
     /* Aage sab kuch sirf logged-in adhikari ke liye. Koi bhi internet se
