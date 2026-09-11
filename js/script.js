@@ -36,7 +36,18 @@
    │  → Sign up → API keys tab → key copy karke neeche paste kar dein.    │
    │  (Nayi key ko active hone me ~10-60 minute lagte hain.)              │
    └──────────────────────────────────────────────────────────────────────┘ */
-const WEATHER_API_KEY = "6835bc57b937f35fcd4f800fb8088ee0";
+/* ---------------------------------------------------------------------------
+ * Mausam ki API key YAHAN NAHI HAI — aur nahi honi chahiye.
+ *
+ * Pehle wo seedhe is file me likhi thi. Yeh file har browser me jaati hai
+ * (View Source me dikh jaati hai) aur GitHub par bhi padi rehti hai. Yani
+ * key kisi ki bhi ho jaati — bill hamara, aur quota khatam hone par KISAN
+ * ko mausam milna band.
+ *
+ * Ab wo sirf server par rehti hai (Vercel me OPENWEATHER_API_KEY), aur
+ * yeh file api/weather.js se poochti hai.
+ * ------------------------------------------------------------------------- */
+const WEATHER_PROXY = 'api/weather';
 
 
 const CONFIG = {
@@ -9702,10 +9713,12 @@ function clearManualPlace() {
   try { localStorage.removeItem(WEATHER_PLACE_KEY); } catch (_) {}
 }
 
-/** API key abhi tak paste nahi hui? */
-function weatherKeyMissing() {
-  return !WEATHER_API_KEY || WEATHER_API_KEY === 'PASTE_KEY_HERE' || WEATHER_API_KEY.length < 10;
-}
+/* Key ab server par hai, isliye yahan se pehle se pata nahi chal sakta ki
+   wo lagi hai ya nahi. Server 503 'not_configured' bhejta hai — hum wahi
+   yaad rakh lete hain aur mausam ka hissa chhupa dete hain. Baaki app
+   chalti rehti hai; wo waise bhi offline chalti hai. */
+let weatherNotConfigured = false;
+function weatherKeyMissing() { return weatherNotConfigured; }
 
 /** navigator.geolocation ko Promise me badalta hai. */
 function getPosition() {
@@ -9736,10 +9749,11 @@ async function geocodePlace(query) {
   const isPin = /^[1-9][0-9]{5}$/.test(q);          // Bharat ka PIN 6 ank ka hota hai
   const where = encodeURIComponent(q + ',' + WEATHER_CONFIG.COUNTRY);
   const url = isPin
-    ? WEATHER_CONFIG.ZIP_URL     + '?zip=' + where + '&appid=' + WEATHER_API_KEY
-    : WEATHER_CONFIG.GEOCODE_URL + '?q='   + where + '&limit=1&appid=' + WEATHER_API_KEY;
+    ? WEATHER_PROXY + '?op=zip&zip='   + where
+    : WEATHER_PROXY + '?op=geocode&q=' + where;
 
   const res = await fetch(url);
+  if (res.status === 503) { weatherNotConfigured = true; throw new Error('BAD_KEY'); }
   if (res.status === 401) throw new Error('BAD_KEY');
   if (res.status === 404) throw new Error('PLACE_NOT_FOUND');
   if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -9799,13 +9813,16 @@ function askForPlace() {
 
 /** OpenWeatherMap se current + forecast dono ek saath laata hai. */
 async function fetchWeatherData(lat, lon) {
-  const q = '?lat=' + lat + '&lon=' + lon + '&units=metric&lang=hi&appid=' + WEATHER_API_KEY;
+  const q = '&lat=' + lat + '&lon=' + lon;
 
   const [curRes, foreRes] = await Promise.all([
-    fetch(WEATHER_CONFIG.CURRENT_URL + q),
-    fetch(WEATHER_CONFIG.FORECAST_URL + q),
+    fetch(WEATHER_PROXY + '?op=current'  + q),
+    fetch(WEATHER_PROXY + '?op=forecast' + q),
   ]);
 
+  if (curRes.status === 503 || foreRes.status === 503) {
+    weatherNotConfigured = true; throw new Error('BAD_KEY');
+  }
   if (curRes.status === 401 || foreRes.status === 401) throw new Error('BAD_KEY');
   if (!curRes.ok)  throw new Error('HTTP ' + curRes.status);
   if (!foreRes.ok) throw new Error('HTTP ' + foreRes.status);
@@ -10139,15 +10156,22 @@ async function refreshWeather(opts) {
     return;
   }
 
-  /* 1) API key hai ya nahi */
+  /* 1) Server par key lagi hai ya nahi
+     Yeh sandesh KISAN padhta hai, isliye usse code ki baat nahi karte —
+     pehle yahan "js/script.js me key paste karein" likha tha, jo kisan ke
+     liye bilkul bematlab hai. Ab saaf-saaf itna ki mausam abhi nahi
+     dikhega, par app ka baaki kaam chalta rahega.
+     (Lagane wale ke liye asli hidayat neeche console me jaati hai.) */
   if (weatherKeyMissing()) {
+    console.warn('[weather] Server par OPENWEATHER_API_KEY set nahi hai. ' +
+                 'Vercel > Project > Settings > Environment Variables me daalein.');
     renderWeatherMessage(
-      'मौसम देखने के लिए OpenWeatherMap की मुफ़्त API key चाहिए। ' +
-      'js/script.js में सबसे ऊपर WEATHER_API_KEY = "PASTE_KEY_HERE" में अपनी key paste करें।',
+      'मौसम की सुविधा अभी चालू नहीं है। रोग पहचान, सलाह और पुरानी जाँचें ' +
+      'पहले की तरह चलती रहेंगी — उनके लिए इंटरनेट भी ज़रूरी नहीं।',
       {
         icon: 'key', retry: false,
-        en: 'Weather needs a free OpenWeatherMap API key. Paste your key into ' +
-            'WEATHER_API_KEY = "PASTE_KEY_HERE" near the top of js/script.js.',
+        en: 'Weather is not switched on yet. Disease detection, advice and ' +
+            'history keep working — they do not need the internet.',
       }
     );
     return;
