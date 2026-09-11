@@ -217,8 +217,22 @@ async function callGemini(apiKey, imageDataUrl, prompt) {
 }
 
 /* ------------------------------------------------------------------------- */
+const rateLimit = require('./_ratelimit');
+
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+
+  /* Yeh sabse mehnga raasta hai — har call ek vision model ko photo bhejta
+     hai. Asli kisan ek ghante me 10-20 jaanch karta hai; 40 kaafi khuli
+     seema hai. Ek hi gaon ke kai kisan ek hi network ke peeche ho sakte
+     hain, isliye tang nahi rakha.
+     GET (health check) par seema nahi — wo kuch kharch nahi karta. */
+  if (req.method === 'POST') {
+    const stop = await rateLimit.blocked(req, res, 'diagnose', 40, 3600,
+      'इस समय बहुत सारी जाँचें आ गई हैं। थोड़ी देर बाद कोशिश कीजिए — ' +
+      'फ़ोन पर होने वाली जाँच अभी भी चलती रहेगी।');
+    if (stop) return;
+  }
 
   const geminiKey = process.env.GEMINI_API_KEY;
   const apiKey = process.env.OPENROUTER_API_KEY;

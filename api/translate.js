@@ -140,8 +140,18 @@ async function translateCached(text, targetCode) {
 }
 
 /* HTTP se bhi bula sakte hain (admin dashboard preview ke liye) */
+const rateLimit = require('./_ratelimit');
+
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+
+  /* Anuvaad cache hota hai, isliye ek kisan ki app isse kam hi bulati hai.
+     100 ek ghante me — asli istemal me kabhi nahi chhuega. */
+  if (req.method === 'POST') {
+    const stop = await rateLimit.blocked(req, res, 'translate', 100, 3600);
+    if (stop) return;
+  }
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ ok:false, error:'method_not_allowed' });

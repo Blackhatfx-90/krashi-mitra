@@ -136,7 +136,15 @@ async function ask(model, apiKey, sys, question, referer) {
   }
 }
 
+const rateLimit = require('./_ratelimit');
+
 module.exports = async function handler(req, res) {
+  /* Sahayak se baat-cheet hoti hai, isliye seema thodi badi — 60 sawal
+     ek ghante me. Utne me koi bhi asli baat-cheet poori ho jaati hai. */
+  const stop = await rateLimit.blocked(req, res, 'ask', 60, 3600,
+    'अभी बहुत सारे सवाल आ गए हैं। थोड़ी देर बाद दोबारा पूछिए।');
+  if (stop) return;
+
   const q = req.method === 'POST' ? (req.body || {}) : (req.query || {});
   const query = String(q.q || '').trim();
   if (!query) return res.status(400).json({ message: 'Sawal khaali hai.' });
