@@ -4,10 +4,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ====================================================================
+       SEO — naam ki saari spelling
+       Log "Krishi Mitra" bhi likhte hain aur "Krashi Mitra" bhi. Hindi ka
+       कृषि angrezi me dono tarah likha jata hai, aur bolne wale ke hisab se
+       "Krushi", "Krashi", "Kris" bhi. Google in sabko ek naam nahi maanta
+       jab tak hum khud na batayein — isliye alternateName me sab gina diye
+       hain aur likhne me dono badi spelling rakhi hain.
+       ==================================================================== -->
+  <title>Krishi Mitra – AI Farming Assistant for Indian Farmers | Krashi Mitra</title>
   <meta name="description"
-    content="Krashi Mitra — Your smart AI companion for healthier crops. Detect diseases, get expert advice, monitor fields and increase crop productivity.">
+    content="Krishi Mitra (Krashi Mitra) is a free AI app for farmers across all India — detect crop disease from a leaf photo, get fertilizer advice, weather and mandi prices in Hindi. Works offline.">
+  <meta name="keywords"
+    content="Krishi Mitra, Krashi Mitra, Kris Mitra, Krishimitra, Krashimitra, Krishi Mitra AI, Krashi Mitra AI, Krishi Sathi Kisan, Krash Sathi Kisan, Krishi Mitra App, Krash Friend App, Krishi Mitra Kisan App, कृषि मित्र, किसान ऐप, फसल रोग पहचान, AI farming assistant India">
   <meta name="theme-color" content="#168A3A">
-  <title>Krashi Mitra — Your Smart AI Companion for Healthier Crops</title>
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://krashi-mitrasih.vercel.app/">
+
+  <!-- Ek hi site do bhashaon me — Google ko batana padta hai ki yeh
+       alag-alag page nahi, ek hi page hai -->
+  <link rel="alternate" hreflang="hi-IN" href="https://krashi-mitrasih.vercel.app/">
+  <link rel="alternate" hreflang="en-IN" href="https://krashi-mitrasih.vercel.app/">
+  <link rel="alternate" hreflang="x-default" href="https://krashi-mitrasih.vercel.app/">
+
+  <!-- WhatsApp/Facebook par link bhejne par kya dikhega -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Krishi Mitra">
+  <meta property="og:title" content="Krishi Mitra – AI Farming Assistant for Indian Farmers">
+  <meta property="og:description"
+    content="Free AI app for Indian farmers. Detect crop disease from a photo, get fertilizer advice, weather and mandi prices — in Hindi, and it works offline.">
+  <meta property="og:url" content="https://krashi-mitrasih.vercel.app/">
+  <meta property="og:image" content="https://krashi-mitrasih.vercel.app/assets/hero-farmer.png">
+  <meta property="og:image:alt" content="Krishi Mitra app being used by a farmer in a green field">
+  <meta property="og:locale" content="hi_IN">
+  <meta property="og:locale:alternate" content="en_IN">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Krishi Mitra – AI Farming Assistant for Indian Farmers">
+  <meta name="twitter:description"
+    content="Free AI app for Indian farmers. Crop disease from a photo, fertilizer advice, weather and mandi prices — in Hindi, works offline.">
+  <meta name="twitter:image" content="https://krashi-mitrasih.vercel.app/assets/hero-farmer.png">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,9 +52,110 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/onboarding-flow.css?v=1" />
   <link rel="stylesheet" href="css/landing-tour.css?v=1" />
   <link rel="stylesheet" href="css/gov-theme.css?v=2">
   <link rel="stylesheet" href="css/language-picker.css?v=2" />
+  <link rel="stylesheet" href="css/seo.css?v=1" />
+
+  <!-- ====================================================================
+       STRUCTURED DATA — Google ko machine-padhne laayak roop me
+       Yahan wahi likha hai jo app SACH ME karti hai. Jhoothi rating ya
+       jhootha "award" daalna aasan hai par wo spam maana jata hai aur
+       site ko peeche kar deta hai.
+       ==================================================================== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Krishi Mitra",
+    "alternateName": [
+      "Krashi Mitra", "Kris Mitra", "Krishimitra", "Krashimitra",
+      "Krishi Mitra AI", "Krashi Mitra AI", "Krishi Sathi Kisan",
+      "Krash Sathi Kisan", "Krishi Mitra App", "Krash Friend App",
+      "Krishi Mitra Kisan App", "\u0915\u0943\u0937\u093f \u092e\u093f\u0924\u094d\u0930"
+    ],
+    "applicationCategory": "AgricultureApplication",
+    "operatingSystem": "Android, iOS, Web",
+    "areaServed": { "@type": "Country", "name": "India" },
+    "description": "Krishi Mitra is an AI-powered assistant app for Indian farmers, offering crop disease detection from photos, fertilizer advice, weather warnings and mandi prices in regional languages. Crop disease detection works offline.",
+    "url": "https://krashi-mitrasih.vercel.app",
+    "inLanguage": ["hi", "en"],
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+    "featureList": [
+      "Crop disease detection from a leaf photo",
+      "Works offline after downloading crop models",
+      "Fertilizer calculator",
+      "Crop calendar with sowing-date reminders",
+      "District-level disease outbreak alerts",
+      "Weather warnings for spraying, frost and wind",
+      "Mandi prices",
+      "Farmer community",
+      "Voice support in Hindi and other Indian languages"
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Krishi Mitra",
+    "alternateName": ["Krashi Mitra", "Krishi Mitra App"],
+    "url": "https://krashi-mitrasih.vercel.app",
+    "inLanguage": ["hi", "en"]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Krishi Mitra?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Krishi Mitra (also written as Krashi Mitra) is a free AI-powered assistant app that helps Indian farmers detect crop diseases from photos, get fertilizer recommendations, and receive weather updates \u2014 all in their own language."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Krishi Mitra available in Hindi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Krishi Mitra works fully in Hindi and in other Indian languages including Bengali, Marathi, Telugu, Tamil, Gujarati, Kannada, Malayalam, Punjabi and Odia, with voice support that reads advice aloud."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Krishi Mitra free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Krishi Mitra is completely free. There is no subscription, no paid plan and no charge for any feature. Downloading the crop models uses your data once, after which disease detection runs on your phone without using data."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Krishi Mitra detect crop disease?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Farmers take or upload a photo of the affected leaf, and Krishi Mitra's AI analyses it to identify the disease and suggest treatment. The app first checks that the photo really shows a plant leaf of the selected crop, so an unrelated photo is not given a wrong disease name."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Krishi Mitra work offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Once you download your crop's model over Wi-Fi, disease detection, treatment advice, the fertilizer calculator, the crop calendar and voice readout all work with no internet at all. Only weather, mandi prices, the farmer community and the online second opinion need a network."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
@@ -108,8 +245,11 @@
     <section class="hero" id="hero">
       <div class="container">
         <div class="hero__content">
-          <h1 class="hero__title" data-ll="hero.title">आपकी फसल का साथी — रोग पहचानें, सही सलाह पाएँ</h1>
-          <p class="hero__description" data-ll="hero.desc">पत्ती की एक फोटो से रोग पहचानिए, इलाज की सलाह लीजिए, मौसम और मंडी भाव देखिए — ज़्यादातर काम बिना इंटरनेट के।</p>
+          <h1 class="hero__title" data-ll="hero.title">Krishi Mitra — आपकी फसल का साथी, रोग पहचानें और सही सलाह पाएँ</h1>
+          <p class="hero__description" data-ll="hero.desc">Krishi Mitra (कृषि मित्र) भारत भर के किसानों के लिए मुफ़्त AI ऐप है। पत्ती की एक फोटो से फसल का रोग पहचानिए, खाद और इलाज की सलाह लीजिए, मौसम की चेतावनी और मंडी भाव देखिए — ज़्यादातर काम बिना इंटरनेट के।</p>
+          <!-- Angrezi me ek line — dono bhasha ke khojne walon ke liye, aur
+               JS band ho to bhi crawler ko dono mil jayein -->
+          <p class="hero__description hero__description--en">Krishi Mitra (Krashi Mitra) is a free AI farming assistant for Indian farmers — detect crop disease from a leaf photo, get fertilizer advice, weather warnings and mandi prices, across all India.</p>
           <div class="hero__actions">
             <a href="/login" class="btn btn--primary btn--large" data-ll="cta.start">Get Started</a>
             <a href="#features" class="btn btn--secondary btn--large" data-ll="cta.learn">Learn More</a>
@@ -118,7 +258,7 @@
 
         <div class="hero__visual">
           <div class="hero__image-wrapper">
-            <img src="assets/hero-farmer.png" alt="Indian farmer using Krashi Mitra app in a green field"
+            <img src="assets/hero-farmer.png" alt="Indian farmer using the Krishi Mitra app in a green field"
               width="460" height="520">
           </div>
           <div class="hero__float-card" aria-hidden="true">
@@ -278,7 +418,7 @@
       <div class="container">
         <div class="ai-section__inner">
           <div class="ai-section__visual">
-            <img src="assets/phone-mockup.png" alt="Krashi Mitra app showing tomato leaf spot disease detection"
+            <img src="assets/phone-mockup.png" alt="Krishi Mitra app screen showing tomato leaf spot disease detected from a photo"
               width="400" height="460" loading="lazy">
           </div>
           <div class="ai-section__content">
@@ -291,6 +431,62 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ========== FAQ ==========
+         Yeh upar wale FAQPage schema ka DIKHNE WALA roop hai. Google ka
+         niyam saaf hai: jo schema me likha ho wo page par bhi dikhna
+         chahiye. Sirf schema daal kar page par na dikhana spam maana
+         jaata hai aur rich result band ho jata hai.
+         ===================================================================== -->
+    <section class="faq" id="faq" aria-labelledby="faq-h">
+      <div class="container">
+        <h2 class="faq__title" id="faq-h" data-ll="faq.title">आम सवाल</h2>
+        <p class="faq__sub" data-ll="faq.sub">Krishi Mitra (कृषि मित्र) के बारे में जो सबसे ज़्यादा पूछा जाता है</p>
+
+        <div class="faq__list">
+          <details class="faq__item">
+            <summary data-ll="faq.q1">Krishi Mitra क्या है?</summary>
+            <p data-ll="faq.a1">Krishi Mitra (जिसे Krashi Mitra भी लिखा जाता है) एक मुफ़्त AI ऐप है
+              जो भारत के किसानों की मदद करती है — पत्ती की फोटो से रोग पहचानना, खाद की सलाह,
+              और मौसम की चेतावनी — सब अपनी भाषा में।</p>
+          </details>
+
+          <details class="faq__item">
+            <summary data-ll="faq.q2">क्या Krishi Mitra हिंदी में है?</summary>
+            <p data-ll="faq.a2">हाँ। Krishi Mitra पूरी तरह हिंदी में चलती है, और बंगाली, मराठी, तेलुगु,
+              तमिल, गुजराती, कन्नड़, मलयालम, पंजाबी व ओड़िया में भी। सलाह बोलकर भी सुनाई जाती है,
+              ताकि पढ़ना न आता हो तो भी काम चले।</p>
+          </details>
+
+          <details class="faq__item">
+            <summary data-ll="faq.q3">क्या Krishi Mitra मुफ़्त है?</summary>
+            <p data-ll="faq.a3">हाँ, पूरी तरह मुफ़्त। कोई शुल्क नहीं, कोई सदस्यता नहीं, किसी सुविधा
+              के लिए पैसे नहीं। मॉडल एक बार डाउनलोड करने में डेटा लगता है — उसके बाद जाँच आपके
+              फ़ोन पर ही होती है और डेटा नहीं लगता।</p>
+          </details>
+
+          <details class="faq__item">
+            <summary data-ll="faq.q4">Krishi Mitra रोग कैसे पहचानती है?</summary>
+            <p data-ll="faq.a4">किसान प्रभावित पत्ती की फोटो खींचता या चुनता है, और Krishi Mitra का AI
+              उसे देखकर रोग बताता है और इलाज सुझाता है। ऐप पहले यह जाँचती है कि फोटो सच में उसी
+              फसल की पत्ती की है — ताकि किसी और फोटो पर गलत रोग का नाम न आ जाए।</p>
+          </details>
+
+          <details class="faq__item">
+            <summary data-ll="faq.q5">क्या Krishi Mitra बिना इंटरनेट चलती है?</summary>
+            <p data-ll="faq.a5">हाँ। एक बार वाई-फ़ाई पर अपनी फसल का मॉडल उतार लें, फिर रोग की जाँच,
+              इलाज की सलाह, खाद का हिसाब, फसल कैलेंडर और आवाज़ — सब बिना इंटरनेट चलते हैं। सिर्फ़
+              मौसम, मंडी भाव, किसान चौपाल और ऑनलाइन दूसरी राय के लिए नेटवर्क चाहिए।</p>
+          </details>
+        </div>
+
+        <p class="faq__more">
+          <a href="/guide/crop-disease-detection" data-ll="faq.more1">रोग पहचान कैसे काम करती है →</a>
+          <a href="/guide/fertilizer-advice" data-ll="faq.more2">खाद की सलाह कैसे बनती है →</a>
+          <a href="/guide/hindi-voice-assistant" data-ll="faq.more3">हिंदी आवाज़ सहायक →</a>
+        </p>
       </div>
     </section>
   </main>
@@ -386,6 +582,7 @@
 <script src="js/i18n.js?v=1"></script>
 <script src="js/landing.js"></script>
 <script src="js/landing-lang.js?v=2"></script>
+<script src="js/onboarding-flow.js?v=1"></script>
 <script src="js/landing-tour.js?v=3"></script>
 <div class="gov-disclaimer">
   <div class="gov-disclaimer__in" data-ll="disclaimer">
