@@ -64,8 +64,8 @@ export default function EarlyWarningRadar({ onOpenBroadcastModal, currentLanguag
             </h2>
             <p className="text-xs text-gray-500 mt-1">
               {hi
-                ? 'किसानों की ऐप से आई असली जाँचों से बने समूह — 14 दिन में एक ही ज़िले में एक ही रोग की 3 या ज़्यादा जाँचें।'
-                : 'Built from real farmer scans — 3+ reports of the same disease in the same district within 14 days.'}
+                ? 'किसानों की ऐप से आई असली जाँचों से बने समूह — 14 दिन में एक ही ज़िले में एक ही रोग की रिपोर्ट करने वाले 3 या ज़्यादा अलग-अलग किसान। एक ही किसान की बार-बार की जाँच एक ही गिनी जाती है।'
+                : 'Built from real farmer scans — 3+ distinct farmers reporting the same disease in one district within 14 days. Repeat scans by one farmer count once.'}
             </p>
           </div>
 
@@ -145,13 +145,24 @@ export default function EarlyWarningRadar({ onOpenBroadcastModal, currentLanguag
                     <p className="text-[11px] text-gray-500">{c.cropNameHi || c.crop}</p>
                   </div>
 
+                  {/* KISAN ki ginti bada number hai, jaanch ki nahi. Ek hi
+                      kisan 10 baar photo khinche to wo prakop nahi hai —
+                      failav kitne KHETON me hai, wahi maayne rakhta hai.
+                      Jaanch ki ginti chhoti karke neeche, kyunki
+                      "3 kisan / 20 jaanch" aur "3 kisan / 3 jaanch" do alag
+                      haalat hain. */}
                   <div className="text-right shrink-0">
                     <span className={`text-lg font-black ${critical ? 'text-red-700' : 'text-amber-700'}`}>
-                      {c.scanCount}
+                      {c.farmerCount ?? c.scanCount}
                     </span>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                      {hi ? 'जाँचें' : 'reports'}
+                      {hi ? 'किसान' : 'farmers'}
                     </p>
+                    {c.scanCount !== undefined && c.scanCount !== c.farmerCount && (
+                      <p className="text-[10px] text-gray-400">
+                        {c.scanCount}{hi ? ' जाँचें' : ' scans'}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -171,6 +182,13 @@ export default function EarlyWarningRadar({ onOpenBroadcastModal, currentLanguag
                     {hi ? 'आख़िरी रिपोर्ट: ' : 'Last report: '}{since(c.lastReportedAt)}
                   </p>
                 </div>
+
+                {c.confirmed && (
+                  <p className="text-[11px] font-bold text-green-700">
+                    {hi ? '✓ विभाग ने इनमें से कुछ जाँचें ख़ुद सत्यापित की हैं'
+                        : '✓ Some of these were verified by the department'}
+                  </p>
+                )}
 
                 {critical && (
                   <div className="p-2.5 bg-red-50 rounded-xl border border-red-200 text-[11px] text-red-900 flex gap-2">
