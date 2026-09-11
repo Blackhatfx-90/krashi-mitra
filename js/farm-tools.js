@@ -19,6 +19,18 @@
 (function () {
   'use strict';
 
+  /* Kisan ne khud avastha dabayi hai ya nahi. Dabayi ho to calendar use
+     nahi badalta — warna uska chuna hua button apne aap wapas kood jata. */
+  let stagePicked = false;
+
+  /* setSowing ki wajah Hindi me — kisan ko English reason nahi dikhani */
+  function sowErrHi(reason) {
+    if (/aane wali/.test(reason)) return 'आगे की तारीख़ नहीं चलेगी — बुवाई हो चुकी तारीख़ लिखें।';
+    if (/purani/.test(reason))    return 'तारीख़ बहुत पुरानी है — साल देख लें।';
+    if (/ped par/.test(reason))   return 'पेड़ में बुवाई की तारीख़ नहीं चलती।';
+    return 'तारीख़ ठीक नहीं लगी — फिर लिखें।';
+  }
+
   /* ---------------------------------------------------------------------
    * 1. POSHAK TATVA KI ZAROORAT (kg prati acre)
    *    Ye wahi aankde hain jo lib/fertilizer.js (server) me hain.
@@ -180,6 +192,88 @@
    * ------------------------------------------------------------------- */
   const el = {};
 
+  /* ---------------------------------------------------------------------
+   * FASAL KA CALENDAR (js/calendar.js se)
+   *
+   * Pehle kisan khud avastha chunta tha. Ab buvai ki tareekh bharne par
+   * avastha khud nikalti hai aur agla kaam apni tareekh ke saath dikhta hai.
+   * Tareekh na bhari ho to sirf poochte hain — baki salah phir bhi chalti
+   * rehti hai, kuch band nahi hota.
+   * ------------------------------------------------------------------- */
+  function calendarHtml(cropId) {
+    if (!window.kmCalendar) return '';
+    const p = window.kmCalendar.plan(cropId);
+    if (!p) return '';
+
+    /* Ped — buvai ki tareekh ka sawal hi nahi */
+    if (p.perennial) {
+      return '<div class="ft-block ft-cal">' +
+        '<h3>' + ico('sprout', 'ic ic--xs') + ' साल भर के काम</h3>' +
+        '<p class="ft-cal-note">' + esc(p.hi + ' पेड़ है — इसमें बुवाई की तारीख़ नहीं चलती, ' +
+          'महीने से काम तय होते हैं।') + '</p>' +
+        taskListHtml(cropId, p) + '</div>';
+    }
+
+    if (p.needsSowing) {
+      return '<div class="ft-block ft-cal">' +
+        '<h3>' + ico('sprout', 'ic ic--xs') + ' फसल का कैलेंडर</h3>' +
+        '<p class="ft-cal-note">' + esc('बुवाई की तारीख़ लिखें — फिर हर काम अपनी ' +
+          'तारीख़ के साथ यहाँ दिखेगा और समय पर याद भी आएगा।') + '</p>' +
+        sowInputHtml(cropId, '') + '</div>';
+    }
+
+    const late = p.late.length;
+    return '<div class="ft-block ft-cal">' +
+      '<h3>' + ico('sprout', 'ic ic--xs') + ' फसल का कैलेंडर</h3>' +
+
+      '<div class="ft-cal-top">' +
+        '<div><b>' + p.das + '</b><span>' + esc('दिन की फसल') + '</span></div>' +
+        '<div><b>' + esc(p.stageHi) + '</b><span>' + esc('अवस्था') + '</span></div>' +
+      '</div>' +
+      '<div class="ft-cal-bar"><i style="width:' + p.progress + '%"></i></div>' +
+
+      (p.next
+        ? '<p class="ft-cal-next">' + ico('clock', 'ic ic--xs') + ' <span>' +
+            esc('अगला काम: ' + p.next.hi) + ' — <b>' +
+            (p.next.inDays <= 0 ? 'आज' : p.next.inDays + ' दिन में') + '</b> (' +
+            esc(p.next.dueText) + ')</span></p>'
+        : '<p class="ft-cal-next">' + esc('इस फसल के सारे काम निपट गए।') + '</p>') +
+
+      (late
+        ? '<p class="ft-cal-late">' + ico('alert', 'ic ic--xs') + ' ' +
+            esc(late + ' ज़रूरी काम छूट गया' + (late > 1 ? 'े' : '') +
+                ' — अभी भी कर सकें तो कर लें।') + '</p>'
+        : '') +
+
+      taskListHtml(cropId, p) +
+      sowInputHtml(cropId, p.sowing) +
+    '</div>';
+  }
+
+  function taskListHtml(cropId, p) {
+    return '<ul class="ft-cal-tasks">' + p.tasks.map((x) =>
+      '<li class="ft-cal-task' + (x.done ? ' is-done' : '') +
+          ' ft-cal-task--' + x.when + '">' +
+        '<button type="button" class="ft-cal-tick" data-cal-task="' + esc(x.id) + '" ' +
+          'aria-pressed="' + (x.done ? 'true' : 'false') + '" ' +
+          'title="' + esc(x.done ? 'हो गया' : 'निशान लगाएँ') + '">' +
+          (x.done ? '✓' : '') + '</button>' +
+        '<span class="ft-cal-task__txt">' + esc(x.hi) +
+          (x.must ? '<em class="ft-cal-must">' + esc('ज़रूरी') + '</em>' : '') + '</span>' +
+        '<span class="ft-cal-task__when">' + esc(x.dueText) + '</span>' +
+      '</li>').join('') + '</ul>';
+  }
+
+  function sowInputHtml(cropId, value) {
+    return '<div class="ft-cal-sow">' +
+      '<label>' + esc('बुवाई की तारीख़') +
+        '<input type="date" id="ftSowDate" value="' + esc(value || '') + '"></label>' +
+      (value ? '<button type="button" class="ft-cal-clear" id="ftSowClear">' +
+                 esc('हटाएँ') + '</button>' : '') +
+      '<p class="ft-cal-err" id="ftSowErr" hidden></p>' +
+    '</div>';
+  }
+
   function render() {
     if (!el.body) return;
     const st = appState();
@@ -195,9 +289,22 @@
     const unit = (el.unit && el.unit.value) || 'acre';
     const f = calcFertilizer(cropId, size, unit);
     const tips = TIPS[cropId] || TIPS.rice;
-    const stage = (el.stage && el.stage.value) || 'vegetative';
+
+    /* Avastha ab andaaze se nahi. Kisan ne buvai ki tareekh bhar di ho to
+       calendar se aati hai; usne khud koi avastha dabayi ho to wahi chalti
+       hai (uska khet hai, uski baat upar). */
+    let stage = el.stage && el.stage.value;
+    if (!stagePicked && window.kmCalendar) {
+      const cp = window.kmCalendar.plan(cropId);
+      if (cp && cp.stage) stage = cp.stage;
+    }
+    if (!stage) stage = 'vegetative';
+    if (el.stage) el.stage.value = stage;
 
     el.body.innerHTML = [
+      /* ---- fasal ka calendar ---- */
+      calendarHtml(cropId),
+
       /* ---- khaad ---- */
       '<div class="ft-block">',
         '<h3>', ico('leaf','ic ic--xs'), ' खाद कितनी डालें</h3>',
@@ -254,8 +361,39 @@
     ].join('');
 
     el.body.querySelectorAll('.ft-stage').forEach((b) => {
-      b.addEventListener('click', () => { el.stage.value = b.dataset.stage; render(); });
+      b.addEventListener('click', () => {
+        el.stage.value = b.dataset.stage;
+        stagePicked = true;              // ab calendar iske upar na chale
+        render();
+      });
     });
+
+    /* ---- calendar ke buttons ---- */
+    const sow = el.body.querySelector('#ftSowDate');
+    if (sow) sow.addEventListener('change', () => {
+      const r = window.kmCalendar.setSowing(cropId, sow.value);
+      const err = el.body.querySelector('#ftSowErr');
+      if (!r.ok) {
+        if (err) { err.textContent = sowErrHi(r.reason); err.hidden = false; }
+        return;
+      }
+      stagePicked = false;               // nayi tareekh par avastha phir calendar se
+      render();
+    });
+
+    const clr = el.body.querySelector('#ftSowClear');
+    if (clr) clr.addEventListener('click', () => {
+      window.kmCalendar.clearSowing(cropId);
+      stagePicked = false;
+      render();
+    });
+
+    el.body.querySelectorAll('[data-cal-task]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const on = b.getAttribute('aria-pressed') === 'true';
+        window.kmCalendar.markDone(cropId, b.dataset.calTask, !on);
+        render();
+      }));
   }
 
   function init() {

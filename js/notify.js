@@ -175,6 +175,15 @@
     return { kulAaye: out.length, kataarMeLage: out.filter((r) => r.queued).length };
   }
 
+  /* Digest ki pehchaan — usme padi soochnaon se banti hai, ghadi se nahi.
+     Kram badalne se id na badle, isliye sort karte hain. */
+  function digestKey(items) {
+    return items.map((x) => String(x.id || x.title || ''))
+                .sort()
+                .join('|')
+                .slice(0, 200);
+  }
+
   /* ---------------------------------------------------------------------
    * Kataar se ek soochna bhejna — saari seemaayein yahan lagti hain
    * ------------------------------------------------------------------- */
@@ -206,7 +215,17 @@
 
     if (sameCat.length >= DIGEST_AFTER) {
       toSend = {
-        id: head.category + ':digest:' + now(),
+        /* Id me ghadi ka time NAHI — usme jo soochnaayein hain, unhi ki id
+           se banti hai.
+           Pehle yahan now() tha. Uska matlab: wahi purani chetavniyan har
+           baar nayi id le leti thi, aur js/alerts.js ka "ek hi cheez dobara
+           mat bajao" wala pehra kabhi lagta hi nahi tha. Kisan din me paanch
+           baar app kholta (ya paanch jaanch karta) to wahi ola-chetavni
+           paanch baar bajti. Uske baad wo ghanti band kar deta — aur us din
+           asli chetavni bhi nahi sunta.
+           Ab wahi soochnaayein = wahi id = ek hi baar. Nayi jud jaye to id
+           badal jaati hai aur ghanti phir se bajti hai. */
+        id: head.category + ':digest:' + digestKey(sameCat),
         category: head.category,
         severity: head.severity,
         title: sameCat.length + ' नई ' + cat.hi,
