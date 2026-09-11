@@ -92,6 +92,47 @@
     }).join('') + '</ul>';
   }
 
+  /* ---------- jile ka prakop ----------
+     Yeh vibhag ki soochna se alag hai — yeh khud kisano ki jaanch se bana
+     hai. Isliye "X kisano ke khet me mila" likhte hain, taaki bharosa
+     bane ki yeh kisi ne likh kar nahi bheja, aankdo se aaya hai. */
+  function outbreakHtml() {
+    if (!window.kmOutbreak) return '';
+    const inf = window.kmOutbreak.info();
+
+    if (!inf.district) {
+      return '<p class="dash-empty">' + esc(t('ob.noDistrict',
+        'जिला भरने पर आपके जिले में फैल रहे रोग यहाँ दिखेंगे।')) + '</p>';
+    }
+    const rows = window.kmOutbreak.list();
+    if (!rows.length) {
+      return '<p class="dash-empty">' + esc(t('ob.none',
+        'आपके जिले में अभी कोई रोग फैलता नहीं दिख रहा — अच्छी बात है।')) + '</p>';
+    }
+
+    const when = inf.updatedAt ? new Date(inf.updatedAt).toLocaleDateString('en-IN',
+      { day: 'numeric', month: 'short' }) : '';
+
+    return '<ul class="dash-news">' + rows.slice(0, 5).map((o) => {
+      const cls = o.severity === 'critical' ? 'critical'
+                : o.severity === 'warning' ? 'warning' : 'info';
+      const fasal = o.cropNameHi || o.crop;
+      const rog = o.diseaseHi || o.diseaseEn || o.label;
+      return '<li class="dash-news__item dash-news__item--' + cls + '">' +
+        '<span class="dash-news__ic">' + ico(cls === 'info' ? 'info' : 'alert') + '</span>' +
+        '<div><p class="dash-news__title">' + esc(fasal + ' — ' + rog) + '</p>' +
+        '<p class="dash-news__msg">' + esc(o.levelHi + ' · ' + o.farmerCount + ' किसानों के खेत में' +
+          (o.villageCount > 1 ? ', ' + o.villageCount + ' गाँव' : '')) + '</p>' +
+        '<p class="dash-news__meta">' + esc(o.district +
+          (o.confirmed ? ' · ' + t('ob.confirmed', 'विभाग ने जाँच की') : '')) +
+        '</p></div></li>';
+    }).join('') + '</ul>' +
+    (inf.purani
+      ? '<p class="dash-note">' + esc(t('ob.stale', 'यह जानकारी पुरानी है') +
+          (when ? ' (' + when + ')' : '')) + '</p>'
+      : '');
+  }
+
   /* ---------- 3. sarkari portal ---------- */
   function portalsHtml() {
     return '<div class="dash-portals">' + PORTALS.map((p) =>
@@ -187,6 +228,9 @@
 
       '<section class="dash-sec"><h3>', ico('broadcast', 'ic ic--xs'), ' ',
         esc(t('dash.news', 'कृषि विभाग की सूचना')), '</h3>', newsHtml(), '</section>',
+
+      '<section class="dash-sec"><h3>', ico('alert', 'ic ic--xs'), ' ',
+        esc(t('dash.outbreak', 'आपके जिले में फैल रहा रोग')), '</h3>', outbreakHtml(), '</section>',
 
       '<section class="dash-sec"><h3>', ico('globe', 'ic ic--xs'), ' ',
         esc(t('dash.portals', 'सरकारी पोर्टल')), '</h3>', portalsHtml(),
@@ -345,6 +389,9 @@
     window.addEventListener('km:language', render);
     window.addEventListener('km:profile-ready', refresh);
   }
+
+  /* Prakop baad me aata hai (6 sec ke baad) — aane par section bhar do */
+  window.addEventListener('km:outbreaks', () => { if (D.el.body) render(); });
 
   window.kmDashboard = { refresh, render, PORTALS };
 
