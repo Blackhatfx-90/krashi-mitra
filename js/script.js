@@ -8676,6 +8676,12 @@ function buildAdvisoryHtml(label, opts) {
           bullets(a.organic),
         '</div>',
 
+        /* Krishi vibhag ne khud koi matra darj ki ho to wo SABSE UPAR —
+           app ki apni built-in matra se pehle. Wo ek zimmedar adhikari ne
+           CIBRC label dekh kar likhi hai; hamari built-in list saamanya
+           margdarshan hai. Dono me farq ho to adhikari ki chalegi. */
+        deptProtocolHtml(a),
+
         '<div class="adv__block">',
           '<h4>रासायनिक उपचार / Chemical</h4>',
           '<span class="tagline tagline--chemical">मात्रा लगभग / प्रति लीटर पानी</span>',
@@ -10689,10 +10695,79 @@ async function fetchAdvisories() {
 
     /* Card dikhana kaafi nahi — phone jeb me ho to wo kabhi nahi dikhta.
        Isliye nayi chetavni par ghanti + kampan + notification bhi. */
-    if (window.kmAlerts) window.kmAlerts.alertMany(state.advisories);
+    if (window.kmNotify) window.kmNotify.pushMany(state.advisories, 'broadcast');
+    else if (window.kmAlerts) window.kmAlerts.alertMany(state.advisories);
+
+    /* Vibhag ki darj ki hui dawa/matra bhi saath me utaar lete hain. */
+    fetchProtocols();
   } catch (err) {
     console.warn('[advisory] nahi mili:', err.message);
   }
+}
+
+/* ---------------------------------------------------------------------------
+ * KRISHI VIBHAG KI DARJ MATRA (CIBRC protocol)
+ *
+ * Adhikari dashboard se dawa aur matra darj karta hai (/api/protocols).
+ * Wo yahan aakar salah ke upar dikhti hai. Bina iske adhikari ka likha
+ * hua kahin nahi pahunchta — wo sirf database me pada rehta.
+ *
+ * Offline: aakhri baar utari hui list localStorage me rehti hai, isliye
+ * khet me net na ho tab bhi wahi matra dikhti hai jo aakhri baar mili thi.
+ * ------------------------------------------------------------------------- */
+const PROTOCOL_KEY = 'km.protocols.v1';
+
+function loadProtocols() {
+  try { return JSON.parse(localStorage.getItem(PROTOCOL_KEY) || '[]'); }
+  catch (_) { return []; }
+}
+
+async function fetchProtocols() {
+  if (!navigator.onLine) return;
+  try {
+    const res = await fetch('api/protocols', { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || !data.ok || !Array.isArray(data.protocols)) return;
+    localStorage.setItem(PROTOCOL_KEY, JSON.stringify(data.protocols));
+  } catch (_) { /* net gaya — purani list chalti rahegi */ }
+}
+
+/* Rog ka naam alag-alag tarike se likha ja sakta hai, isliye dono taraf
+   se dhoondhte hain — Hindi naam bhi, angrezi bhi. */
+function protocolFor(a) {
+  const rows = loadProtocols();
+  if (!rows.length || !a) return null;
+  const crop = String(state.cropId || '').toLowerCase();
+  const hi = String(a.nameHi || '').toLowerCase();
+  const en = String(a.nameEn || '').toLowerCase();
+
+  return rows.find((r) => {
+    if (crop && String(r.crop || '').toLowerCase() !== crop) return false;
+    const rd = String(r.disease || '').toLowerCase();
+    const re = String(r.diseaseEn || '').toLowerCase();
+    return (rd && (rd === hi || hi.indexOf(rd) !== -1 || rd.indexOf(hi) !== -1)) ||
+           (re && en && (re === en || en.indexOf(re) !== -1 || re.indexOf(en) !== -1));
+  }) || null;
+}
+
+function deptProtocolHtml(a) {
+  const p = protocolFor(a);
+  if (!p) return '';
+  return [
+    '<div class="adv__block adv__block--dept">',
+      '<h4>', icon('shield', 'ic ic--xs'), ' कृषि विभाग की दर्ज मात्रा</h4>',
+      p.chemical ? '<p class="dept-chem">' + escapeHtml(p.chemical) + '</p>' : '',
+      '<p class="dept-dose"><strong>', escapeHtml(p.dose), '</strong></p>',
+      p.waitingPeriodDays
+        ? '<p class="dept-wait">छिड़काव के बाद <strong>' + escapeHtml(String(p.waitingPeriodDays)) +
+          ' दिन</strong> तक फसल न तोड़ें।</p>'
+        : '',
+      p.cibrcRegNo ? '<p class="dept-reg">CIBRC पंजीकरण: ' + escapeHtml(p.cibrcRegNo) + '</p>' : '',
+      p.notes ? '<p class="dept-note">' + escapeHtml(p.notes) + '</p>' : '',
+      '<p class="dept-by">दर्ज करने वाला: ', escapeHtml(p.updatedBy || '—'), '</p>',
+    '</div>',
+  ].join('');
 }
 
 function renderAdvisoryAlert() {

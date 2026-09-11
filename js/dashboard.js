@@ -116,6 +116,7 @@
       row(t('prof.land', 'ज़मीन'), p.landAmount ? (p.landAmount + ' ' + (p.landUnit || 'acre')) : '') +
       row(t('prof.lang', 'भाषा'), (window.kmLang && window.kmLang.current().native) || '') +
       alertRowHtml() +
+      notifyRowsHtml() +
       '<div class="dash-pactions">' +
         '<button type="button" class="btn btn--ghost btn--sm" id="dashEditProfile">' +
           esc(t('prof.edit', 'जानकारी बदलें')) + '</button>' +
@@ -146,6 +147,31 @@
         esc(on ? t('alert.test', 'बजाकर देखें') : t('alert.on', 'चालू करें')) +
         '</button>') +
       '</div>';
+  }
+
+  /* ---------- kaunsi soochna chahiye ----------
+     Ghanti chalu hai to hi ye dikhate hain — warna bematlab hai. Kisan
+     samudaay ke jawab band kar sakta hai par vibhag ki chetavni nahi;
+     wo 'badlaJaSakta:false' hoti hai, uska switch hum dikhate hi nahi. */
+  function notifyRowsHtml() {
+    if (!window.kmNotify || !window.kmAlerts) return '';
+    const st = window.kmAlerts.status();
+    if (!st.on || st.permission !== 'granted') return '';
+
+    const rows = window.kmNotify.status().shreniyan.filter((c) => c.badlaJaSakta);
+    if (!rows.length) return '';
+
+    return '<div class="dash-prow dash-prow--sub"><span>' +
+      esc(t('notify.pick', 'कौन-सी सूचना चाहिए')) +
+      '<small>' + esc(t('notify.note',
+        'एक घंटे में ' + window.kmNotify._limits.MAX_PER_HOUR +
+        ' से ज़्यादा सूचना नहीं आएगी')) + '</small></span></div>' +
+      rows.map((c) =>
+        '<div class="dash-prow"><span>' + esc(c.naam) + '</span>' +
+        '<button type="button" class="btn btn--ghost btn--sm" ' +
+          'data-notif-cat="' + esc(c.id) + '" aria-pressed="' + (c.chaalu ? 'true' : 'false') + '">' +
+          esc(c.chaalu ? t('notify.on', 'चालू') : t('notify.off', 'बंद')) +
+        '</button></div>').join('');
   }
 
   /* ---------- poora dashboard ---------- */
@@ -189,6 +215,14 @@
       await window.kmAlerts.enable();
       render();
     });
+
+    host.querySelectorAll('[data-notif-cat]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const cat = b.dataset.notifCat;
+        const off = b.getAttribute('aria-pressed') === 'true';
+        window.kmNotify.setCategory(cat, off ? false : true);
+        render();
+      }));
 
     const out = host.querySelector('#dashLogout');
     if (out) out.addEventListener('click', logout);
@@ -292,7 +326,9 @@
       if (!r.ok) return;
       const d = await r.json();
       D.news = (d && d.advisories) || d.rows || [];
-      if (window.kmAlerts) window.kmAlerts.alertMany(D.news);
+      /* Seedhi ghanti nahi — soochna seva se, taaki ek saath 6 na bajein */
+      if (window.kmNotify) window.kmNotify.pushMany(D.news, 'broadcast');
+      else if (window.kmAlerts) window.kmAlerts.alertMany(D.news);
     } catch (_) { /* offline */ }
   }
 

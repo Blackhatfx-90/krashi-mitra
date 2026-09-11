@@ -153,6 +153,28 @@
     return { queued: true, id: id };
   }
 
+
+  /**
+   * Ek saath aayi list (jaise vibhag ki saari advisories) kataar me lagao.
+   * Bhejna kataar tay karegi — yahan saari ek-saath nahi bajengi.
+   */
+  function pushMany(list, category) {
+    const cat = category || 'broadcast';
+    const out = [];
+    (Array.isArray(list) ? list : []).forEach((a) => {
+      if (!a) return;
+      out.push(push({
+        id: a.id || a._id || a.key,
+        category: cat,
+        severity: a.severity || a.level || 'warning',
+        title: a.title || a.heading || a.crop || CATEGORIES[cat].hi,
+        body: a.body || a.message || a.text || a.advice || '',
+        url: a.url || '',
+      }));
+    });
+    return { kulAaye: out.length, kataarMeLage: out.filter((r) => r.queued).length };
+  }
+
   /* ---------------------------------------------------------------------
    * Kataar se ek soochna bhejna — saari seemaayein yahan lagti hain
    * ------------------------------------------------------------------- */
@@ -257,7 +279,7 @@
   });
 
   window.kmNotify = {
-    push, drain, status, setCategory, prefs, isMuted,
+    push, pushMany, drain, status, setCategory, prefs, isMuted,
     clearQueue, resetLimits, start, stop,
     CATEGORIES: CATEGORIES,
     _limits: { MAX_PER_HOUR, MIN_GAP_MS, DIGEST_AFTER },
