@@ -26,15 +26,20 @@
   'use strict';
 
   /* ┌──────────────────────────────────────────────────────────────────────┐
-     │  APNI data.gov.in API KEY YAHAN PASTE KAREIN                         │
+     │  API KEY YAHAN NAHI AATI — aur nahi aani chahiye.                    │
      │                                                                      │
-     │  Free key: https://data.gov.in  ->  Sign Up  ->  My Account          │
-     │            ->  "API Key" copy karke neeche paste kar dein.           │
+     │  Pehle yahan "apni key paste karein" likha tha. Yeh file har         │
+     │  browser me jaati hai (View Source me dikhti hai) aur GitHub par     │
+     │  bhi padi rehti hai — yani paste karte hi key sabki ho jaati.        │
+     │  Mausam wali key ke saath theek yahi ho chuka tha.                   │
      │                                                                      │
-     │  Key na daalne par app tootegi NAHI — card sirf yeh likh dega ki     │
-     │  key daal dein.                                                      │
+     │  Ab key sirf server par rehti hai:                                   │
+     │     Vercel -> Project -> Settings -> Environment Variables           │
+     │     DATAGOV_API_KEY = <data.gov.in se mili free key>                 │
+     │                                                                      │
+     │  Yeh file api/mandi.js se poochti hai.                               │
      └──────────────────────────────────────────────────────────────────────┘ */
-  const DATAGOV_API_KEY = "PASTE_DATAGOV_KEY_HERE";
+  const MANDI_PROXY = 'api/mandi';
 
 
   const CFG = {
@@ -158,11 +163,10 @@
     try { localStorage.setItem(key, JSON.stringify(val)); } catch (_) {}
   }
 
-  function keyMissing() {
-    return !DATAGOV_API_KEY ||
-           DATAGOV_API_KEY === 'PASTE_DATAGOV_KEY_HERE' ||
-           DATAGOV_API_KEY.length < 10;
-  }
+  /* Key ab server par hai, isliye yahan se pehle se pata nahi chal sakta.
+     Server 503 'not_configured' bhejta hai — wahi yaad rakh lete hain. */
+  let notConfigured = false;
+  function keyMissing() { return notConfigured; }
 
 
   /* ==========================================================================
@@ -255,13 +259,13 @@
     if (!names.length) throw new Error('CROP_NOT_MAPPED');
 
     for (const commodity of names) {
-      const url = CFG.BASE_URL + CFG.RESOURCE_ID +
-        '?api-key=' + encodeURIComponent(DATAGOV_API_KEY) +
-        '&format=json&limit=' + CFG.ROW_LIMIT +
-        '&filters%5Bstate%5D=' + encodeURIComponent(stateName) +
-        '&filters%5Bcommodity%5D=' + encodeURIComponent(commodity);
+      const url = MANDI_PROXY +
+        '?state=' + encodeURIComponent(stateName) +
+        '&commodity=' + encodeURIComponent(commodity) +
+        '&limit=' + CFG.ROW_LIMIT;
 
       const res = await fetch(url);
+      if (res.status === 503) { notConfigured = true; throw new Error('BAD_KEY'); }
       if (res.status === 401 || res.status === 403) throw new Error('BAD_KEY');
       if (!res.ok) throw new Error('HTTP ' + res.status);
 
@@ -312,10 +316,15 @@
     if (!cropId) { renderMsg('pehle fasal chunein'); return; }
 
     if (keyMissing()) {
+      /* Yeh sandesh KISAN padhta hai — usse code ki baat karna bematlab
+         hai. Pehle yahan "js/mandi.js me key paste karein" likha tha.
+         Lagane wale ke liye asli hidayat console me jaati hai. */
+      console.warn('[mandi] Server par DATAGOV_API_KEY set nahi hai. ' +
+                   'Vercel > Project > Settings > Environment Variables me daalein.');
       renderMsg('key', {
-        hi: 'मंडी भाव देखने के लिए data.gov.in की मुफ़्त API key चाहिए। ' +
-            'js/mandi.js में सबसे ऊपर DATAGOV_API_KEY में अपनी key paste करें।',
-        en: 'Mandi prices need a free data.gov.in API key. Paste it into DATAGOV_API_KEY at the top of js/mandi.js.',
+        hi: 'मंडी भाव की सुविधा अभी चालू नहीं है। बाकी ऐप — रोग पहचान, ' +
+            'सलाह और मौसम — पहले की तरह चलती रहेगी।',
+        en: 'Mandi prices are not switched on yet. The rest of the app keeps working.',
         icon: 'key', retry: false,
       });
       return;
