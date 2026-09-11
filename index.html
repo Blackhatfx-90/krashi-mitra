@@ -94,11 +94,11 @@
 
     <!-- Mobile Menu -->
     <nav class="navbar__mobile-menu" id="navbar-mobile-menu" role="navigation" aria-label="Mobile navigation">
-      <a href="#hero">Home</a>
-      <a href="#features">Features</a>
-      <a href="#how-it-works">How It Works</a>
-      <a href="#about">About Us</a>
-      <a href="#contact">Contact</a>
+      <a href="#hero" data-ll="nav.home">Home</a>
+      <a href="#features" data-ll="nav.features">Features</a>
+      <a href="#how-it-works" data-ll="nav.how">How It Works</a>
+      <a href="#about" data-ll="nav.about">About Us</a>
+      <a href="#contact" data-ll="nav.contact">Contact</a>
       <a href="/login" class="btn btn--primary btn--full" data-ll="cta.start">Get Started</a>
     </nav>
   </header>
@@ -130,8 +130,8 @@
               </svg>
             </div>
             <div class="hero__float-card__text">
-              <span class="hero__float-card__label">AI Analysis</span>
-              <span class="hero__float-card__value">Healthy Crop</span>
+              <span class="hero__float-card__label" data-ll="float.label">AI Analysis</span>
+              <span class="hero__float-card__value" data-ll="float.value">Healthy Crop</span>
             </div>
           </div>
         </div>
@@ -151,8 +151,8 @@
             </svg>
           </div>
           <div class="trust-bar__content">
-            <h4>AI Powered</h4>
-            <p>Advanced AI models for accurate detection</p>
+            <h4 data-ll="trust.ai.title">AI Powered</h4>
+            <p data-ll="trust.ai.desc">Advanced AI models for accurate detection</p>
           </div>
         </div>
 
@@ -165,8 +165,8 @@
             </svg>
           </div>
           <div class="trust-bar__content">
-            <h4>Instant Results</h4>
-            <p>Get real-time results and solutions</p>
+            <h4 data-ll="trust.instant.title">Instant Results</h4>
+            <p data-ll="trust.instant.desc">Get real-time results and solutions</p>
           </div>
         </div>
 
@@ -181,8 +181,8 @@
             </svg>
           </div>
           <div class="trust-bar__content">
-            <h4>Expert Advice</h4>
-            <p>Personalized advisory for your crops</p>
+            <h4 data-ll="trust.expert.title">Expert Advice</h4>
+            <p data-ll="trust.expert.desc">Personalized advisory for your crops</p>
           </div>
         </div>
 
@@ -195,8 +195,8 @@
             </svg>
           </div>
           <div class="trust-bar__content">
-            <h4>Better Yields</h4>
-            <p>Improve productivity and profitability</p>
+            <h4 data-ll="trust.yield.title">Better Yields</h4>
+            <p data-ll="trust.yield.desc">Improve productivity and profitability</p>
           </div>
         </div>
       </div>
@@ -212,8 +212,8 @@
           </svg>
         </div>
         <div class="section-heading">
-          <h2>Powerful features for modern farmers</h2>
-          <p>Everything you need to protect your crops and grow better.</p>
+          <h2 data-ll="feat.heading">Powerful features for modern farmers</h2>
+          <p data-ll="feat.subheading">Everything you need to protect your crops and grow better.</p>
         </div>
 
         <div class="features__grid">
@@ -226,8 +226,8 @@
                 <circle cx="12" cy="13" r="4" />
               </svg>
             </div>
-            <h3>Scan & Detect</h3>
-            <p>Upload image of affected plant part and detect diseases or pests.</p>
+            <h3 data-ll="feat.scan.title">Scan & Detect</h3>
+            <p data-ll="feat.scan.desc">Upload image of affected plant part and detect diseases or pests.</p>
           </article>
 
           <!-- Feature 2 -->
@@ -240,8 +240,8 @@
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
             </div>
-            <h3>Smart Advisory</h3>
-            <p>Get AI-powered recommendations and treatment solutions.</p>
+            <h3 data-ll="feat.advisory.title">Smart Advisory</h3>
+            <p data-ll="feat.advisory.desc">Get AI-powered recommendations and treatment solutions.</p>
           </article>
 
           <!-- Feature 3 -->
@@ -254,8 +254,8 @@
                 <line x1="9" y1="21" x2="9" y2="9" />
               </svg>
             </div>
-            <h3>Field Monitoring</h3>
-            <p>Monitor your fields, keep records and track crop health.</p>
+            <h3 data-ll="feat.monitor.title">Field Monitoring</h3>
+            <p data-ll="feat.monitor.desc">Monitor your fields, keep records and track crop health.</p>
           </article>
 
           <!-- Feature 4 -->
@@ -266,8 +266,8 @@
                 <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
               </svg>
             </div>
-            <h3>Weather & Alerts</h3>
-            <p>Stay updated with weather forecast and important alerts.</p>
+            <h3 data-ll="feat.weather.title">Weather & Alerts</h3>
+            <p data-ll="feat.weather.desc">Stay updated with weather forecast and important alerts.</p>
           </article>
         </div>
       </div>
@@ -282,8 +282,8 @@
               width="400" height="460" loading="lazy">
           </div>
           <div class="ai-section__content">
-            <h2>AI that understands your crops</h2>
-            <p>Our advanced AI analyzes images and data to provide accurate insights and actionable advice in your
+            <h2 data-ll="ai.heading">AI that understands your crops</h2>
+            <p data-ll="ai.desc">Our advanced AI analyzes images and data to provide accurate insights and actionable advice in your
               language.</p>
             <a href="/login" class="btn btn--primary btn--large" data-ll="cta.free">Try Now for Free</a>
             <div class="ai-section__plant" aria-hidden="true">
@@ -304,7 +304,7 @@
             <img src="assets/logo-icon.png" alt="" width="32" height="32">
             <span>Krashi Mitra</span>
           </div>
-          <p>Your smart AI companion for healthier crops.</p>
+          <p data-ll="footer.tagline">Your smart AI companion for healthier crops.</p>
           <div class="footer__social" aria-label="Social media links">
             <!-- Twitter / X -->
             <a href="#" aria-label="Follow us on Twitter">
@@ -338,35 +338,35 @@
         </div>
 
         <div class="footer__column">
-          <h4>Product</h4>
+          <h4 data-ll="footer.product">Product</h4>
           <ul>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#features">Pricing</a></li>
+            <li><a href="#features" data-ll="footer.features">Features</a></li>
+            <li><a href="#how-it-works" data-ll="footer.howworks">How It Works</a></li>
+            <li><a href="#features" data-ll="footer.pricing">Pricing</a></li>
           </ul>
         </div>
 
         <div class="footer__column">
-          <h4>Resources</h4>
+          <h4 data-ll="footer.resources">Resources</h4>
           <ul>
-            <li><a href="/app.html#handbook">Crop Guide</a></li>
-            <li><a href="/app.html#handbook">Pest Library</a></li>
-            <li><a href="#about">Blog</a></li>
+            <li><a href="/app.html#handbook" data-ll="footer.cropguide">Crop Guide</a></li>
+            <li><a href="/app.html#handbook" data-ll="footer.pestlib">Pest Library</a></li>
+            <li><a href="#about" data-ll="footer.blog">Blog</a></li>
           </ul>
         </div>
 
         <div class="footer__column">
-          <h4>Company</h4>
+          <h4 data-ll="footer.company">Company</h4>
           <ul>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="#about" data-ll="footer.about">About Us</a></li>
+            <li><a href="#contact" data-ll="footer.contact">Contact</a></li>
+            <li><a href="privacy.html" data-ll="footer.privacy">Privacy Policy</a></li>
           </ul>
         </div>
       </div>
 
       <div class="footer__bottom">
-        <p>© 2026 Krashi Mitra. All rights reserved.</p>
+        <p data-ll="footer.copy">© 2026 Krashi Mitra. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -388,7 +388,7 @@
 <script src="js/landing-lang.js?v=1"></script>
 <script src="js/landing-tour.js?v=3"></script>
 <div class="gov-disclaimer">
-  <div class="gov-disclaimer__in">
+  <div class="gov-disclaimer__in" data-ll="disclaimer">
     <strong>ज़रूरी सूचना:</strong>
     कृषि मित्र एक <strong>स्वतंत्र विद्यार्थी परियोजना</strong> है (Smart India Hackathon)।
     यह भारत सरकार या किसी सरकारी विभाग का आधिकारिक ऐप <strong>नहीं</strong> है और
