@@ -47,6 +47,17 @@ module.exports = async function handler(req, res) {
         rows = rows.filter((a) => a.issuedAt > since);
       }
 
+      /* Rajya aur mandal ka nishana. 'all' ya khali = sabke liye. */
+      const state = clean(q.state, 60).toLowerCase();
+      if (state) {
+        rows = rows.filter((a) => !a.state || a.state.toLowerCase() === state);
+      }
+      const division = clean(q.division, 80).toLowerCase();
+      if (division) {
+        rows = rows.filter((a) => !a.division || a.division === 'all' ||
+                                  a.division.toLowerCase() === division);
+      }
+
       /* ---- Kisan ki apni bhasha me ----------------------------------------
        * App ?lang=ta-IN bhejti hai. Admin ne Hindi me likha hota hai, isliye
        * yahan anuvaad karke bhejte hain. Sirf sabse nayi 3 chetavni ka
@@ -55,6 +66,14 @@ module.exports = async function handler(req, res) {
        * Anuvaad na ho paye to ASLI Hindi text hi jaata hai (translated:false)
        * — kisan ko adhoora anuvaad dene se behtar hai sahi Hindi dena. */
       const lang = clean(q.lang, 10);
+
+      /* Agar chetavni sirf kuch bhashaon ke kisano ke liye hai to baaki ko
+         mat dikhao. languages khali ho to wo sabke liye hai. */
+      if (lang) {
+        rows = rows.filter((a) => !Array.isArray(a.languages) || !a.languages.length ||
+                                  a.languages.indexOf(lang) !== -1);
+      }
+
       if (lang && lang !== 'hi-IN' && rows.length) {
         try {
           const { translateCached } = require('./translate');
@@ -115,7 +134,15 @@ module.exports = async function handler(req, res) {
         crop: clean(body.crop, 40).toLowerCase() || 'all',
         cropNameHi: clean(body.cropNameHi, 60),
         district: clean(body.district, 80) || 'all',
+        division: clean(body.division, 80) || 'all',
         state: clean(body.state, 60),
+        /* Kis bhasha ke kisano ko bhejni hai. Khali = sabko.
+           Ye "kis bhasha me likhi hai" nahi hai — wo hamesha Hindi hai aur
+           kisan ki app apni bhasha me anuvaad maang leti hai. Ye "kis
+           samuday tak pahunchani hai" hai, jaise Bodo ilaake ki soochna. */
+        languages: Array.isArray(body.languages)
+          ? body.languages.map(l => clean(l, 10)).filter(Boolean).slice(0, 24)
+          : [],
         severity: clean(body.severity, 20) || 'info',   // info | warning | critical
         titleHi: clean(body.titleHi, 160) || 'कृषि विभाग की सलाह',
         messageHi: messageHi,

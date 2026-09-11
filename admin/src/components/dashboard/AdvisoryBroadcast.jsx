@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { broadcastAdvisory } from '../../lib/api';
+import { useState, useEffect } from 'react';
+import { broadcastAdvisory, fetchAdminSession } from '../../lib/api';
 import { 
   Send, 
   Globe2, 
@@ -20,11 +20,34 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
   const [targetDivision, setTargetDivision] = useState('all');
   const [targetCrop, setTargetCrop] = useState(ADVISORY_TEMPLATES[0].crop);
   const [langTab, setLangTab] = useState('hi'); // hi, en
-  const [channels, setChannels] = useState({
-    push: true,
-    sms: true,
-    ivrs: false
-  });
+  /* SMS aur IVRS ka koi gateway abhi juda NAHI hai. Pehle ye dono checkbox
+     tick ho jate the aur "Broadcast" dabane par kuch nahi jata tha —
+     adhikari maan leta ki gaon me SMS chala gaya. Ab sirf wahi raasta
+     dikhta hai jo sach me chalta hai. */
+  const [channels, setChannels] = useState({ push: true });
+
+  /* Kisne bheji — jawabdehi ke liye asli session se, gaddi hue naam se nahi. */
+  const [admin, setAdmin] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetchAdminSession().then(a => { if (alive && a && a.authenticated) setAdmin(a); });
+    return () => { alive = false; };
+  }, []);
+
+  /* Kis bhasha ke kisano tak — kuch na chuno to sabko jaayegi. */
+  const LANGS = [
+    ['hi-IN','हिन्दी'],['mr-IN','मराठी'],['bn-IN','বাংলা'],['ta-IN','தமிழ்'],
+    ['te-IN','తెలుగు'],['gu-IN','ગુજરાતી'],['pa-IN','ਪੰਜਾਬੀ'],['kn-IN','ಕನ್ನಡ'],
+    ['ml-IN','മലയാളം'],['or-IN','ଓଡ଼ିଆ'],['ur-IN','اردو'],['en-IN','English'],
+  ];
+  const [targetLangs, setTargetLangs] = useState([]);
+  const toggleLang = (code) => setTargetLangs(l =>
+    l.indexOf(code) >= 0 ? l.filter(x => x !== code) : l.concat(code));
+
+  /* CIBRC anumodan ka dava adhikari khud karta hai — pehle ye code me
+     hamesha `true` jata tha, yani ek jhootha sarkari thappa. Kisan isi
+     thappe ke bharose dawa khareedta hai. */
+  const [cibrc, setCibrc] = useState(false);
   const [customText, setCustomText] = useState(ADVISORY_TEMPLATES[0].bodyHi);
   const [isSending, setIsSending] = useState(false);
   const [broadcastDone, setBroadcastDone] = useState(false);
@@ -53,13 +76,15 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
       crop: targetCrop || 'all',
       cropNameHi: selectedTemplate.cropNameHi || '',
       district: targetDivision === 'all' ? 'all' : targetDivision,
+      division: targetDivision || 'all',
+      languages: targetLangs,
       severity: selectedTemplate.severity || 'warning',
       titleHi: selectedTemplate.titleHi || selectedTemplate.title || 'कृषि विभाग की सलाह',
       messageHi: langTab === 'hi' ? customText : (selectedTemplate.bodyHi || customText),
       messageEn: langTab === 'en' ? customText : (selectedTemplate.bodyEn || ''),
       chemical: selectedTemplate.chemical || '',
-      cibrcApproved: true,
-      issuedBy: 'Dr. A. K. Gangwar (Joint Director Agriculture)',
+      cibrcApproved: cibrc,
+      issuedBy: (admin && admin.portalId) ? ('पोर्टल आईडी ' + admin.portalId) : '',
     });
 
     if (!res || !res.ok) console.warn('[advisory] kisan app tak nahi pahunchi:', res && res.error);
@@ -248,7 +273,7 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
             />
           </div>
 
-          {/* Delivery Channels Checklist */}
+          {/* Kis raste se jayegi — sirf wahi jo sach me juda hai */}
           <div className="space-y-1.5">
             <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">
               Dissemination Channels
@@ -261,36 +286,59 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
                   onChange={(e) => setChannels({ ...channels, push: e.target.checked })}
                   className="rounded text-green-600 focus:ring-green-500 w-4 h-4"
                 />
-                <span>Krishi Mitra App Push Alert</span>
+                <span>Krashi Mitra ऐप — घंटी, कंपन व नोटिफ़िकेशन</span>
               </label>
 
-              <label className="flex items-center gap-2 text-xs font-semibold text-gray-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={channels.sms}
-                  onChange={(e) => setChannels({ ...channels, sms: e.target.checked })}
-                  className="rounded text-green-600 focus:ring-green-500 w-4 h-4"
-                />
-                <span>Kisan SMS Gateway</span>
-              </label>
-
-              <label className="flex items-center gap-2 text-xs font-semibold text-gray-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={channels.ivrs}
-                  onChange={(e) => setChannels({ ...channels, ivrs: e.target.checked })}
-                  className="rounded text-green-600 focus:ring-green-500 w-4 h-4"
-                />
-                <span>Voice Call Alert (IVRS)</span>
-              </label>
+              <span className="text-[11px] text-gray-400 font-medium">
+                SMS गेटवे और IVRS अभी नहीं जुड़े हैं — जुड़ते ही यहाँ दिखेंगे।
+              </span>
             </div>
           </div>
+
+          {/* Bhasha ka nishana */}
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">
+              किन भाषाओं के किसानों को (कुछ न चुनें = सभी को)
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {LANGS.map(([code, label]) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => toggleLang(code)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
+                    targetLangs.indexOf(code) >= 0
+                      ? 'bg-green-600 text-white border-green-600'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-green-400'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* CIBRC ka thappa — adhikari khud lagata hai */}
+          <label className="flex items-start gap-2 text-xs text-gray-700 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={cibrc}
+              onChange={(e) => setCibrc(e.target.checked)}
+              className="rounded text-green-600 focus:ring-green-500 w-4 h-4 mt-0.5"
+            />
+            <span>
+              <b>इस सलाह में बताई गई दवा CIBRC अनुमोदित है</b>
+              <span className="block text-[11px] text-gray-500">
+                किसान की ऐप में यह मुहर दिखेगी। बिना पुष्टि के न लगाएँ — किसान इसी भरोसे पर दवा ख़रीदता है।
+              </span>
+            </span>
+          </label>
 
           {/* Dispatch Button */}
           <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
               <ShieldCheck className="w-4 h-4 text-green-600" />
-              <span>Signed by UP Plant Protection Officer</span>
+              <span>{admin && admin.portalId ? 'भेजने वाला: ' + admin.portalId : 'लॉगिन सत्र नहीं मिला'}</span>
             </div>
 
             <button

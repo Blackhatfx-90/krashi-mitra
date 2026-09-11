@@ -21,7 +21,8 @@ export default function AdminNavbar({
   setCurrentLanguage,
   onOpenRequisitionModal,
   onOpenBroadcastModal,
-  onLogout
+  onLogout,
+  admin
 }) {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showDivMenu, setShowDivMenu] = useState(false);
@@ -222,9 +223,11 @@ export default function AdminNavbar({
               <div className="w-8 h-8 rounded-lg bg-green-700 text-white flex items-center justify-center font-bold text-xs shadow-xs">
                 {activeState.code}
               </div>
+              {/* Naam demo data se aata hai; PORTAL ID asli session se —
+                  yahi ek cheez hai jo pakka sach hai ki kaun logged in hai. */}
               <div className="hidden xl:block">
                 <p className="text-xs font-bold text-gray-900 leading-tight truncate max-w-[130px]">{activeState.officer.name}</p>
-                <p className="text-[10px] text-gray-500">{activeState.officer.id}</p>
+                <p className="text-[10px] text-gray-500">{(admin && admin.portalId) || activeState.officer.id}</p>
               </div>
               <ChevronDown className="w-3 h-3 text-gray-400" />
             </button>
@@ -235,6 +238,12 @@ export default function AdminNavbar({
                   <p className="text-xs font-bold text-gray-900">{activeState.officer.name}</p>
                   <p className="text-[11px] text-gray-500">{activeState.officer.designation}</p>
                   <p className="text-[10px] text-green-700 font-semibold mt-0.5">{activeState.officer.universityLab}</p>
+                  {admin && admin.portalId && (
+                    <p className="text-[10px] text-gray-600 mt-1">
+                      पोर्टल आईडी: <span className="font-mono font-bold">{admin.portalId}</span>
+                      {admin.role ? ' · ' + admin.role : ''}
+                    </p>
+                  )}
                 </div>
                 
                 <button

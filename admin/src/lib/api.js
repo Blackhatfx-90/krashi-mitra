@@ -95,3 +95,48 @@ export function scanToQueueItem(scan) {
     suggestedAction: 'किसान को दिखाई गई सलाह ऐप में पहले से है — यहाँ से पुष्टि या लैब रेफ़र करें।',
   };
 }
+
+/* ---------------------------------------------------------------------------
+ * ASLI AANKDE — /api/stats
+ *
+ * Dashboard ke bade number pehle src/data/*.js me haath se likhe hue the.
+ * Wo har baar wahi dikhte the, chahe kisi kisan ne aaj ek bhi jaanch bheji
+ * ho ya nahi. Sarkari faisla jhoothe number par nahi hona chahiye.
+ *
+ * Jo number hamare paas sach me nahi hai (khasra/cadastral rakba, bachai
+ * gayi fasal ka rupaya) wo `null` aata hai — shoonya nahi — aur uske saath
+ * `unavailable` me kaaran likha hota hai. UI wahan "—" dikhata hai.
+ * ------------------------------------------------------------------------- */
+export async function fetchStats() {
+  try {
+    const res = await fetch(BASE + '/stats', { cache: 'no-store', credentials: 'same-origin' });
+    if (res.status === 401) return { ok: false, error: 'login' };
+    if (!res.ok) return { ok: false, error: 'server' };
+    return await res.json();
+  } catch (err) {
+    console.warn('[api] stats nahi mile:', err.message);
+    return { ok: false, error: 'network' };
+  }
+}
+
+/* Adhikari ka apna khata — kaun logged in hai. */
+export async function fetchAdminSession() {
+  try {
+    const res = await fetch(BASE + '/admin?action=session', {
+      cache: 'no-store', credentials: 'same-origin',
+    });
+    if (!res.ok) return { authenticated: false };
+    return await res.json();
+  } catch (_) {
+    return { authenticated: false };
+  }
+}
+
+export async function adminLogout() {
+  try {
+    await fetch(BASE + '/admin?action=logout', { method: 'POST', credentials: 'same-origin' });
+    return { ok: true };
+  } catch (_) {
+    return { ok: false };
+  }
+}

@@ -32,6 +32,7 @@ import AdvisoryBroadcast from '../../components/dashboard/AdvisoryBroadcast';
 import RegionalAnalytics from '../../components/dashboard/RegionalAnalytics';
 import RequisitionModal from '../../components/ui/RequisitionModal';
 import { getStateData } from '../../data/multiStateAgriData';
+import { fetchStats, fetchAdminSession, adminLogout } from '../../lib/api';
 
 export default function RegionalAdminDashboard({ 
   authStateId = 'uttar_pradesh', 
@@ -49,7 +50,50 @@ export default function RegionalAdminDashboard({
   }, [authStateId]);
 
   const activeState = getStateData(selectedStateId);
-  const metrics = activeState.metrics;
+
+  /* --------------------------------------------------------------------
+   * ASLI AANKDE
+   * Pehle yahan `activeState.metrics` tha — ek JS file me haath se likhe
+   * hue number, jo har baar wahi dikhte the. Ab /api/stats se aate hain,
+   * jo kisan ki bheji hui asli jaanchon se gine jate hain.
+   *
+   * Jo number hamare paas hai hi nahi (khasra rakba, bachai gayi fasal ka
+   * rupaya) wo null aata hai aur UI me "—" dikhta hai, jhootha number
+   * nahi. Har 60 second me taaza hota hai.
+   * ------------------------------------------------------------------ */
+  const [stats, setStats] = useState(null);
+  const [statsState, setStatsState] = useState('loading'); // loading|ok|login|error
+  const [admin, setAdmin] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      const d = await fetchStats();
+      if (!alive) return;
+      if (d && d.ok) { setStats(d); setStatsState('ok'); }
+      else setStatsState(d && d.error === 'login' ? 'login' : 'error');
+    };
+    load();
+    const timer = setInterval(load, 60000);
+    return () => { alive = false; clearInterval(timer); };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    fetchAdminSession().then((s) => { if (alive && s && s.authenticated) setAdmin(s); });
+    return () => { alive = false; };
+  }, []);
+
+  const handleLogout = async () => {
+    await adminLogout();
+    if (onLogout) onLogout();
+    else window.location.href = '/admin-portal/';
+  };
+
+  const m = (stats && stats.metrics) || {};
+  /* null/undefined ko "—" dikhao. 0 ek asli jawab hai — usse chhupao mat. */
+  const show = (v) => (v === null || v === undefined ? '—' : v.toLocaleString('en-IN'));
+  const why = (key) => (stats && stats.unavailable && stats.unavailable[key]) || '';
 
   // Drawer & Modal States
   const [inspectingCluster, setInspectingCluster] = useState(null);
@@ -85,7 +129,8 @@ export default function RegionalAdminDashboard({
         setActiveView={setActiveView}
         onOpenRequisitionModal={() => openRequisition(null)}
         onOpenBroadcastModal={() => setActiveView('advisory')}
-        onLogout={onLogout}
+        admin={admin}
+        onLogout={handleLogout}
       />
 
       <div className="flex-1 flex">
@@ -98,6 +143,7 @@ export default function RegionalAdminDashboard({
           isOpen={sidebarOpen}
           setIsOpen={setSidebarOpen}
           currentLanguage={currentLanguage}
+          stats={stats}
         />
 
         {/* Main Content Area */}
@@ -118,11 +164,22 @@ export default function RegionalAdminDashboard({
             </span>
           </div>
 
-          {/* Top Executive Summary Metric Strip */}
+          {/* Top Executive Summary Metric Strip — ab asli aankde (/api/stats) */}
+          {statsState === 'login' && (
+            <div className="agri-card p-3 text-xs font-semibold text-amber-800 bg-amber-50 border-amber-200">
+              सत्र समाप्त हो गया है। आँकड़े देखने के लिए दोबारा लॉगिन कीजिए।
+            </div>
+          )}
+          {statsState === 'error' && (
+            <div className="agri-card p-3 text-xs font-semibold text-gray-600">
+              आँकड़े अभी नहीं आ पाए — सर्वर से संपर्क नहीं हुआ। एक मिनट में अपने आप दोबारा कोशिश होगी।
+            </div>
+          )}
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            
-            {/* Outbreak Hotspots Card */}
-            <div 
+
+            {/* 1. Outbreak clusters — ek hi zile me ek hi rog ki >=3 jaanchein */}
+            <div
               onClick={() => setActiveView('map')}
               className={`agri-card p-3.5 cursor-pointer transition-all ${
                 activeView === 'map' ? 'ring-2 ring-red-500 bg-red-50/15' : 'hover:border-red-300'
@@ -130,49 +187,50 @@ export default function RegionalAdminDashboard({
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                  Outbreak Hotspots
+                  Outbreak Clusters
                 </span>
-                <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
+                {m.criticalClusters > 0 && (
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
+                )}
               </div>
               <div className="flex items-baseline gap-2 mt-1.5">
                 <span className="text-2xl font-extrabold text-red-600">
-                  {metrics.activeOutbreakClusters}
+                  {show(m.activeClusters)}
                 </span>
                 <span className="text-xs font-bold text-red-800">
-                  ({metrics.criticalRedAlerts} Red Alerts)
+                  ({show(m.criticalClusters)} गंभीर)
                 </span>
               </div>
-              <p className="text-[11px] text-gray-500 mt-1 truncate">
-                {metrics.activeAffectedAreaHa.toLocaleString()} Ha under infestation in {activeState.code}
+              <p className="text-[11px] text-gray-500 mt-1">
+                {statsState === 'ok' && !m.activeClusters
+                  ? 'अभी कोई क्लस्टर नहीं — यह अच्छी ख़बर है'
+                  : '14 दिन में एक ही ज़िले, एक ही रोग की 3+ जाँचें'}
               </p>
             </div>
 
-            {/* Farm Cadastral Plots Geofenced */}
-            <div 
-              onClick={() => setActiveView('map')}
-              className="agri-card p-3.5 cursor-pointer transition-all hover:border-green-400 bg-gradient-to-br from-white to-green-50/30"
+            {/* 2. Farm parcels — cadastral layer abhi judi nahi hai */}
+            <div
+              className="agri-card p-3.5 bg-gradient-to-br from-white to-gray-50/40"
+              title={why('farmParcels')}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-green-800 uppercase tracking-wider">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                   Farm Parcels (खेत)
                 </span>
-                <Satellite className="w-3.5 h-3.5 text-blue-600" />
+                <Satellite className="w-3.5 h-3.5 text-gray-400" />
               </div>
               <div className="flex items-baseline gap-2 mt-1.5">
-                <span className="text-2xl font-extrabold text-green-700">
-                  {activeState.farmPlots?.length || 0}
-                </span>
-                <span className="text-xs font-bold text-green-800">
-                  Cadastral Polygons
+                <span className="text-2xl font-extrabold text-gray-400">
+                  {show(m.farmParcels)}
                 </span>
               </div>
-              <p className="text-[11px] text-green-700 font-medium mt-1">
-                Satellite Verified & Monitored
+              <p className="text-[11px] text-gray-500 mt-1 line-clamp-2">
+                {why('farmParcels') || 'खसरा/कैडस्ट्रल परत अभी नहीं जुड़ी है।'}
               </p>
             </div>
 
-            {/* Field Verifications Pending */}
-            <div 
+            {/* 3. Pending verifications — asli ginti, asli intezaar */}
+            <div
               onClick={() => setActiveView('validation')}
               className={`agri-card p-3.5 cursor-pointer transition-all ${
                 activeView === 'validation' ? 'ring-2 ring-blue-500 bg-blue-50/15' : 'hover:border-blue-300'
@@ -186,19 +244,24 @@ export default function RegionalAdminDashboard({
               </div>
               <div className="flex items-baseline gap-2 mt-1.5">
                 <span className="text-2xl font-extrabold text-blue-600">
-                  {metrics.pendingLabVerifications}
+                  {show(m.pendingScans)}
                 </span>
-                <span className="text-xs font-semibold text-blue-800">
-                  Farmer Scans
-                </span>
+                <span className="text-xs font-semibold text-blue-800">किसान जाँचें</span>
               </div>
               <p className="text-[11px] text-gray-500 mt-1">
-                Avg SLA: {metrics.averageResponseTimeHours} hrs response
+                {statsState !== 'ok'
+                  ? 'आँकड़े आ रहे हैं…'
+                  : m.slaHours === null || m.slaHours === undefined
+                    ? 'कोई जाँच प्रतीक्षा में नहीं'
+                    : 'औसत प्रतीक्षा: ' + m.slaHours + ' घंटे'}
               </p>
             </div>
 
-            {/* Crop Loss Prevented */}
-            <div 
+            {/* 4. Aaj ki jaanchein — pehle yahan "Crop Loss Prevented ₹ crore"
+                   tha. Wo ek aarthik anumaan hai jiske liye rakba, upaj aur
+                   mandi bhav chahiye — teenon nahi hain. Isliye uski jagah
+                   ek number jo SACH me pata hai. */}
+            <div
               onClick={() => setActiveView('analytics')}
               className={`agri-card p-3.5 cursor-pointer transition-all ${
                 activeView === 'analytics' ? 'ring-2 ring-green-600 bg-green-50/15' : 'hover:border-green-300'
@@ -206,18 +269,20 @@ export default function RegionalAdminDashboard({
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                  Crop Loss Prevented
+                  जाँचें (7 दिन)
                 </span>
                 <span className="w-2.5 h-2.5 rounded-full bg-green-600"></span>
               </div>
-              <div className="flex items-baseline gap-1 mt-1.5">
+              <div className="flex items-baseline gap-2 mt-1.5">
                 <span className="text-2xl font-extrabold text-green-700">
-                  ₹{metrics.cropLossPreventedCrores}
+                  {show(m.scans7d)}
                 </span>
-                <span className="text-xs font-bold text-green-800">Crores</span>
+                <span className="text-xs font-bold text-green-800">
+                  {show(m.scans24h)} आज
+                </span>
               </div>
-              <p className="text-[11px] text-green-700 font-semibold mt-1 truncate">
-                {metrics.targetedPesticideReductionPercent}% chemical reduction in {activeState.code}
+              <p className="text-[11px] text-green-700 font-semibold mt-1">
+                कुल {show(m.totalScans)} · सत्यापित {show(m.verifiedScans)}
               </p>
             </div>
 

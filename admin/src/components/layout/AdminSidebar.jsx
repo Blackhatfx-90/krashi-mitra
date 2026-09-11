@@ -16,9 +16,16 @@ export default function AdminSidebar({
   setActiveView, 
   isOpen, 
   setIsOpen,
-  currentLanguage 
+  currentLanguage,
+  stats
 }) {
-  const metrics = activeState.metrics;
+  /* Sidebar ke badge pehle demo data se aate the — "8 Plots", "28",
+     "₹450 Cr" — chahe database khali ho. Ab wahi number jo dashboard ke
+     upar wale card dikhate hain (/api/stats). Jo pata nahi, uska badge
+     hi nahi dikhta — galat number dikhane se behtar hai kuch na dikhana. */
+  const m = (stats && stats.metrics) || {};
+  const badge = (v, suffix) =>
+    (v === null || v === undefined) ? null : (v.toLocaleString('en-IN') + (suffix || ''));
 
   const navItems = [
     {
@@ -29,7 +36,7 @@ export default function AdminSidebar({
           labelEn: 'Cadastral Farm GIS Map',
           labelHi: 'खेत भूखंड व हॉटस्पॉट (GIS)',
           icon: MapPin,
-          badge: `${activeState.farmPlots?.length || 0} Plots`,
+          badge: badge(m.farmParcels, ' Plots'),
           badgeColor: 'bg-green-100 text-green-800 font-bold'
         },
         {
@@ -37,7 +44,7 @@ export default function AdminSidebar({
           labelEn: 'Epidemic Risk Radar',
           labelHi: 'मौसम-रोग जोखिम रडार',
           icon: Activity,
-          badge: '7-Day AI',
+          badge: badge(m.activeClusters, ' क्लस्टर'),
           badgeColor: 'bg-amber-100 text-amber-800'
         },
         {
@@ -45,7 +52,7 @@ export default function AdminSidebar({
           labelEn: 'Field Verification Queue',
           labelHi: 'किसान निदान व लैब सत्यापन',
           icon: CheckCircle2,
-          badge: `${metrics.pendingLabVerifications}`,
+          badge: badge(m.pendingScans),
           badgeColor: 'bg-blue-100 text-blue-700'
         }
       ]
@@ -58,7 +65,7 @@ export default function AdminSidebar({
           labelEn: 'Demand & Supply Forecasting',
           labelHi: 'कीटनाशक व ड्रोन मांग ट्रैकर',
           icon: Package,
-          badge: `${metrics.demandShortageAlertsCount} Deficits`,
+          badge: null,
           badgeColor: 'bg-red-50 text-red-600 border border-red-200'
         },
         {
@@ -79,7 +86,7 @@ export default function AdminSidebar({
           labelEn: 'Analytics & Crop Loss Impact',
           labelHi: 'फसल बचत व प्रभाव रिपोर्ट',
           icon: BarChart3,
-          badge: `₹${metrics.cropLossPreventedCrores} Cr`,
+          badge: badge(m.scans7d, ' जाँचें'),
           badgeColor: 'bg-green-50 text-green-700 font-bold border border-green-200'
         }
       ]
