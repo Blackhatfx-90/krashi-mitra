@@ -69,6 +69,14 @@ export default function AdminSidebar({
           badgeColor: 'bg-red-50 text-red-600 border border-red-200'
         },
         {
+          id: 'protocols',
+          labelEn: 'Chemicals & Doses (CIBRC)',
+          labelHi: 'दवा व मात्रा (CIBRC)',
+          icon: Sprout,
+          badge: null,
+          badgeColor: ''
+        },
+        {
           id: 'advisory',
           labelEn: 'Targeted Advisory Broadcast',
           labelHi: 'कृषि परामर्श प्रसारण केंद्र',

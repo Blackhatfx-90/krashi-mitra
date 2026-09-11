@@ -140,3 +140,44 @@ export async function adminLogout() {
     return { ok: false };
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * CIBRC protocol — dawa aur matra ki list
+ *
+ * Pehle ye matraayein code ki ek file me thi. Badalne ke liye programmer,
+ * build aur deploy chahiye tha — matlab CIBRC ki nayi matra kisano tak
+ * hafton nahi pahunchti thi. Ab adhikari khud badalta hai.
+ * ------------------------------------------------------------------------- */
+export async function fetchProtocols() {
+  try {
+    const res = await fetch(BASE + '/protocols', { cache: 'no-store', credentials: 'same-origin' });
+    if (!res.ok) return { ok: false, protocols: [] };
+    return await res.json();
+  } catch (_) {
+    return { ok: false, protocols: [] };
+  }
+}
+
+export async function saveProtocol(p) {
+  try {
+    const res = await fetch(BASE + '/protocols', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(p),
+    });
+    return await res.json();
+  } catch (_) {
+    return { ok: false, error: 'network' };
+  }
+}
+
+export async function deleteProtocol(id) {
+  try {
+    const res = await fetch(BASE + '/protocols?id=' + encodeURIComponent(id), {
+      method: 'DELETE', credentials: 'same-origin',
+    });
+    return await res.json();
+  } catch (_) {
+    return { ok: false, error: 'network' };
+  }
+}

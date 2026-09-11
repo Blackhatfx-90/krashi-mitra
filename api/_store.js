@@ -90,6 +90,16 @@ async function hashSet(key, field, value) {
   await kv(['HSET', key, field, json]);
 }
 
+/* Ek field mitana. Protocol hatane ke liye chahiye — bina iske purana
+   galat protocol hamesha ke liye database me pada rehta. */
+async function hashDel(key, field) {
+  if (!kvReady()) {
+    if (mem.hashes[key]) delete mem.hashes[key][field];
+    return;
+  }
+  await kv(['HDEL', key, field]);
+}
+
 async function hashAll(key) {
   if (!kvReady()) {
     const out = {};
@@ -138,5 +148,5 @@ function storageNote() {
 
 module.exports = {
   kvReady, storageKind, storageNote,
-  listPush, listAll, hashSet, hashAll, newId,
+  listPush, listAll, hashSet, hashAll, hashDel, newId,
 };

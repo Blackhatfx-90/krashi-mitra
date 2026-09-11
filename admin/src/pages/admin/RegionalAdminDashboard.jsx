@@ -30,6 +30,7 @@ import FieldValidationQueue from '../../components/dashboard/FieldValidationQueu
 import EarlyWarningRadar from '../../components/dashboard/EarlyWarningRadar';
 import AdvisoryBroadcast from '../../components/dashboard/AdvisoryBroadcast';
 import RegionalAnalytics from '../../components/dashboard/RegionalAnalytics';
+import ProtocolEditor from '../../components/dashboard/ProtocolEditor';
 import RequisitionModal from '../../components/ui/RequisitionModal';
 import { getStateData } from '../../data/multiStateAgriData';
 import { fetchStats, fetchAdminSession, adminLogout } from '../../lib/api';
@@ -332,6 +333,10 @@ export default function RegionalAdminDashboard({
                 initialData={advisoryInitialData}
                 currentLanguage={currentLanguage}
               />
+            )}
+
+            {activeView === 'protocols' && (
+              <ProtocolEditor currentLanguage={currentLanguage} />
             )}
 
             {activeView === 'analytics' && (
