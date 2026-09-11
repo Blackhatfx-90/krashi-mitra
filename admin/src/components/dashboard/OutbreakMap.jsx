@@ -140,6 +140,17 @@ export default function OutbreakMap({
   }, [stateObj, selectedDivision, selectedCrop, selectedSeverity]);
 
   return (
+    <>
+      {/* Naksha par dikhne wale khet (cadastral polygons) NAMOONA hain —
+          khasra/bhu-abhilekh ki asli GIS parat abhi judi nahi hai. Asli
+          cheez sirf wo cluster hain jo kisano ki jaanchon se bante hain
+          (Epidemic Risk Radar me). Yahan chhupana khatarnak hoga: adhikari
+          in polygons ko asli khet samajh kar team bhej sakta hai. */}
+      <div className="agri-card p-3.5 mb-4 bg-amber-50 border-amber-200 text-xs text-amber-900">
+        <b>नक्शे के खेत (पार्सल) नमूना हैं।</b> ज़िले के भू-अभिलेख/खसरा GIS से
+        अभी जुड़ाव नहीं है। असली आँकड़े किसानों की जाँचों से बने रोग-समूह हैं —
+        वे “Epidemic Risk Radar” में दिखते हैं।
+      </div>
     <div className="flex flex-col bg-white rounded-2xl border border-[#eaecf0] shadow-xs overflow-hidden">
       
       {/* Control Bar: Filters & Satellite Switcher */}
@@ -351,5 +362,6 @@ export default function OutbreakMap({
       </div>
 
     </div>
+    </>
   );
 }

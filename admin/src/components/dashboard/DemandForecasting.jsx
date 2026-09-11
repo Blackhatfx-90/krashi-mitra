@@ -56,6 +56,16 @@ export default function DemandForecasting({
   const totalDeficitCount = DEMAND_SUPPLY_INVENTORY.filter(i => i.severity === 'critical').length;
 
   return (
+    <>
+      {/* Ye poori screen NAMOONA data par chalti hai. Godaam ka stock, dawa
+          ki kami, aur maang ka anuman kisi asli supply system se nahi aata
+          — koi aisa system abhi juda hi nahi hai. Adhikari iske aadhar par
+          requisition bhej sakta hai, isliye chhupana khatarnak hai. */}
+      <div className="agri-card p-3.5 mb-4 bg-amber-50 border-amber-200 text-xs text-amber-900">
+        <b>यह नमूना (demo) डेटा है।</b> गोदाम का स्टॉक, दवा की कमी और माँग का
+        अनुमान अभी किसी असली आपूर्ति प्रणाली से नहीं जुड़ा है। इन आँकड़ों पर
+        ख़रीद या माँग-पत्र (requisition) का निर्णय न लें।
+      </div>
     <div className="space-y-4">
       
       {/* Top Header & Export Banner */}
@@ -276,5 +286,6 @@ export default function DemandForecasting({
       </div>
 
     </div>
+    </>
   );
 }

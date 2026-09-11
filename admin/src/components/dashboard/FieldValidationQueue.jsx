@@ -16,15 +16,19 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { FIELD_VERIFICATION_QUEUE } from '../../data/maharashtraAgriData';
-import { fetchLiveScans, updateScanStatus, scanToQueueItem } from '../../lib/api';
+import { fetchLiveScans, updateScanStatus, scanToQueueItem, fetchAdminSession } from '../../lib/api';
 
 export default function FieldValidationQueue({ 
   onOpenBroadcastModal,
   currentLanguage 
 }) {
-  const [queue, setQueue] = useState(FIELD_VERIFICATION_QUEUE);
+  /* Shuru me demo list — par har row par nishan laga hua, taaki UI saaf
+     bata sake ki ye asli kisan nahi hain. Asli jaanch aate hi ye hat jati
+     hai (neeche loadLive me). */
+  const DEMO_QUEUE = FIELD_VERIFICATION_QUEUE.map(d => ({ ...d, isDemo: true }));
+  const [queue, setQueue] = useState(DEMO_QUEUE);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedItem, setSelectedItem] = useState(FIELD_VERIFICATION_QUEUE[0]);
+  const [selectedItem, setSelectedItem] = useState(DEMO_QUEUE[0]);
   const [showImageModal, setShowImageModal] = useState(false);
 
   /* --- LIVE: kisan app se aayi jaanchein ---------------------------------
@@ -32,11 +36,25 @@ export default function FieldValidationQueue({
    * hain. API na chale to kuch nahi bigadta — demo list dikhti rehti hai.  */
   const [liveInfo, setLiveInfo] = useState({ count: 0, storage: null, at: null });
 
+  /* Faisla kisne liya — asli session se. Pehle yahan ek gaddha hua adhikari
+     ka naam code me likha tha, jo har faisle par server par chala jata tha.
+     Wo jawabdehi nahi, jawabdehi ka naatak hai. */
+  const [admin, setAdmin] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetchAdminSession().then(a => { if (alive && a && a.authenticated) setAdmin(a); });
+    return () => { alive = false; };
+  }, []);
+  const reviewer = () => (admin && admin.portalId) ? ('पोर्टल आईडी ' + admin.portalId) : '';
+
   const loadLive = useCallback(async () => {
     const { ok, scans, storage } = await fetchLiveScans();
     if (!ok) return;
     const live = scans.map(scanToQueueItem);
-    setQueue([...live, ...FIELD_VERIFICATION_QUEUE]);
+    /* Asli jaanchein aa gayi to demo rows hata do. Ek hi list me asli aur
+       nakli kisan mile hue dikhna sabse bura haal hai — adhikari kisi
+       banaye hue "kisan" ke liye gaadi bhej sakta hai. */
+    setQueue(live.length ? live : DEMO_QUEUE);
     setLiveInfo({ count: live.length, storage, at: new Date() });
   }, []);
 
@@ -53,7 +71,7 @@ export default function FieldValidationQueue({
     const item = queue.find(q => q.id === id);
     if (!item || !item.isLive) return;
     updateScanStatus(id, status, {
-      reviewedBy: 'Dr. A. K. Gangwar (Joint Director Agri, Bareilly)',
+      reviewedBy: reviewer(),
       officerNote: note || '',
     });
   };
@@ -66,7 +84,7 @@ export default function FieldValidationQueue({
         return {
           ...item,
           status: 'verified',
-          verifiedBy: 'Dr. A. K. Gangwar (Joint Director Agri, Bareilly)'
+          verifiedBy: reviewer()
         };
       }
       return item;
@@ -75,7 +93,7 @@ export default function FieldValidationQueue({
       setSelectedItem(prev => ({
         ...prev,
         status: 'verified',
-        verifiedBy: 'Dr. A. K. Gangwar (Joint Director Agri, Bareilly)'
+        verifiedBy: reviewer()
       }));
     }
   };
@@ -108,9 +126,20 @@ export default function FieldValidationQueue({
     return true;
   });
 
+  const showingDemo = queue.some(q => q.isDemo);
+
   return (
     <div className="space-y-4">
-      
+
+      {/* Jab list me asli jaanch nahi hai to chhupao mat — saaf bata do */}
+      {showingDemo && (
+        <div className="agri-card p-3.5 bg-amber-50 border-amber-200 text-xs text-amber-900">
+          <b>यह नमूना (demo) सूची है।</b> किसानों की ऐप से अभी कोई जाँच नहीं आई है।
+          जैसे ही असली जाँच आएगी, यह सूची अपने आप उससे बदल जाएगी — नमूना डेटा हट जाएगा।
+          इन नामों पर कोई कार्रवाई न करें, ये असली किसान नहीं हैं।
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="agri-card p-5 space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
