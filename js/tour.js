@@ -177,7 +177,10 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'hi-IN';
+        /* Pehle yahan 'hi-IN' pakka likha tha — Tamil chunne wale kisan ko
+           bhi tour Hindi me bolta tha. Ab wahi bhasha jo baaki app bolti
+           hai (CONFIG.SPEECH_LANG, jo bhasha badalte hi badal jaati hai). */
+        u.lang = (typeof window.kmSpeechLang === 'function' && window.kmSpeechLang()) || 'hi-IN';
         u.rate = 0.92;
         window.speechSynthesis.speak(u);
       }

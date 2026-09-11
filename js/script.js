@@ -10826,6 +10826,21 @@ function renderAdvisoryAlert() {
  * bhasha me ho. Jis bhasha ki awaaz phone me nahi hai, uske liye picker khud
  * hi Hindi/English par gir jaata hai aur note bhi bhej deta hai.
  * ------------------------------------------------------------------------- */
+/* App khulte hi pichhli baar chuni hui bhasha uthao.
+   Pehle CONFIG.SPEECH_LANG 'hi-IN' par shuru hota tha aur sirf tab badalta
+   tha jab kisan bhasha BADALTA. Yani Tamil chunne wale kisan ko har baar
+   app kholne par pehla vaakya Hindi me sunai deta tha. */
+/* CONFIG ek top-level const hai, isliye wo window par nahi aata. Doosri
+   file (js/tour.js) ko bolne ki bhasha chahiye, isliye ek chhota rasta. */
+window.kmSpeechLang = function () { return CONFIG.SPEECH_LANG; };
+
+(function initSpeechLang() {
+  try {
+    const p = JSON.parse(localStorage.getItem('km.preferences.v1') || '{}');
+    if (p.language) CONFIG.SPEECH_LANG = p.language;
+  } catch (_) { /* prefs na mile to Hindi hi sahi */ }
+})();
+
 window.addEventListener('km:language', (e) => {
   const d = e.detail || {};
   if (!d.code) return;
