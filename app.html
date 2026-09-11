@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/voice.css?v=2" />
   <link rel="stylesheet" href="css/mandi.css?v=1" />
   <link rel="stylesheet" href="css/farm-tools.css?v=1" />
+  <link rel="stylesheet" href="css/community.css?v=1" />
   <link rel="stylesheet" href="css/onboarding.css?v=1" />
   <link rel="stylesheet" href="css/dashboard.css?v=1" />
   <link rel="stylesheet" href="css/language-picker.css?v=2" />
@@ -338,6 +339,9 @@
       <p class="nav__group">ADVISORY</p>
       <button type="button" class="nav__item" data-view="advisory">
         <svg class="ic"><use href="#i-bulb"/></svg><span data-i18n="nav.advisory">Smart Advisory</span>
+      </button>
+      <button type="button" class="nav__item" data-view="community">
+        <svg class="ic"><use href="#i-user"/></svg><span data-i18n="nav.community">किसान चौपाल</span>
       </button>
       <button type="button" class="nav__item" data-view="handbook">
         <svg class="ic"><use href="#i-book"/></svg><span data-i18n="nav.handbook">Crop Guide</span>
@@ -738,6 +742,22 @@
       </section>
 
 
+      <!-- ================ VIEW: KISAN CHAUPAL (js/community.js) ============ -->
+      <section class="view" id="view-community">
+        <article class="card cm-card" id="communityCard">
+          <div class="card__head">
+            <h2>किसान चौपाल</h2>
+            <p>अपने इलाके के किसानों से पूछें — जो जवाब मॉडल नहीं दे सकता</p>
+          </div>
+          <div id="communityBody"></div>
+          <p class="cm-warn">
+            यहाँ की सलाह किसानों की अपनी है, कृषि विभाग की नहीं। दवा की मात्रा
+            हमेशा लेबल देखकर और अपने कृषि विज्ञान केंद्र से पूछकर ही तय करें।
+          </p>
+        </article>
+      </section>
+
+
       <!-- ====================== VIEW: HANDBOOK ====================== -->
       <section class="view" id="view-handbook">
         <article class="card">
@@ -792,6 +812,18 @@
           <button type="button" class="btn btn--ghost btn--block" id="reportToggle"
                   aria-pressed="false">भेजना चालू करें</button>
           <p class="muted-sm" id="reportNote"></p>
+        </article>
+
+        <!-- MERA DATA (js/privacy-tools.js) — privacy.html me likhi baat par amal -->
+        <article class="card pv-card">
+          <div class="card__head">
+            <h2>मेरा डेटा</h2>
+            <p>यह ऐप आपके फ़ोन पर क्या रखता है — और उसे उतारने या मिटाने का बटन</p>
+          </div>
+          <div id="privacyToolsBody"></div>
+          <p class="muted-sm">
+            <a href="privacy.html">निजता नीति</a> · <a href="terms.html">शर्तें</a>
+          </p>
         </article>
 
         <!-- Offline models -->
@@ -862,6 +894,8 @@
 <script src="js/notify.js?v=1"></script>
 <script src="js/outbreak.js?v=1"></script>
 <script src="js/calendar.js?v=1"></script>
+<script src="js/community.js?v=1"></script>
+<script src="js/privacy-tools.js?v=1"></script>
 <script src="js/tf.min.js" onerror="window.__TF_LOCAL_FAILED = true;"></script>
 <script src="js/script.js?v=34"></script>
 <!-- Guided tour + voice assistant.
