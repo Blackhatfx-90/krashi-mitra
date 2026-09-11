@@ -92,12 +92,29 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      /* issuedByPortalId adhikari ki PORTAL ID hai — aur wahi uska login
+         username bhi hai (POST /api/admin?action=login me portalId +
+         password). Yeh endpoint har kisan ki app har baar bulati hai, yani
+         wo ID poori duniya ko dikhti thi. Bahar jaane wale jawab se hata
+         dete hain; jawabdehi database me jyon ki tyon padi rehti hai aur
+         logged-in adhikari ko dikhti hai.
+         `issuedBy` (jaise "कृषि विभाग, बरेली") kisan ko dikhna chahiye —
+         wo bhejne wale ka pad hai, login nahi. Wo rehta hai. */
+      let isAdmin = false;
+      try { isAdmin = Boolean(await require('./admin').adminFor(req)); }
+      catch (_) { isAdmin = false; }
+
+      const out = isAdmin ? rows : rows.map((a) => {
+        const { issuedByPortalId, ...safe } = a;
+        return safe;
+      });
+
       return res.status(200).json({
         ok: true,
         storage: store.storageKind(),
         note: store.storageNote(),
-        count: rows.length,
-        advisories: rows,
+        count: out.length,
+        advisories: out,
       });
     }
 

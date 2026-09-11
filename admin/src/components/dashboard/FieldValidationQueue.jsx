@@ -47,8 +47,13 @@ export default function FieldValidationQueue({
   }, []);
   const reviewer = () => (admin && admin.portalId) ? ('पोर्टल आईडी ' + admin.portalId) : '';
 
+  const [needsLogin, setNeedsLogin] = useState(false);
+
   const loadLive = useCallback(async () => {
-    const { ok, scans, storage } = await fetchLiveScans();
+    const { ok, scans, storage, needsLogin: no401 } = await fetchLiveScans();
+    /* Session khatam ho gaya to chup mat raho. Warna adhikari demo list
+       dekhta rehta hai aur samajhta hai ki aaj koi jaanch aayi hi nahi. */
+    setNeedsLogin(Boolean(no401));
     if (!ok) return;
     const live = scans.map(scanToQueueItem);
     /* Asli jaanchein aa gayi to demo rows hata do. Ek hi list me asli aur
@@ -132,7 +137,14 @@ export default function FieldValidationQueue({
     <div className="space-y-4">
 
       {/* Jab list me asli jaanch nahi hai to chhupao mat — saaf bata do */}
-      {showingDemo && (
+      {needsLogin && (
+        <div className="agri-card p-3.5 bg-amber-50 border-amber-200 text-xs font-bold text-amber-900">
+          सत्र समाप्त हो गया है — नीचे जो दिख रहा है वह असली जाँचें नहीं हैं।
+          किसानों की जाँचें देखने के लिए दोबारा लॉगिन कीजिए।
+        </div>
+      )}
+
+      {showingDemo && !needsLogin && (
         <div className="agri-card p-3.5 bg-amber-50 border-amber-200 text-xs text-amber-900">
           <b>यह नमूना (demo) सूची है।</b> किसानों की ऐप से अभी कोई जाँच नहीं आई है।
           जैसे ही असली जाँच आएगी, यह सूची अपने आप उससे बदल जाएगी — नमूना डेटा हट जाएगा।

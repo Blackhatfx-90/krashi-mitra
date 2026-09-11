@@ -17,7 +17,12 @@ const BASE = '/api';
 /** Kisan app se aayi jaanchein. Fail ho to khali list. */
 export async function fetchLiveScans() {
   try {
-    const res = await fetch(BASE + '/scans', { cache: 'no-store' });
+    /* credentials saaf-saaf likha hai: /api/scans ab login maangta hai
+       (usme kisan ka naam, phone aur khet ka GPS hota hai). Default waise
+       bhi same-origin hai, par yahan padhne wale ko dikhna chahiye ki
+       cookie jaani zaroori hai. */
+    const res = await fetch(BASE + '/scans', { cache: 'no-store', credentials: 'same-origin' });
+    if (res.status === 401) return { ok: false, scans: [], storage: null, needsLogin: true };
     if (!res.ok) return { ok: false, scans: [], storage: null };
     const data = await res.json();
     return {
@@ -37,6 +42,7 @@ export async function updateScanStatus(id, status, extra) {
   try {
     const res = await fetch(BASE + '/scans', {
       method: 'PATCH',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(Object.assign({ id, status }, extra || {})),
     });

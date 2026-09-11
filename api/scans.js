@@ -40,6 +40,29 @@ module.exports = async function handler(req, res) {
   try {
     /* ---------------- GET: dashboard list padhta hai ---------------------- */
     if (req.method === 'GET') {
+      /* ================================================================
+       * SIRF LOGGED-IN ADHIKARI. Pehle yahan koi jaanch NAHI thi.
+       *
+       * Is jawab me kisan ka NAAM, PHONE NUMBER, GAON, khet ka theek-theek
+       * GPS aur patti ki PHOTO hoti hai — 300 tak. Bina login ke matlab
+       * tha ki internet par koi bhi
+       *
+       *     curl https://<site>/api/scans
+       *
+       * chalakar saikdon kisano ke phone number aur unke kheton ke
+       * nirdeshank utha le jaaye. Kisan ne yeh data vibhag ko bhejne ke
+       * liye diya tha (wo bhi khud chaalu karke), duniya ko nahi.
+       *
+       * Kisan app par iska koi asar nahi — wo sirf POST karti hai.
+       * ================================================================ */
+      let admin = null;
+      try { admin = await require('./admin').adminFor(req); }
+      catch (e) { console.error('[scans] admin check fail:', e && e.message); }
+      if (!admin) {
+        return res.status(401).json({ ok: false, error: 'admin_login_zaroori',
+          messageHi: 'यह सूची देखने के लिए अधिकारी लॉगिन ज़रूरी है।' });
+      }
+
       const [rows, overrides] = await Promise.all([
         store.listAll(SCANS_KEY, MAX_SCANS),
         store.hashAll(STATUS_KEY),
@@ -116,7 +139,20 @@ module.exports = async function handler(req, res) {
     }
 
     /* ---------------- PATCH: admin status badalta hai --------------------- */
+    /* Yahan bhi koi jaanch nahi thi. Sirf niji jaankari ka sawal nahi hai —
+       'rejected' ki hui jaanch prakop ki ginti se BAHAR ho jaati hai
+       (api/outbreaks.js). Yani koi bhi bahar se saari jaanchein 'rejected'
+       karke ek asli failte hue rog ko dashboard se gayab kar sakta tha,
+       aur kisano ke phone par chetavni jaani band ho jaati. */
     if (req.method === 'PATCH') {
+      let admin = null;
+      try { admin = await require('./admin').adminFor(req); }
+      catch (e) { console.error('[scans] admin check fail:', e && e.message); }
+      if (!admin) {
+        return res.status(401).json({ ok: false, error: 'admin_login_zaroori',
+          messageHi: 'स्थिति बदलने के लिए अधिकारी लॉगिन ज़रूरी है।' });
+      }
+
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch (_) { body = null; } }
       const id = body && clean(body.id, 40);
