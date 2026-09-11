@@ -9116,7 +9116,7 @@ function updateHistoryBadge() {
   el.historyBadge.hidden = state.history.length === 0;
 }
 
-function detectItemHtml(entry) {
+function detectItemHtml(entry, opts) {
   const a = getAdvisory(entry.label);
   const unknown = !entry.confident;
   const name = unknown ? 'पहचान नहीं हो पाई' : a.nameHi;
@@ -9136,8 +9136,28 @@ function detectItemHtml(entry) {
       '</div>',
       '<span class="risk risk--', escapeHtml(unknown ? 'unknown' : (a.risk || 'unknown')), '">',
         escapeHtml(unknown ? 'अनिश्चित' : (a.riskHi || '')), '</span>',
+      /* Hataane ka button sirf poori history me — "recent" me teen hi dikhte
+         hain, wahan cross lagana jagah kha jata hai aur galti se dab bhi
+         sakta hai. */
+      (opts && opts.removable)
+        ? '<button type="button" class="detect-item__del" data-del-ts="' + entry.ts +
+            '" title="इस जाँच को हटाएँ" aria-label="इस जाँच को हटाएँ">&times;</button>'
+        : '',
     '</div>',
   ].join('');
+}
+
+/* Ek jaanch hamesha ke liye hata do. Kisan ki apni jaanch hai — usse
+   poochne ki zarurat nahi ki kyun hata raha hai. */
+function deleteHistoryEntry(ts) {
+  const n = state.history.length;
+  state.history = state.history.filter((h) => String(h.ts) !== String(ts));
+  if (state.history.length === n) return false;
+  persistHistory();
+  renderHistory();
+  renderRecent();
+  updateHistoryBadge();
+  return true;
 }
 
 function renderRecent() {
@@ -9149,8 +9169,14 @@ function renderRecent() {
 
 function renderHistory() {
   el.historyList.innerHTML = state.history.length
-    ? state.history.map(detectItemHtml).join('')
+    ? state.history.map((h) => detectItemHtml(h, { removable: true })).join('')
     : '<p class="detect-empty">कोई पुरानी जाँच नहीं मिली।</p>';
+
+  el.historyList.querySelectorAll('[data-del-ts]').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!confirm('यह जाँच हटा दें? वापस नहीं आएगी।')) return;
+      deleteHistoryEntry(b.dataset.delTs);
+    }));
 }
 
 

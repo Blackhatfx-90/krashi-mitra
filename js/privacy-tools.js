@@ -50,6 +50,14 @@
     { k:'km.tourMuted',             hi:'टूर की सेटिंग'              },
     { k:'km.tourPart2',             hi:'टूर की स्थिति'              },
     { k:'km.permissionsAsked',      hi:'माँगी गई अनुमतियाँ'         },
+    { k:'krashimitra.lastCrop',     hi:'आख़िरी चुनी फसल'            },
+    { k:'krashimitra.weather.v1',   hi:'मौसम की पुरानी जानकारी'     },
+    { k:'krashimitra.weather.place.v1', hi:'मौसम के लिए जगह'        },
+    { k:'krashimitra.mandiradius',  hi:'मंडी की दूरी की सेटिंग'      },
+    { k:'hasSeenTour',              hi:'टूर देखा या नहीं'           },
+    { k:'kisansathi.landingtour.v1', hi:'पहले पन्ने का टूर'         },
+    { k:'krashimitra.mandi.v1',     hi:'मंडी भाव की जानकारी'        },
+    { k:'krashimitra.mandigeo.v1',  hi:'मंडी की जगह'                },
   ];
 
   function raw(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
