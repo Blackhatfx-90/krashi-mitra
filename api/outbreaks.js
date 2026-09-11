@@ -88,6 +88,8 @@ function clusterScans(scans, opts) {
       farmers: {},          // aadhar ginti — baad me hata dete hain
       scanCount: 0,
       verifiedCount: 0,
+      confSum: 0,
+      points: [],          // GPS — sirf login wale dashboard ke liye
       villages: {},
       firstSeen: s.receivedAt,
       lastSeen: s.receivedAt,
@@ -95,6 +97,8 @@ function clusterScans(scans, opts) {
 
     g.farmers[farmerKey(s)] = 1;
     g.scanCount += 1;
+    g.confSum += Number(s.confidence) || 0;
+    if (Array.isArray(s.gps) && g.points.length < 60) g.points.push(s.gps);
     if (s.status === 'verified' || s.status === 'lab') g.verifiedCount += 1;
     if (s.village) g.villages[s.village] = 1;
     if (s.receivedAt < g.firstSeen) g.firstSeen = s.receivedAt;
@@ -110,6 +114,12 @@ function clusterScans(scans, opts) {
 
     delete g.farmers;
     g.farmerCount = count;
+    g.avgConfidence = g.scanCount ? Math.round((g.confSum / g.scanCount) * 1000) / 10 : 0;
+    delete g.confSum;
+
+    /* GPS kheton ka theek-theek pata hai. Sarvajanik jawab me nahi jata —
+       sirf login kiye hue adhikari ke naksha ke liye. */
+    if (!o.includePrivate) delete g.points;
     g.villageCount = Object.keys(g.villages).length;
     g.villages = Object.keys(g.villages).slice(0, 8);
     g.level = lv.level;

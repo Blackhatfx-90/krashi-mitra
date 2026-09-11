@@ -42,9 +42,6 @@ const STATUS_KEY = 'km:scan_status';
 const MAX_SCANS  = 300;
 
 const CLUSTER_WINDOW_DAYS = 14;
-const CLUSTER_MIN_SCANS   = 3;
-const CRITICAL_MIN_SCANS  = 8;
-const CRITICAL_MIN_CONF   = 0.85;
 
 const DAY = 86400000;
 
@@ -52,60 +49,60 @@ function ago(days) { return Date.now() - days * DAY; }
 function ts(s) { const t = Date.parse(s || ''); return isFinite(t) ? t : 0; }
 
 /* Ek hi rog ko alag-alag naam se aane par bhi ek hi maano. */
-function diseaseKey(s) {
-  return String(s.diseaseEn || s.label || 'unknown').toLowerCase().trim();
-}
 function districtKey(s) {
   return String(s.district || '').trim() || null;   // zila na ho to cluster me nahi
 }
 
+/* ---------------------------------------------------------------------------
+ * Cluster ki paribhasha EK hi jagah hai — api/outbreaks.js me.
+ *
+ * Pehle yahan apni alag ginti thi: scan ginte the (>=3), aur critical 8 scan
+ * par. Usme teen dikkat thi —
+ *
+ *   1. Ek hi kisan 10 baar photo khinche to "cluster" ban jata tha. Adhikari
+ *      ko lagta 10 khet me rog hai, jabki ek tha.
+ *   2. Jis jaanch ko adhikari khud 'rejected' kar chuka tha, wo bhi ginti me
+ *      rehti thi — yaani uske dekhne ka koi asar hi nahi hota tha.
+ *   3. Swasth fasal ki jaanch bhi gin jaati thi.
+ *
+ * Aur sabse badi baat: kisan app /api/outbreaks se apni ginti leti hai. Do
+ * alag paribhasha ka matlab hota ki adhikari ki screen par 8 likha ho aur
+ * usi jile ke kisan ke phone par 3. Isliye ab dono ek hi function se aate
+ * hain — bharosa ka sawal hai.
+ *
+ * Adhikari login kiya hua hai, isliye use GPS bhi milta hai (naksha ke liye);
+ * kisan wale sarvajanik raste par nahi jata.
+ * ------------------------------------------------------------------------- */
+const { clusterScans } = require('./outbreaks');
+
 function buildClusters(scans) {
-  const recent = scans.filter(s => ts(s.receivedAt) >= ago(CLUSTER_WINDOW_DAYS));
-  const bins = new Map();
-
-  for (const s of recent) {
-    const d = districtKey(s);
-    if (!d) continue;                                // bina zile ke naksha nahi ban sakta
-    const k = d + '||' + diseaseKey(s);
-    if (!bins.has(k)) {
-      bins.set(k, {
-        district: d,
-        disease: s.diseaseHi || s.diseaseEn || s.label,
-        crop: s.crop,
-        cropNameHi: s.cropNameHi || s.crop,
-        scans: 0, confSum: 0, latest: 0,
-        villages: new Set(),
-        points: [],
-      });
-    }
-    const b = bins.get(k);
-    b.scans += 1;
-    b.confSum += Number(s.confidence) || 0;
-    b.latest = Math.max(b.latest, ts(s.receivedAt));
-    if (s.village) b.villages.add(s.village);
-    if (Array.isArray(s.gps)) b.points.push(s.gps);
-  }
-
-  return [...bins.values()]
-    .filter(b => b.scans >= CLUSTER_MIN_SCANS)
-    .map(b => {
-      const avgConf = b.scans ? b.confSum / b.scans : 0;
-      const critical = b.scans >= CRITICAL_MIN_SCANS || avgConf >= CRITICAL_MIN_CONF;
-      return {
-        district: b.district,
-        disease: b.disease,
-        crop: b.crop,
-        cropNameHi: b.cropNameHi,
-        scanCount: b.scans,
-        avgConfidence: Math.round(avgConf * 1000) / 10,
-        villages: [...b.villages].slice(0, 12),
-        villageCount: b.villages.size,
-        points: b.points.slice(0, 60),
-        lastReportedAt: b.latest ? new Date(b.latest).toISOString() : null,
-        severity: critical ? 'critical' : 'watch',
-      };
-    })
-    .sort((a, b) => b.scanCount - a.scanCount);
+  return clusterScans(scans, {
+    windowDays: CLUSTER_WINDOW_DAYS,
+    includePrivate: true,
+  }).map((c) => ({
+    district: c.district,
+    disease: c.diseaseHi || c.diseaseEn || c.label,
+    crop: c.crop,
+    cropNameHi: c.cropNameHi || c.crop,
+    /* Ab do ginti dikhti hain: kitne KISAN (asli failav) aur kitni JAANCH.
+       Adhikari ko dono chahiye — 3 kisan/20 jaanch aur 3 kisan/3 jaanch
+       do alag haalat hain. */
+    farmerCount: c.farmerCount,
+    scanCount: c.scanCount,
+    verifiedCount: c.verifiedCount,
+    confirmed: c.confirmed,
+    avgConfidence: c.avgConfidence,
+    villages: c.villages,
+    villageCount: c.villageCount,
+    points: c.points || [],
+    lastReportedAt: c.lastSeen || null,
+    firstReportedAt: c.firstSeen || null,
+    level: c.level,
+    levelHi: c.levelHi,
+    /* Radar 'critical' / 'watch' samajhta hai — usi me badal dete hain */
+    severity: c.level === 'gambhir' ? 'critical'
+            : c.level === 'chetavni' ? 'warning' : 'watch',
+  }));
 }
 
 module.exports = async function handler(req, res) {
