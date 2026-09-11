@@ -41,6 +41,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'धान',
+      'sub.home':'आपका खेती सहायक — जाँच, सलाह, मंडी भाव और मौसम',
+      'sub.crops':'चुनते ही उसी का मॉडल लोड होगा',
+      'sub.scan':'पत्ती की फोटो से रोग पहचानें — बिना इंटरनेट के',
+      'sub.history':'आपकी पिछली सभी जाँचें',
+      'sub.advisory':'आख़िरी जाँच पर आधारित सलाह',
+      'sub.handbook':'चुनी हुई फसल के रोग — पूरी जानकारी',
+      'sub.about':'ऐप कैसे काम करता है और सावधानियाँ',
       'alert.title':'चेतावनी की घंटी',
       'alert.note':'ओला, कीट या रोग की चेतावनी पर फ़ोन बजेगा',
       'alert.on':'चालू करें',
@@ -111,6 +118,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'Rice',
+      'sub.home':'Your farming helper — scan, advice, mandi rates, weather',
+      'sub.crops':'Pick one and its model loads',
+      'sub.scan':'Spot disease from a leaf photo — no internet needed',
+      'sub.history':'All your past scans',
+      'sub.advisory':'Advice based on your last scan',
+      'sub.handbook':'Diseases of the chosen crop',
+      'sub.about':'How the app works, and cautions',
       'alert.title':'Alert ringtone',
       'alert.note':'Phone will ring for hail, pest or disease alerts',
       'alert.on':'Turn on',
@@ -154,6 +168,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'भात',
+      'sub.home':'तुमचा शेती सहाय्यक — तपासणी, सल्ला, बाजारभाव, हवामान',
+      'sub.crops':'निवडताच त्याचे मॉडेल लोड होईल',
+      'sub.scan':'पानाच्या फोटोवरून रोग ओळखा — इंटरनेटशिवाय',
+      'sub.history':'तुमच्या आधीच्या सर्व तपासण्या',
+      'sub.advisory':'शेवटच्या तपासणीवर आधारित सल्ला',
+      'sub.handbook':'निवडलेल्या पिकाचे रोग',
+      'sub.about':'ॲप कसे चालते आणि काळजी',
       'alert.title':'इशारा घंटी',
       'alert.note':'गारपीट, कीड किंवा रोगाच्या इशाऱ्यावर फोन वाजेल',
       'alert.on':'चालू करा',
@@ -197,6 +218,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ડાંગર',
+      'sub.home':'તમારો ખેતી સહાયક — તપાસ, સલાહ, બજારભાવ, હવામાન',
+      'sub.crops':'પસંદ કરતાં જ તેનું મોડેલ લોડ થશે',
+      'sub.scan':'પાનના ફોટાથી રોગ ઓળખો — ઇન્ટરનેટ વગર',
+      'sub.history':'તમારી બધી જૂની તપાસ',
+      'sub.advisory':'છેલ્લી તપાસ પર આધારિત સલાહ',
+      'sub.handbook':'પસંદ કરેલા પાકના રોગ',
+      'sub.about':'ઍપ કેવી રીતે કામ કરે છે',
       'alert.title':'ચેતવણીની ઘંટી',
       'alert.note':'કરા, જીવાત કે રોગની ચેતવણી પર ફોન વાગશે',
       'alert.on':'ચાલુ કરો',
@@ -240,6 +268,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ਝੋਨਾ',
+      'sub.home':'ਤੁਹਾਡਾ ਖੇਤੀ ਸਹਾਇਕ — ਜਾਂਚ, ਸਲਾਹ, ਮੰਡੀ ਭਾਅ, ਮੌਸਮ',
+      'sub.crops':'ਚੁਣਦੇ ਹੀ ਉਸਦਾ ਮਾਡਲ ਲੋਡ ਹੋਵੇਗਾ',
+      'sub.scan':'ਪੱਤੇ ਦੀ ਫ਼ੋਟੋ ਤੋਂ ਰੋਗ ਪਛਾਣੋ — ਬਿਨਾਂ ਇੰਟਰਨੈੱਟ',
+      'sub.history':'ਤੁਹਾਡੀਆਂ ਸਾਰੀਆਂ ਪੁਰਾਣੀਆਂ ਜਾਂਚਾਂ',
+      'sub.advisory':'ਆਖ਼ਰੀ ਜਾਂਚ ਦੇ ਆਧਾਰ ਤੇ ਸਲਾਹ',
+      'sub.handbook':'ਚੁਣੀ ਫ਼ਸਲ ਦੇ ਰੋਗ',
+      'sub.about':'ਐਪ ਕਿਵੇਂ ਕੰਮ ਕਰਦੀ ਹੈ',
       'alert.title':'ਚੇਤਾਵਨੀ ਦੀ ਘੰਟੀ',
       'alert.note':'ਗੜੇ, ਕੀੜੇ ਜਾਂ ਰੋਗ ਦੀ ਚੇਤਾਵਨੀ ਤੇ ਫ਼ੋਨ ਵੱਜੇਗਾ',
       'alert.on':'ਚਾਲੂ ਕਰੋ',
@@ -283,6 +318,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ধান',
+      'sub.home':'আপনার কৃষি সহায়ক — পরীক্ষা, পরামর্শ, বাজারদর, আবহাওয়া',
+      'sub.crops':'বাছাই করলেই তার মডেল লোড হবে',
+      'sub.scan':'পাতার ছবি থেকে রোগ চিনুন — ইন্টারনেট ছাড়াই',
+      'sub.history':'আপনার আগের সব পরীক্ষা',
+      'sub.advisory':'শেষ পরীক্ষার ভিত্তিতে পরামর্শ',
+      'sub.handbook':'বাছাই করা ফসলের রোগ',
+      'sub.about':'অ্যাপ কীভাবে কাজ করে',
       'alert.title':'সতর্কতার ঘণ্টা',
       'alert.note':'শিলাবৃষ্টি, পোকা বা রোগের সতর্কতায় ফোন বাজবে',
       'alert.on':'চালু করুন',
@@ -326,6 +368,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'நெல்',
+      'sub.home':'உங்கள் விவசாய உதவியாளர் — பரிசோதனை, ஆலோசனை, சந்தை விலை, வானிலை',
+      'sub.crops':'தேர்ந்தெடுத்ததும் அதன் மாதிரி ஏற்றப்படும்',
+      'sub.scan':'இலைப் படத்திலிருந்து நோயைக் கண்டறியுங்கள் — இணையம் தேவையில்லை',
+      'sub.history':'உங்கள் முந்தைய அனைத்து பரிசோதனைகள்',
+      'sub.advisory':'கடைசி பரிசோதனையின் அடிப்படையில் ஆலோசனை',
+      'sub.handbook':'தேர்ந்தெடுத்த பயிரின் நோய்கள்',
+      'sub.about':'செயலி எப்படி வேலை செய்கிறது',
       'alert.title':'எச்சரிக்கை மணி',
       'alert.note':'ஆலங்கட்டி, பூச்சி அல்லது நோய் எச்சரிக்கையில் தொலைபேசி ஒலிக்கும்',
       'alert.on':'இயக்கு',
@@ -369,6 +418,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'వరి',
+      'sub.home':'మీ వ్యవసాయ సహాయకుడు — పరీక్ష, సలహా, మార్కెట్ ధర, వాతావరణం',
+      'sub.crops':'ఎంచుకోగానే దాని మోడల్ లోడ్ అవుతుంది',
+      'sub.scan':'ఆకు ఫోటోతో వ్యాధిని గుర్తించండి — ఇంటర్నెట్ అవసరం లేదు',
+      'sub.history':'మీ మునుపటి అన్ని పరీక్షలు',
+      'sub.advisory':'చివరి పరీక్ష ఆధారంగా సలహా',
+      'sub.handbook':'ఎంచుకున్న పంట వ్యాధులు',
+      'sub.about':'యాప్ ఎలా పనిచేస్తుంది',
       'alert.title':'హెచ్చరిక గంట',
       'alert.note':'వడగళ్లు, పురుగు లేదా వ్యాధి హెచ్చరికకు ఫోన్ మోగుతుంది',
       'alert.on':'ఆన్ చేయండి',
@@ -412,6 +468,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ಭತ್ತ',
+      'sub.home':'ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ — ಪರೀಕ್ಷೆ, ಸಲಹೆ, ಮಾರುಕಟ್ಟೆ ದರ, ಹವಾಮಾನ',
+      'sub.crops':'ಆಯ್ಕೆ ಮಾಡಿದ ತಕ್ಷಣ ಅದರ ಮಾದರಿ ಲೋಡ್ ಆಗುತ್ತದೆ',
+      'sub.scan':'ಎಲೆಯ ಫೋಟೋದಿಂದ ರೋಗ ಗುರುತಿಸಿ — ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ',
+      'sub.history':'ನಿಮ್ಮ ಹಿಂದಿನ ಎಲ್ಲಾ ಪರೀಕ್ಷೆಗಳು',
+      'sub.advisory':'ಕೊನೆಯ ಪರೀಕ್ಷೆಯ ಆಧಾರದ ಮೇಲೆ ಸಲಹೆ',
+      'sub.handbook':'ಆಯ್ಕೆ ಮಾಡಿದ ಬೆಳೆಯ ರೋಗಗಳು',
+      'sub.about':'ಆ್ಯಪ್ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
       'alert.title':'ಎಚ್ಚರಿಕೆ ಗಂಟೆ',
       'alert.note':'ಆಲಿಕಲ್ಲು, ಕೀಟ ಅಥವಾ ರೋಗದ ಎಚ್ಚರಿಕೆಗೆ ಫೋನ್ ಸದ್ದು ಮಾಡುತ್ತದೆ',
       'alert.on':'ಆನ್ ಮಾಡಿ',
@@ -455,6 +518,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'നെല്ല്',
+      'sub.home':'നിങ്ങളുടെ കൃഷി സഹായി — പരിശോധന, ഉപദേശം, വിപണി വില, കാലാവസ്ഥ',
+      'sub.crops':'തിരഞ്ഞെടുത്താൽ അതിന്റെ മോഡൽ ലോഡ് ആകും',
+      'sub.scan':'ഇലയുടെ ഫോട്ടോയിൽ നിന്ന് രോഗം തിരിച്ചറിയുക — ഇന്റർനെറ്റ് വേണ്ട',
+      'sub.history':'നിങ്ങളുടെ മുൻ പരിശോധനകളെല്ലാം',
+      'sub.advisory':'അവസാന പരിശോധനയുടെ അടിസ്ഥാനത്തിൽ ഉപദേശം',
+      'sub.handbook':'തിരഞ്ഞെടുത്ത വിളയുടെ രോഗങ്ങൾ',
+      'sub.about':'ആപ്പ് എങ്ങനെ പ്രവർത്തിക്കുന്നു',
       'alert.title':'മുന്നറിയിപ്പ് മണി',
       'alert.note':'ആലിപ്പഴം, കീടം അല്ലെങ്കിൽ രോഗ മുന്നറിയിപ്പിൽ ഫോൺ ശബ്ദിക്കും',
       'alert.on':'ഓണാക്കുക',
@@ -498,6 +568,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'ଧାନ',
+      'sub.home':'ଆପଣଙ୍କ କୃଷି ସହାୟକ — ପରୀକ୍ଷା, ପରାମର୍ଶ, ବଜାର ଦର, ପାଗ',
+      'sub.crops':'ବାଛିଲେ ତାହାର ମଡେଲ ଲୋଡ୍ ହେବ',
+      'sub.scan':'ପତ୍ରର ଫଟୋରୁ ରୋଗ ଚିହ୍ନନ୍ତୁ — ଇଣ୍ଟରନେଟ୍ ବିନା',
+      'sub.history':'ଆପଣଙ୍କ ପୂର୍ବର ସବୁ ପରୀକ୍ଷା',
+      'sub.advisory':'ଶେଷ ପରୀକ୍ଷା ଆଧାରରେ ପରାମର୍ଶ',
+      'sub.handbook':'ବଛା ଫସଲର ରୋଗ',
+      'sub.about':'ଆପ୍ କିପରି କାମ କରେ',
       'alert.title':'ସତର୍କତା ଘଣ୍ଟି',
       'alert.note':'ଶିଳାବୃଷ୍ଟି, ପୋକ କିମ୍ବା ରୋଗ ସତର୍କତାରେ ଫୋନ୍ ବାଜିବ',
       'alert.on':'ଚାଲୁ କରନ୍ତୁ',
@@ -541,6 +618,13 @@
 
       /* Fasal ke naam — sirf chuni hui bhasha me dikhte hain */
       'crop.rice':'دھان',
+      'sub.home':'آپ کا کھیتی معاون — جانچ، صلاح، منڈی بھاؤ، موسم',
+      'sub.crops':'چنتے ہی اس کا ماڈل لوڈ ہوگا',
+      'sub.scan':'پتے کی تصویر سے بیماری پہچانیں — بغیر انٹرنیٹ',
+      'sub.history':'آپ کی پچھلی سب جانچیں',
+      'sub.advisory':'آخری جانچ پر مبنی صلاح',
+      'sub.handbook':'چنی ہوئی فصل کی بیماریاں',
+      'sub.about':'ایپ کیسے کام کرتی ہے',
       'alert.title':'انتباہی گھنٹی',
       'alert.note':'اولے، کیڑے یا بیماری کی وارننگ پر فون بجے گا',
       'alert.on':'چالو کریں',
