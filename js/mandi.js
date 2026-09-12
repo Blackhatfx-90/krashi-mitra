@@ -104,7 +104,7 @@
    * ------------------------------------------------------------------- */
   const appState = () => (typeof state !== 'undefined') ? state : null;
   const appCrops = () => (typeof CROPS !== 'undefined') ? CROPS : {};
-  const appWeatherKey = () => (typeof WEATHER_API_KEY !== 'undefined') ? WEATHER_API_KEY : '';
+  const appWeatherKey = () => (typeof WEATHER_API_KEY !== 'undefined' && WEATHER_API_KEY) ? WEATHER_API_KEY : '520c40d9ec23d08f1445a7bd44b14f06';
 
   /** App ke apne helper — agar kisi wajah se na milein to app tootni nahi chahiye. */
   const esc  = (t) => (typeof escapeHtml === 'function' ? escapeHtml(t) : String(t == null ? '' : t));

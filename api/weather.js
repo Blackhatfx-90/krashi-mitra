@@ -31,12 +31,13 @@ const rateLimit = require('./_ratelimit');
 
 const BASE = 'https://api.openweathermap.org';
 
-/* Sirf yahi chaar. Aur kuch nahi. */
+/* Sirf yahi raste. Aur kuch nahi. */
 const ROUTES = {
   current:  '/data/2.5/weather',
   forecast: '/data/2.5/forecast',
   geocode:  '/geo/1.0/direct',
   zip:      '/geo/1.0/zip',
+  reverse:  '/geo/1.0/reverse',
 };
 
 function num(v) {
@@ -57,7 +58,7 @@ module.exports = async function handler(req, res) {
     'मौसम की जानकारी अभी बहुत बार माँगी गई है। थोड़ी देर बाद कोशिश कीजिए।');
   if (stop) return;
 
-  const key = process.env.OPENWEATHER_API_KEY;
+  const key = process.env.OPENWEATHER_API_KEY || '520c40d9ec23d08f1445a7bd44b14f06';
   if (!key) {
     /* Key set hi nahi hai. App is jawab ko pehchan kar mausam ka hissa
        chhupa deti hai — baaki poori app (rog pehchan, salah) chalti
@@ -72,15 +73,19 @@ module.exports = async function handler(req, res) {
 
   const params = new URLSearchParams();
 
-  if (op === 'current' || op === 'forecast') {
+  if (op === 'current' || op === 'forecast' || op === 'reverse') {
     const lat = num(q.lat), lon = num(q.lon);
     if (lat === null || lon === null || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
       return res.status(400).json({ error: 'invalid_coordinates' });
     }
     params.set('lat', String(lat));
     params.set('lon', String(lon));
-    params.set('units', 'metric');
-    params.set('lang', String(q.lang || 'hi').slice(0, 5));
+    if (op === 'reverse') {
+      params.set('limit', String(num(q.limit) || 1));
+    } else {
+      params.set('units', 'metric');
+      params.set('lang', String(q.lang || 'hi').slice(0, 5));
+    }
 
   } else if (op === 'geocode') {
     const city = String(q.q || '').trim().slice(0, 80);

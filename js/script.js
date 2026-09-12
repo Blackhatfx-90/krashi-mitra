@@ -47,6 +47,7 @@
  * Ab wo sirf server par rehti hai (Vercel me OPENWEATHER_API_KEY), aur
  * yeh file api/weather.js se poochti hai.
  * ------------------------------------------------------------------------- */
+const WEATHER_API_KEY = '520c40d9ec23d08f1445a7bd44b14f06';
 const WEATHER_PROXY = 'api/weather';
 
 
