@@ -27,6 +27,7 @@
 
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcryptjs');
+const rateLimit = require('./_ratelimit');
 const crypto = require('crypto');
 
 let clientPromise;
@@ -71,6 +72,26 @@ module.exports = async function handler(req, res) {
 
     /* ---------------- LOGIN ---------------- */
     if (req.method === 'POST' && action === 'login') {
+      /* ================================================================
+       * SEEMA — kisan wale login se TANG.
+       *
+       * Yahan ek hi portal ID hoti hai, poora gaon nahi. Aur is khate se
+       * sabhi kisano ko chetavni jaa sakti hai aur dawa ki MATRA badal
+       * sakti hai. Yani ise todne ka inaam bahut bada hai.
+       *
+       * 5 galat koshish / 15 minute / IP. Adhikari apna password 5 baar
+       * galat nahi daalta; script 5 par hi ruk jaati hai.
+       * Sahi password par ginti nahi badhti.
+       * ================================================================ */
+      const rl = await rateLimit.count(req, 'admin-login', 5, 900);
+      if (!rl.ok) {
+        res.setHeader('Retry-After', String(rl.retryAfter));
+        return res.status(429).json({
+          error: 'बहुत बार गलत पासवर्ड डाला गया है। कुछ मिनट बाद कोशिश कीजिए।',
+          retryAfter: rl.retryAfter,
+        });
+      }
+
       const ENV_ID = process.env.ADMIN_PORTAL_ID;
       const ENV_PW = process.env.ADMIN_PORTAL_PASSWORD;
       if (!ENV_ID || !ENV_PW) {
@@ -102,6 +123,7 @@ module.exports = async function handler(req, res) {
 
       const ok = portalId === admin.portalId && await bcrypt.compare(password, admin.passwordHash);
       if (!ok) {
+        await rateLimit.note(req, 'admin-login', 900);
         // Jaan-boojhkar nahi batate ki ID galat thi ya password
         return res.status(401).json({ error: 'पोर्टल आईडी या पासवर्ड गलत है।' });
       }
