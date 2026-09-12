@@ -112,7 +112,7 @@ async function ask(model, apiKey, sys, question, referer) {
       headers: {
         'Authorization': 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
-        'HTTP-Referer': referer || 'https://krashi-mitra.vercel.app',
+        'HTTP-Referer': referer || process.env.PUBLIC_SITE_URL || 'https://krashi-mitra.netlify.app',
         'X-Title': 'Krashi Mitra',
       },
       body: JSON.stringify({

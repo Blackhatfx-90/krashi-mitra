@@ -4,7 +4,9 @@
   "description": "Offline-first, **multi-crop** web app. फसल की पत्ती की फोटो से रोग की पहचान **आपके फ़ोन पर ही** होती है — कोई सर्वर नहीं, कोई API नहीं।",
   "main": "sw.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "bash scripts/build-netlify.sh",
+    "build:admin": "cd admin && npm install && npx vite build"
   },
   "repository": {
     "type": "git",

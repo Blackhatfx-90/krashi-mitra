@@ -46,10 +46,29 @@ function cookies(req) {
     .map((v) => { const i = v.indexOf('='); return [v.slice(0, i).trim(), decodeURIComponent(v.slice(i + 1))]; }));
 }
 
-/** App ka apna pata — Vercel ke peeche host header proxy se aata hai. */
+/* ---------------------------------------------------------------------------
+ * App ka apna pata.
+ *
+ * Yeh sabse nazuk cheez hai: isi se redirect_uri banta hai, aur Google use
+ * AKSHAR-DAR-AKSHAR milata hai us pate se jo Console me darj hai. Ek
+ * akshar ka farak = "Error 400: redirect_uri_mismatch" aur login band.
+ *
+ * Isliye teen parat:
+ *   1. PUBLIC_SITE_URL — agar set ho to wahi, bina kisi anuman ke.
+ *      (Netlify par ise set kar dena sabse surakshit hai — deploy preview
+ *       aur branch deploy ke apne-apne pate hote hain, aur unme se kisi
+ *       par bhi login tabhi chalega jab pata sthir ho.)
+ *   2. x-forwarded-host / host — aam haalat me yahi sahi hota hai.
+ *   3. kuch na mile to khali — neeche wala code use pehchan kar saaf
+ *      error deta hai, "https://undefined/..." par nahi bhejta.
+ * ------------------------------------------------------------------------- */
 function origin(req) {
+  const fixed = String(process.env.PUBLIC_SITE_URL || '').trim().replace(/\/+$/, '');
+  if (fixed) return fixed;
+
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const host  = req.headers['x-forwarded-host'] || req.headers.host;
+  if (!host) return '';
   return proto + '://' + host;
 }
 
@@ -77,7 +96,17 @@ function failBack(req, res, why) {
 module.exports = async function handler(req, res) {
   const CLIENT_ID     = process.env.GOOGLE_CLIENT_ID;
   const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-  const REDIRECT_URI  = origin(req) + '/api/google';
+  const site = origin(req);
+  if (!site) {
+    /* Pata hi nahi chala ki app kahan chal rahi hai. Aise me Google ke
+       paas bhejna bekaar hai — wo turant mismatch par gira dega. */
+    console.error('[google-auth] app ka pata nahi mila — PUBLIC_SITE_URL set kijiye');
+    return res.status(500).json({
+      error: 'site_url_missing',
+      messageHi: 'सर्वर पर साइट का पता सेट नहीं है। (PUBLIC_SITE_URL)',
+    });
+  }
+  const REDIRECT_URI  = site + '/api/google';
 
   /* ---------------------------------------------------------------------
    * JAANCH ka raasta:  /api/google?check=1

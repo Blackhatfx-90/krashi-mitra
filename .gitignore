@@ -27,3 +27,6 @@ build/
 # Regional admin dashboard — sirf source aur build committed hain
 admin/node_modules/
 admin/dist/
+
+# Local Netlify folder
+.netlify

@@ -40,10 +40,43 @@ const DEFAULT_MODELS = [
   'openrouter/free',                 // last resort: OpenRouter ka free router
 ];
 
-/** Ek model ko itna time — Vercel function 60s me khatam hona chahiye. */
-const PER_MODEL_TIMEOUT_MS = 22000;
-/** Zyada se zyada itne models try karenge (timeout budget ke andar). */
-const MAX_ATTEMPTS = 3;
+/* ---------------------------------------------------------------------------
+ * SAMAY KA BUDGET — yeh Netlify par aakar badalna PADA
+ *
+ * Pehle: har model ko 22 second, aur 3 model tak koshish = 66 second tak.
+ * Vercel par function ko 60 second mile the (vercel.json me maxDuration),
+ * isliye chal jata tha.
+ *
+ * Netlify par function ka waqt bahut kam hai (default 10 second). Agar hum
+ * 22 second wala model call chalu rakhte, to har baar function BEECH ME
+ * mar jata — kisan ko 502 milta, aur hum kabhi sahi kaaran bhi na dekh
+ * paate (log bhi katt jaate).
+ *
+ * Isliye ab ek KUL BUDGET hai, aur har model call usi ke andar rehta hai.
+ * Budget khatam hone par aage koshish hi nahi karte — seedha offline
+ * jawab ke saath saaf sandesh.
+ *
+ * Netlify par function ka waqt badha lein to bas env var badal dein,
+ * code chhune ki zaroorat nahi:
+ *     API_BUDGET_MS   = 9000   (default — 10s wale function me surakshit)
+ *     AI_MAX_ATTEMPTS = 2
+ * ------------------------------------------------------------------------- */
+const TOTAL_BUDGET_MS = Number(process.env.API_BUDGET_MS) || 9000;
+
+/** Jawab dene ke liye itna hissa hamesha bacha kar rakhte hain. */
+const SAFETY_MS = 1200;
+
+/** Zyada se zyada itne models try karenge (budget ke andar). */
+const MAX_ATTEMPTS = Number(process.env.AI_MAX_ATTEMPTS) || 2;
+
+/** Ek model ko zyada se zyada itna — par bacha hua budget isse chhota ho
+    to wahi chalta hai. */
+const PER_MODEL_TIMEOUT_MS = Math.max(3000, Math.floor(TOTAL_BUDGET_MS / MAX_ATTEMPTS));
+
+/** Kitna samay bacha hai. */
+function msLeft(startedAt) {
+  return TOTAL_BUDGET_MS - SAFETY_MS - (Date.now() - startedAt);
+}
 /** Photo ki max size (base64 ke baad). Vercel ki body limit 4.5 MB hai. */
 const MAX_IMAGE_CHARS = 3 * 1024 * 1024;
 
@@ -142,9 +175,10 @@ function matchLabel(guess, labels) {
   return partial || null;
 }
 
-async function callModel(model, apiKey, imageDataUrl, prompt, referer) {
+async function callModel(model, apiKey, imageDataUrl, prompt, referer, budgetMs) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), PER_MODEL_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(),
+                           Math.max(1500, Math.min(PER_MODEL_TIMEOUT_MS, budgetMs || PER_MODEL_TIMEOUT_MS)));
 
   try {
     const res = await fetch(OPENROUTER_URL, {
@@ -153,7 +187,7 @@ async function callModel(model, apiKey, imageDataUrl, prompt, referer) {
       headers: {
         'Authorization': 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
-        'HTTP-Referer': referer || 'https://krashi-mitra.vercel.app',
+        'HTTP-Referer': referer || process.env.PUBLIC_SITE_URL || 'https://krashi-mitra.netlify.app',
         'X-Title': 'Krashi Mitra - Crop Disease Detection',
       },
       body: JSON.stringify({
@@ -195,7 +229,7 @@ async function callModel(model, apiKey, imageDataUrl, prompt, referer) {
   }
 }
 
-async function callGemini(apiKey, imageDataUrl, prompt) {
+async function callGemini(apiKey, imageDataUrl, prompt, budgetMs) {
   const match = imageDataUrl.match(/^data:(image\/[a-z0-9.+-]+);base64,(.+)$/i);
   if (!match) return { ok: false, status: 400, error: 'bad_image' };
   const controller = new AbortController();
@@ -295,9 +329,10 @@ module.exports = async function handler(req, res) {
   const referer = req.headers && req.headers.origin;
   const chain = models();
   const tried = [];
+  const startedAt = Date.now();
 
-  if (geminiKey) {
-    const out = await callGemini(geminiKey, image, prompt);
+  if (geminiKey && msLeft(startedAt) > 1500) {
+    const out = await callGemini(geminiKey, image, prompt, msLeft(startedAt));
     tried.push(out.usedModel || 'gemini-2.0-flash');
     if (out.ok) {
       const parsed = parseJsonish(out.content);
@@ -311,8 +346,13 @@ module.exports = async function handler(req, res) {
   }
 
   for (let i = 0; apiKey && i < chain.length && tried.length < MAX_ATTEMPTS; i++) {
+    /* Budget khatam — aage koshish karne ka matlab sirf itna hai ki
+       function beech me mar jaye aur kisan ko 502 mile. Usse behtar hai
+       abhi rukna: offline jawab uske paas pehle se hai. */
+    if (msLeft(startedAt) < 1500) break;
+
     const model = chain[i];
-    const out = await callModel(model, apiKey, image, prompt, referer);
+    const out = await callModel(model, apiKey, image, prompt, referer, msLeft(startedAt));
     tried.push(model);
 
     if (!out.ok) {

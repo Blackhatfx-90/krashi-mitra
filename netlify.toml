@@ -1,0 +1,105 @@
+# ============================================================================
+# KRASHI MITRA — Netlify ka config
+#
+# Vercel se yahan aaye kyunki free plan par 12 se zyada serverless function
+# nahi chalte, aur app me 14 API raste hain. Netlify par wo saare EK hi
+# function se chalte hain (netlify/functions/api.js), isliye ginti ki
+# dikkat hi khatam.
+#
+# Yeh file Vercel ke vercel.json ki har cheez ka barabar roop hai —
+# headers, rewrites, cache — taaki kuch peeche na chhoote.
+# ============================================================================
+
+[build]
+  # dist/ me sirf wahi jaata hai jo browser ko chahiye. Seedha jad se
+  # publish karte to admin/node_modules (199 MB) bhi chadh jaata.
+  command  = "bash scripts/build-netlify.sh"
+  publish  = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+  # mongodb aur bcryptjs ko BUNDLE nahi karte — jyon ka tyon copy hote hain.
+  # mongodb apne andar dynamic require karta hai (optional driver, compression
+  # wagairah). esbuild un raston ko dhoondh nahi pata aur bundle chup-chaap
+  # adhoora reh jata hai — deploy safal dikhta hai, par login pehli hi
+  # request par girta hai. Ye jaal bahut aam hai, isliye pehle hi kaat diya.
+  external_node_modules = ["mongodb", "bcryptjs"]
+  # Function ko api/ aur lib/ chahiye — ye publish folder ke bahar hain,
+  # isliye bundle me alag se shaamil karne padte hain.
+  included_files = ["api/**", "lib/**", "data/**"]
+
+# ---------------------------------------------------------------------------
+# API — saare raste ek hi function par
+# ---------------------------------------------------------------------------
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# ---------------------------------------------------------------------------
+# Do dashboard (vercel.json ke rewrites ka barabar)
+# ---------------------------------------------------------------------------
+[[redirects]]
+  from = "/admin"
+  to = "/admin-portal/index.html"
+  status = 200
+
+# Regional admin ek single-page app hai — uske andar ka koi bhi rasta
+# usi ek index.html par khulna chahiye, warna page refresh par 404.
+[[redirects]]
+  from = "/regional-admin/*"
+  to = "/regional-admin/index.html"
+  status = 200
+
+# ---------------------------------------------------------------------------
+# Headers
+# ---------------------------------------------------------------------------
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
+
+# Service worker kabhi cache na ho — warna purana SW naye code ko rok deta
+# hai aur kisan ke phone par app hafton purani padi rehti hai.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
+
+# Model kabhi badalte nahi (naya aaye to naye naam se). Isliye hamesha ke
+# liye cache — khet ke dheeme net par yahi sabse badi rahat hai.
+[[headers]]
+  for = "/models/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/regional-admin/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/js/tf.min.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
