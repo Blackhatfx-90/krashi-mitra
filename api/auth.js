@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcryptjs');
+const rateLimit = require('./_ratelimit');
 
 let clientPromise;
 function client() {
@@ -14,9 +15,43 @@ function clearCookie(res) { res.setHeader('Set-Cookie', 'krashi_session=; Path=/
 function body(req) { return new Promise((resolve,reject)=>{ let s=''; req.on('data',c=>s+=c); req.on('end',()=>{try{resolve(s?JSON.parse(s):{})}catch(e){reject(e)}}); }); }
 async function db() { return (await client()).db(process.env.MONGODB_DB || 'krashi_mitra'); }
 async function userFor(req) { const c=cookies(req); if(!c.krashi_session) return null; const d=await db(); const session=await d.collection('sessions').findOne({token:c.krashi_session, expiresAt:{$gt:new Date()}}); return session ? d.collection('users').findOne({_id:session.userId}) : null; }
+/* ---------------------------------------------------------------------------
+ * PASSWORD AAZMANE KI SEEMA
+ *
+ * login par koi ginti nahi thi. Yani ek script ek hi email par hazaron
+ * password aazma sakti thi — kisan ke khate me ghusne ke liye koi aur
+ * rukawat hai hi nahi (na OTP, na captcha). bcrypt dheema zaroor hai, par
+ * dheema hona rok nahi hai.
+ *
+ * 10 galat koshish / 15 minute / IP. Jo aadmi apna hi password bhool gaya
+ * hai wo 3-4 baar me yaad kar leta hai; 10 usse kaafi upar hai.
+ *
+ * SIRF GALAT koshish ginti hai — sahi password par ginti nahi badhti,
+ * warna ek ghar ke kai log ek hi phone se login karein to aapas me hi
+ * atak jaate.
+ *
+ * signup par bhi seema hai, warna ek script hazaron farzi khate bana kar
+ * database bhar de.
+ * ------------------------------------------------------------------------- */
+const LOGIN_TRIES = 10, LOGIN_WINDOW = 900;      // 15 minute
+const SIGNUP_TRIES = 5, SIGNUP_WINDOW = 3600;    // 1 ghanta
+
 module.exports = async (req,res) => { res.setHeader('Content-Type','application/json'); try { const d=await db(); const action=req.query.action; const input=await body(req);
-  if(req.method==='POST' && action==='signup'){ const email=String(input.email||'').trim().toLowerCase(), phone=String(input.phone||'').replace(/\D/g,'').slice(-10), password=String(input.password||''); if(!email||phone.length!==10||password.length<8) return res.status(400).json({error:'नाम, ईमेल, 10 अंकों का मोबाइल और कम से कम 8 अक्षर का पासवर्ड जरूरी है।'}); const exists=await d.collection('users').findOne({$or:[{email},{phone}]}); if(exists) return res.status(409).json({error:'यह ईमेल या मोबाइल पहले से पंजीकृत है।'}); const now=new Date(), user={name:String(input.name).trim(),email,phone,passwordHash:await bcrypt.hash(password,12),authProvider:'password',profile:null,createdAt:now,updatedAt:now}; const r=await d.collection('users').insertOne(user); const t=token(); await d.collection('sessions').insertOne({token:t,userId:r.insertedId,expiresAt:new Date(Date.now()+2592000000)}); setCookie(res,t); return res.status(201).json({user:{name:user.name,email,phone},profileComplete:false}); }
-  if(req.method==='POST' && action==='login'){ const email=String(input.email||'').trim().toLowerCase(), password=String(input.password||''); const user=await d.collection('users').findOne({email}); if(!user) return res.status(401).json({error:'ईमेल या पासवर्ड गलत है।'}); if(!user.passwordHash) return res.status(409).json({error:'यह खाता Google से बना है और अभी इसका पासवर्ड सेट नहीं हुआ। कृपया एक बार Google से लॉगिन करके पासवर्ड बनाएँ।',needsGoogle:true}); if(!(await bcrypt.compare(password,user.passwordHash))) return res.status(401).json({error:'ईमेल या पासवर्ड गलत है।'}); const t=token(); await d.collection('sessions').insertOne({token:t,userId:user._id,expiresAt:new Date(Date.now()+2592000000)}); setCookie(res,t); return res.json({user:{name:user.name,email:user.email,phone:user.phone},profileComplete:Boolean(user.profile)}); }
+  if(req.method==='POST' && (action==='login'||action==='signup')){
+    const isLogin = action==='login';
+    const r = await rateLimit.count(req, isLogin?'login':'signup',
+                                    isLogin?LOGIN_TRIES:SIGNUP_TRIES,
+                                    isLogin?LOGIN_WINDOW:SIGNUP_WINDOW);
+    if(!r.ok){
+      res.setHeader('Retry-After', String(r.retryAfter));
+      return res.status(429).json({ error: isLogin
+        ? 'बहुत बार गलत पासवर्ड डाला गया है। कृपया कुछ मिनट बाद दोबारा कोशिश कीजिए।'
+        : 'बहुत सारे खाते बनाने की कोशिश हुई है। कृपया थोड़ी देर बाद कोशिश कीजिए।',
+        retryAfter: r.retryAfter });
+    }
+  }
+  if(req.method==='POST' && action==='signup'){ const email=String(input.email||'').trim().toLowerCase(), phone=String(input.phone||'').replace(/\D/g,'').slice(-10), password=String(input.password||''); if(!email||phone.length!==10||password.length<8) return res.status(400).json({error:'नाम, ईमेल, 10 अंकों का मोबाइल और कम से कम 8 अक्षर का पासवर्ड जरूरी है।'}); const exists=await d.collection('users').findOne({$or:[{email},{phone}]}); if(exists) return res.status(409).json({error:'यह ईमेल या मोबाइल पहले से पंजीकृत है।'}); const now=new Date(), user={name:String(input.name).trim(),email,phone,passwordHash:await bcrypt.hash(password,12),authProvider:'password',profile:null,createdAt:now,updatedAt:now}; const r=await d.collection('users').insertOne(user); const t=token(); await d.collection('sessions').insertOne({token:t,userId:r.insertedId,expiresAt:new Date(Date.now()+2592000000)}); setCookie(res,t); await rateLimit.note(req,'signup',SIGNUP_WINDOW); return res.status(201).json({user:{name:user.name,email,phone},profileComplete:false}); }
+  if(req.method==='POST' && action==='login'){ const email=String(input.email||'').trim().toLowerCase(), password=String(input.password||''); const user=await d.collection('users').findOne({email}); if(!user) { await rateLimit.note(req,'login',LOGIN_WINDOW); return res.status(401).json({error:'ईमेल या पासवर्ड गलत है।'}); } if(!user.passwordHash) return res.status(409).json({error:'यह खाता Google से बना है और अभी इसका पासवर्ड सेट नहीं हुआ। कृपया एक बार Google से लॉगिन करके पासवर्ड बनाएँ।',needsGoogle:true}); if(!(await bcrypt.compare(password,user.passwordHash))) { await rateLimit.note(req,'login',LOGIN_WINDOW); return res.status(401).json({error:'ईमेल या पासवर्ड गलत है।'}); } const t=token(); await d.collection('sessions').insertOne({token:t,userId:user._id,expiresAt:new Date(Date.now()+2592000000)}); setCookie(res,t); return res.json({user:{name:user.name,email:user.email,phone:user.phone},profileComplete:Boolean(user.profile)}); }
   if(req.method==='GET' && action==='session'){ const user=await userFor(req); if(!user) return res.status(401).json({authenticated:false}); return res.json({authenticated:true,user:{name:user.name,email:user.email,phone:user.phone},profile:user.profile||null,language:user.language||null,needsPassword:!user.passwordHash,authProvider:user.authProvider||'password'}); }
   if(req.method==='POST' && action==='profile'){ const user=await userFor(req); if(!user) return res.status(401).json({error:'सत्र समाप्त हो गया।'}); const land=Number(input.landAmount); if(!input.village||!input.state||!/^[0-9]{6}$/.test(String(input.pin||''))||!Number.isFinite(land)||land<=0) return res.status(400).json({error:'कृपया गांव, राज्य, सही PIN और जमीन की मात्रा भरें।'}); const profile={village:String(input.village).trim(),state:String(input.state),pin:String(input.pin),landAmount:land,landUnit:String(input.landUnit||'acre'),updatedAt:new Date()}; await d.collection('users').updateOne({_id:user._id},{$set:{profile,updatedAt:new Date()}}); return res.json({profile}); }
   /* Chuni hui bhasha account ke saath sambhal lete hain, taaki naya phone

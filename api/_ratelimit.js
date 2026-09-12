@@ -46,31 +46,59 @@ function callerIp(req) {
  * @param {number} windowSec khidki kitni lambi (second)
  * @returns {Promise<{ok:boolean, retryAfter:number}>}
  */
-async function check(req, bucket, max, windowSec) {
+function fieldFor(bucket, ip, windowSec, now) {
+  return bucket + ':' + ip + ':' + Math.floor(now / (windowSec * 1000));
+}
+
+/**
+ * SIRF DEKHTA HAI — ginti nahi badhata.
+ * Login ke liye yahi chahiye: seema sirf GALAT koshish par badhni chahiye,
+ * har koshish par nahi. Warna ek ghar ke kai log ek hi phone se login
+ * karein to wo aapas me hi atak jaate.
+ */
+async function count(req, bucket, max, windowSec) {
   const ip = callerIp(req);
   if (ip === 'unknown') return { ok: true, retryAfter: 0 };   // pata hi nahi — rokna galat hoga
 
   const now = Date.now();
   const win = Math.floor(now / (windowSec * 1000));
-  const field = bucket + ':' + ip + ':' + win;
+  const field = fieldFor(bucket, ip, windowSec, now);
 
   try {
     const all = await store.hashAll(KEY);
     const row = all[field];
-    const count = (row && Number(row.n)) || 0;
+    const n = (row && Number(row.n)) || 0;
 
-    if (count >= max) {
+    if (n >= max) {
       const nextWindowAt = (win + 1) * windowSec * 1000;
       return { ok: false, retryAfter: Math.max(1, Math.ceil((nextWindowAt - now) / 1000)) };
     }
+    return { ok: true, retryAfter: 0, used: n };
 
-    await store.hashSet(KEY, field, { n: count + 1, at: now });
+  } catch (e) {
+    console.error('[ratelimit] jaanch fail, khula chhod rahe hain:', e && e.message);
+    return { ok: true, retryAfter: 0 };            // fail-open
+  }
+}
+
+/** Ek koshish ginti me jodta hai. */
+async function note(req, bucket, windowSec) {
+  const ip = callerIp(req);
+  if (ip === 'unknown') return;
+
+  const now = Date.now();
+  const field = fieldFor(bucket, ip, windowSec || 900, now);
+
+  try {
+    const all = await store.hashAll(KEY);
+    const row = all[field];
+    await store.hashSet(KEY, field, { n: ((row && Number(row.n)) || 0) + 1, at: now });
 
     /* Purani khidkiyon ki entry jhaad dete hain — warna ye hash hamesha
        badhta rehta. Har baar nahi, kabhi-kabhi (taaki har request par
        poora hash na saaf karna pade). */
     if (Math.random() < 0.02) {
-      const cutoff = now - windowSec * 1000 * 3;
+      const cutoff = now - (windowSec || 900) * 1000 * 3;
       for (const f of Object.keys(all)) {
         const r = all[f];
         if (r && Number(r.at) && Number(r.at) < cutoff) {
@@ -78,13 +106,17 @@ async function check(req, bucket, max, windowSec) {
         }
       }
     }
-
-    return { ok: true, retryAfter: 0 };
-
   } catch (e) {
-    console.error('[ratelimit] jaanch fail, khula chhod rahe hain:', e && e.message);
-    return { ok: true, retryAfter: 0 };            // fail-open
+    console.error('[ratelimit] ginti nahi likhi:', e && e.message);   // fail-open
   }
+}
+
+/** Dekho AUR gino — AI wale raston ke liye, jahan har call kharcha hai. */
+async function check(req, bucket, max, windowSec) {
+  const r = await count(req, bucket, max, windowSec);
+  if (!r.ok) return r;
+  await note(req, bucket, windowSec);
+  return { ok: true, retryAfter: 0 };
 }
 
 /** Rukna pade to seedha jawab bhej deta hai. true = request yahin khatam. */
@@ -102,4 +134,4 @@ async function blocked(req, res, bucket, max, windowSec, messageHi) {
   return true;
 }
 
-module.exports = { check, blocked, callerIp };
+module.exports = { check, count, note, blocked, callerIp };
