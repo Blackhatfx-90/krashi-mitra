@@ -79,8 +79,7 @@ function makeReq(event, rawBody) {
     method: event.httpMethod || 'GET',
     url: event.path,
     headers: headers,
-    query: Object.assign({}, event.queryStringParameters || {},
-                             event.multiValueQueryStringParameters || {}),
+    query: Object.assign({}, event.queryStringParameters || {}),
     body: parsed,
   };
 
