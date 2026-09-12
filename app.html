@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#ffffff" />
   <meta name="description" content="Krashi Mitra — Offline crop disease detection and smart advisory for farmers" />
 
-  <title>Krashi Mitra — फसल रोग पहचान व सलाह</title>
+  <title data-i18n="ui.a01">Krashi Mitra — फसल रोग पहचान व सलाह</title>
 
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.json" />
@@ -317,7 +317,7 @@
     <!-- Abhi kaun si fasal chuni hai -->
     <button type="button" class="crop-chip" id="changeCropBtn" data-view="crops">
       <span id="cropChip"><svg class="ic ic--inline"><use href="#i-sprout"/></svg> फसल चुनें</span>
-      <span class="crop-chip__change">बदलें</span>
+      <span class="crop-chip__change" data-i18n="ui.a02">बदलें</span>
     </button>
 
     <nav class="nav" aria-label="मुख्य मेन्यू">
@@ -355,7 +355,7 @@
 
       <!-- HAMESHA dikhta hai — kisan ko app phone me lene ka seedha rasta -->
       <button type="button" class="nav__item nav__item--get" id="getAppBtn">
-        <svg class="ic"><use href="#i-download"/></svg><span>ऐप डाउनलोड करें</span>
+        <svg class="ic"><use href="#i-download"/></svg><span data-i18n="ui.a03">ऐप डाउनलोड करें</span>
         <span class="nav__badge nav__badge--new" id="getAppBadge">APP</span>
       </button>
     </nav>
@@ -364,8 +364,8 @@
       <div class="help-card__avatar" aria-hidden="true"><svg class="ic"><use href="#i-user"/></svg></div>
       <div>
         <p class="help-card__title">Need Help?</p>
-        <p class="help-card__sub">कृषि विज्ञान केंद्र से बात करें</p>
-        <a class="help-card__btn" href="tel:18001801551">किसान कॉल सेंटर</a>
+        <p class="help-card__sub" data-i18n="ui.a04">कृषि विज्ञान केंद्र से बात करें</p>
+        <a class="help-card__btn" href="tel:18001801551" data-i18n="ui.a05">किसान कॉल सेंटर</a>
       </div>
     </div>
   </aside>
@@ -384,8 +384,8 @@
       </button>
 
       <div class="topbar__title">
-        <h1 id="viewTitle">नमस्ते, किसान भाई</h1>
-        <p id="viewSubtitle">पत्ती की फोटो से रोग पहचानें — बिना इंटरनेट के</p>
+        <h1 id="viewTitle" data-i18n="ui.a06">नमस्ते, किसान भाई</h1>
+        <p id="viewSubtitle" data-i18n="ui.a07">पत्ती की फोटो से रोग पहचानें — बिना इंटरनेट के</p>
       </div>
 
       <div class="topbar__meta">
@@ -404,7 +404,7 @@
       <div id="errorBanner" class="alert alert--error" hidden>
         <svg class="ic"><use href="#i-alert"/></svg>
         <div class="alert__body">
-          <strong id="errorTitle">त्रुटि / Error</strong>
+          <strong id="errorTitle" data-i18n="ui.a08">त्रुटि / Error</strong>
           <p id="errorMessage"></p>
           <p id="errorMessageEn" class="alert__en" hidden></p>
         </div>
@@ -435,7 +435,7 @@
         <article class="card">
           <div class="card__head">
             <h2 data-i18n="head.chooseCrop">आपकी फसल कौन सी है?</h2>
-            <p>Which is your crop? — फसल चुनते ही सिर्फ उसी का AI मॉडल लोड होगा (तेज़ और हल्का)</p>
+            <p data-i18n="ui.a09">Which is your crop? — फसल चुनते ही सिर्फ उसी का AI मॉडल लोड होगा (तेज़ और हल्का)</p>
           </div>
           <div class="crop-grid" id="cropGrid"></div>
           <p class="tip">
@@ -453,11 +453,11 @@
           <div class="card__head card__head--row">
             <div>
               <h2 data-i18n="head.weather">आज का मौसम / Weather</h2>
-              <p id="weatherPlace">आपके खेत के पास</p>
+              <p id="weatherPlace" data-i18n="ui.a10">आपके खेत के पास</p>
             </div>
             <div class="weather-actions">
               <button type="button" class="speak-btn" id="weatherSpeakBtn" data-speaking="false" disabled>
-                <svg class="ic"><use href="#i-speaker"/></svg><span>सुनो / Listen</span>
+                <svg class="ic"><use href="#i-speaker"/></svg><span data-i18n="ui.a11">सुनो / Listen</span>
               </button>
               <button type="button" class="icon-btn" id="weatherRefreshBtn" aria-label="ताज़ा करें / Refresh">
                 <svg class="ic"><use href="#i-refresh"/></svg>
@@ -468,7 +468,7 @@
           <div id="weatherBody"></div>
 
           <p class="weather-foot">
-            <svg class="ic ic--xs"><use href="#i-globe"/></svg> मौसम के लिए इंटरनेट + लोकेशन चाहिए। <strong>रोग पहचान बिना इंटरनेट के काम करती है।</strong>
+            <svg class="ic ic--xs"><use href="#i-globe"/></svg> मौसम के लिए इंटरनेट + लोकेशन चाहिए। <strong data-i18n="ui.a12">रोग पहचान बिना इंटरनेट के काम करती है।</strong>
           </p>
         </article>
 
@@ -478,11 +478,11 @@
           <div class="card__head card__head--row">
             <div>
               <h2 data-i18n="head.mandi">आस-पास की मंडी का भाव</h2>
-              <p>अपनी फसल कहाँ बेचने पर सबसे अच्छा दाम मिलेगा</p>
+              <p data-i18n="ui.a13">अपनी फसल कहाँ बेचने पर सबसे अच्छा दाम मिलेगा</p>
             </div>
             <div class="mandi-actions">
               <button type="button" class="speak-btn" id="mandiSpeakBtn" data-speaking="false" disabled>
-                <svg class="ic"><use href="#i-speaker"/></svg><span>सुनो / Listen</span>
+                <svg class="ic"><use href="#i-speaker"/></svg><span data-i18n="ui.a14">सुनो / Listen</span>
               </button>
               <button type="button" class="icon-btn" id="mandiRefreshBtn" aria-label="ताज़ा करें / Refresh">
                 <svg class="ic"><use href="#i-refresh"/></svg>
@@ -496,18 +496,18 @@
         <!-- ---------- KHETI SAHAYAK (js/farm-tools.js) ---------- -->
         <article class="card ft-card" id="farmToolsCard">
           <div class="card__head">
-            <h2>खेती सहायक</h2>
-            <p>खाद का हिसाब, इस समय क्या करें, और किससे सलाह लें — सब बिना इंटरनेट</p>
+            <h2 data-i18n="ui.a15">खेती सहायक</h2>
+            <p data-i18n="ui.a16">खाद का हिसाब, इस समय क्या करें, और किससे सलाह लें — सब बिना इंटरनेट</p>
           </div>
 
           <div class="ft-controls">
-            <label for="ftSize">ज़मीन</label>
+            <label for="ftSize" data-i18n="ui.a17">ज़मीन</label>
             <input type="number" id="ftSize" value="1" min="0.1" step="0.1" inputmode="decimal" />
             <select id="ftUnit" aria-label="ज़मीन की इकाई">
-              <option value="acre">एकड़</option>
-              <option value="hectare">हेक्टेयर</option>
-              <option value="bigha">बीघा</option>
-              <option value="kanal">कनाल</option>
+              <option value="acre" data-i18n="ui.a18">एकड़</option>
+              <option value="hectare" data-i18n="ui.a19">हेक्टेयर</option>
+              <option value="bigha" data-i18n="ui.a20">बीघा</option>
+              <option value="kanal" data-i18n="ui.a21">कनाल</option>
             </select>
             <input type="hidden" id="ftStage" value="vegetative" />
           </div>
@@ -522,7 +522,7 @@
           <article class="card">
             <div class="card__head">
               <h2 data-i18n="head.scan">Scan &amp; Detect Disease</h2>
-              <p id="scanCropHint">चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें</p>
+              <p id="scanCropHint" data-i18n="ui.a22">चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें</p>
             </div>
 
             <!-- Jaanch ka tarika: ऑटो / ���नलाइन AI / ऑफ़लाइन -->
@@ -547,7 +547,7 @@
               <div class="dropzone__inner" id="dropzoneEmpty">
                 <span class="dropzone__badge"><svg class="ic"><use href="#i-camera"/></svg></span>
                 <p class="dropzone__title">Upload Image</p>
-                <p class="dropzone__sub">या फोटो यहाँ खींचकर छोड़ें</p>
+                <p class="dropzone__sub" data-i18n="ui.a23">या फोटो यहाँ खींचकर छोड़ें</p>
               </div>
               <div class="dropzone__preview" id="previewWrap" hidden>
                 <img id="previewImg" alt="चुनी गई पत्ती की फोटो" />
@@ -570,7 +570,7 @@
             <div class="batch">
               <div class="batch__head">
                 <span class="batch__count" id="batchCount">0 / 40</span>
-                <button type="button" class="link-btn link-btn--danger" id="batchClearBtn" hidden>
+                <button type="button" class="link-btn link-btn--danger" id="batchClearBtn" hidden data-i18n="ui.a24">
                   सब हटाएँ
                 </button>
               </div>
@@ -580,11 +580,11 @@
 
             <button type="button" class="btn btn--block btn--dark" id="batchScanBtn" disabled>
               <svg class="ic"><use href="#i-leaf"/></svg>
-              <span>कम से कम 2 फोटो चाहिए</span>
+              <span data-i18n="ui.a25">कम से कम 2 फोटो चाहिए</span>
             </button>
 
             <p class="tip">
-              टिप: खेत की <strong>अलग-अलग जगहों</strong> से पत्तियों की फोटो लें (2 से 40) —
+              टिप: खेत की <strong data-i18n="ui.a26">अलग-अलग जगहों</strong> से पत्तियों की फोटो लें (2 से 40) —
               एक ही पत्ती से पूरे खेत का हाल पता नहीं चलता। साफ रोशनी, सादा बैकग्राउंड।
             </p>
           </article>
@@ -594,7 +594,7 @@
             <div class="card__head card__head--row">
               <div>
                 <h2 data-i18n="head.recent">Recent Detections</h2>
-                <p>पिछली जाँचें (इसी फ़ोन में सुरक्षित)</p>
+                <p data-i18n="ui.a27">पिछली जाँचें (इसी फ़ोन में सुरक्षित)</p>
               </div>
               <button type="button" class="link-btn" data-view="history">View All</button>
             </div>
@@ -609,8 +609,8 @@
         <!-- Batch scan chal raha hai — step by step -->
         <article class="card" id="batchProgress" hidden>
           <div class="card__head">
-            <h2>जाँच चल रही है…</h2>
-            <p id="batchProgressText">फोटो 1 / 5 जाँची जा रही है…</p>
+            <h2 data-i18n="ui.a28">जाँच चल रही है…</h2>
+            <p id="batchProgressText" data-i18n="ui.a29">फोटो 1 / 5 जाँची जा रही है…</p>
           </div>
           <div class="batch__bar"><i id="batchBarFill"></i></div>
           <p class="muted-sm" id="batchProgressSub"></p>
@@ -619,7 +619,7 @@
         <!-- Analysing (ek photo wala purana box) -->
         <div class="card card--center" id="loadingBox" hidden>
           <span class="spinner" aria-hidden="true"></span>
-          <p id="loadingText">जाँच हो रही है… / Analysing…</p>
+          <p id="loadingText" data-i18n="ui.a30">जाँच हो रही है… / Analysing…</p>
         </div>
 
         <!-- ---------- RESULT ---------- -->
@@ -630,12 +630,12 @@
             <div class="low-conf__head">
               <span class="low-conf__icon"><svg class="ic"><use href="#i-alert"/></svg></span>
               <div>
-                <h2>यह पत्ती की फोटो नहीं लग रही</h2>
-                <p id="notPlantReason">इस फोटो में पौधे जैसा कुछ नहीं मिला।</p>
+                <h2 data-i18n="ui.a31">यह पत्ती की फोटो नहीं लग रही</h2>
+                <p id="notPlantReason" data-i18n="ui.a32">इस फोटो में पौधे जैसा कुछ नहीं मिला।</p>
               </div>
             </div>
             <ul class="low-conf__tips" id="notPlantTips"></ul>
-            <p class="not-plant__why">
+            <p class="not-plant__why" data-i18n="ui.a33">
               ऐसी फोटो पर जाँच जान-बूझकर रोकी गई है, क्योंकि AI मॉडल हर फोटो को किसी न किसी
               रोग में डाल देता है — और गलत सलाह से फसल को नुकसान हो सकता है।
             </p>
@@ -643,7 +643,7 @@
               <button type="button" class="btn btn--primary" id="retakeBtn">
                 <svg class="ic"><use href="#i-camera"/></svg> दूसरी फोटो लें
               </button>
-              <button type="button" class="btn btn--ghost" id="forceScanBtn">
+              <button type="button" class="btn btn--ghost" id="forceScanBtn" data-i18n="ui.a34">
                 फिर भी जाँचें
               </button>
             </div>
@@ -653,7 +653,7 @@
           <article class="card" id="batchSummaryCard" hidden>
             <div class="card__head">
               <h2 data-i18n="head.result">पूरे खेत का नतीजा</h2>
-              <p>सभी फोटो मिलाकर</p>
+              <p data-i18n="ui.a35">सभी फोटो मिलाकर</p>
             </div>
             <div id="batchSummary"></div>
           </article>
@@ -671,15 +671,15 @@
             <div class="low-conf__head">
               <span class="low-conf__icon"><svg class="ic"><use href="#i-alert"/></svg></span>
               <div>
-                <h2>सही तरह identify नहीं हो पाया</h2>
-                <p>कृपया clear फोटो लें या सही crop की leaf upload करें</p>
+                <h2 data-i18n="ui.a36">सही तरह identify नहीं हो पाया</h2>
+                <p data-i18n="ui.a37">कृपया clear फोटो लें या सही crop की leaf upload करें</p>
               </div>
             </div>
             <ul class="low-conf__tips">
-              <li>पत्ती को तेज़ धूप में नहीं, छाँव की साफ रोशनी में रखें</li>
-              <li>कैमरा 15–20 cm दूर रखें, पत्ती पूरी फ्रेम में हो</li>
-              <li>बैकग्राउंड सादा रखें (हाथ या कागज़ के ऊपर पत्ती)</li>
-              <li>फोटो हिली हुई (blurred) न हो</li>
+              <li data-i18n="ui.a38">पत्ती को तेज़ धूप में नहीं, छाँव की साफ रोशनी में रखें</li>
+              <li data-i18n="ui.a39">कैमरा 15–20 cm दूर रखें, पत्ती पूरी फ्रेम में हो</li>
+              <li data-i18n="ui.a40">बैकग्राउंड सादा रखें (हाथ या कागज़ के ऊपर पत्ती)</li>
+              <li data-i18n="ui.a41">फोटो हिली हुई (blurred) न हो</li>
             </ul>
             <p class="low-conf__score">
               सर्वाधिक मिलान / Best guess: <strong id="lowConfBest">—</strong>
@@ -690,7 +690,7 @@
           <article class="card advisory-card" id="advisoryCard" hidden>
             <div class="card__head">
               <h2 data-i18n="head.advisory">AI Smart Advisory</h2>
-              <p>आपकी फसल के लिए सुझाई गई कार्रवाई</p>
+              <p data-i18n="ui.a42">आपकी फसल के लिए सुझाई गई कार्रवाई</p>
             </div>
             <div class="advisory-body" id="advisoryHost"></div>
           </article>
@@ -700,7 +700,7 @@
             <div class="card__head card__head--row">
               <div>
                 <h2 data-i18n="head.scores">Confidence Scores</h2>
-                <p id="scoresSub">सभी श्रेणियों की संभावना</p>
+                <p id="scoresSub" data-i18n="ui.a43">सभी श्रेणियों की संभावना</p>
               </div>
               <span class="muted-sm">threshold 75%</span>
             </div>
@@ -720,7 +720,7 @@
           <div class="card__head card__head--row">
             <div>
               <h2 data-i18n="head.history">Detection History</h2>
-              <p>सभी पिछली जाँचें — सिर्फ इसी फ़ोन में सुरक्षित, कहीं अपलोड नहीं होतीं</p>
+              <p data-i18n="ui.a44">सभी पिछली जाँचें — सिर्फ इसी फ़ोन में सुरक्षित, कहीं अपलोड नहीं होतीं</p>
             </div>
             <button type="button" class="link-btn link-btn--danger" id="clearHistoryBtn">
               <svg class="ic"><use href="#i-trash"/></svg> Clear
@@ -736,7 +736,7 @@
         <article class="card">
           <div class="card__head">
             <h2>Smart Advisory</h2>
-            <p>आख़िरी जाँच के आधार पर सलाह</p>
+            <p data-i18n="ui.a45">आख़िरी जाँच के आधार पर सलाह</p>
           </div>
           <div id="advisoryMirror" class="advisory-body"></div>
         </article>
@@ -747,11 +747,11 @@
       <section class="view" id="view-community">
         <article class="card cm-card" id="communityCard">
           <div class="card__head">
-            <h2>किसान चौपाल</h2>
-            <p>अपने इलाके के किसानों से पूछें — जो जवाब मॉडल नहीं दे सकता</p>
+            <h2 data-i18n="ui.a46">किसान चौपाल</h2>
+            <p data-i18n="ui.a47">अपने इलाके के किसानों से पूछें — जो जवाब मॉडल नहीं दे सकता</p>
           </div>
           <div id="communityBody"></div>
-          <p class="cm-warn">
+          <p class="cm-warn" data-i18n="ui.a48">
             यहाँ की सलाह किसानों की अपनी है, कृषि विभाग की नहीं। दवा की मात्रा
             हमेशा लेबल देखकर और अपने कृषि विज्ञान केंद्र से पूछकर ही तय करें।
           </p>
@@ -763,7 +763,7 @@
       <section class="view" id="view-handbook">
         <article class="card">
           <div class="card__head">
-            <h2>Crop Guide — रोग पुस्तिका</h2>
+            <h2 data-i18n="ui.a49">Crop Guide — रोग पुस्तिका</h2>
             <p>फसल: <strong id="handbookCropName">—</strong> · बिना फोटो के भी सभी रोगों की पूरी जानकारी (ऑफ़लाइन)</p>
           </div>
           <div id="libraryHost" class="library"></div>
@@ -778,20 +778,20 @@
         <article class="card install-card" id="installCard">
           <div class="card__head">
             <h2 data-i18n="head.install">ऐप फ़ोन में लें</h2>
-            <p>होम स्क्रीन पर आइकॉन बन जाएगा, ऐप बिना ब्राउज़र के खुलेगी और बिना
+            <p data-i18n="ui.a50">होम स्क्रीन पर आइकॉन बन जाएगा, ऐप बिना ब्राउज़र के खुलेगी और बिना
                इंटरनेट भी चलेगी।</p>
           </div>
 
           <!-- APK (tabhi dikhega jab script.js me APK_URL bhara ho) -->
           <a class="btn btn--primary btn--block" id="apkBtn" href="#" hidden download>
             <svg class="ic"><use href="#i-download"/></svg>
-            <span>APK डाउनलोड करें / Download APK</span>
+            <span data-i18n="ui.a51">APK डाउनलोड करें / Download APK</span>
           </a>
 
           <!-- PWA install (Chrome/Android/desktop) -->
           <button type="button" class="btn btn--dark btn--block" id="installBtn" hidden>
             <svg class="ic"><use href="#i-download"/></svg>
-            <span>इंस्टॉल करें / Install app</span>
+            <span data-i18n="ui.a52">इंस्टॉल करें / Install app</span>
           </button>
 
           <p class="install-note" id="installNote"></p>
@@ -801,29 +801,29 @@
         <!-- Krishi vibhag ko jaanch bhejna — DEFAULT BAND -->
         <article class="card">
           <div class="card__head">
-            <h2>कृषि विभाग को जाँच भेजें</h2>
-            <p>आपके इलाके में रोग फैलने पर विभाग समय रहते चेतावनी भेज सके, इसके लिए।</p>
+            <h2 data-i18n="ui.a53">कृषि विभाग को जाँच भेजें</h2>
+            <p data-i18n="ui.a54">आपके इलाके में रोग फैलने पर विभाग समय रहते चेतावनी भेज सके, इसके लिए।</p>
           </div>
           <ul class="bullets">
-            <li><strong>क्या जाता है:</strong> जाँच का नतीजा, फसल का नाम, और पत्ती का छोटा फोटो।</li>
-            <li><strong>क्या कभी नहीं जाता:</strong> आपका नाम और फ़ोन नंबर।</li>
-            <li>जगह तभी जाती है जब आपने मौसम के लिए पहले से जगह दी हो।</li>
-            <li>बिना इंटरनेट कुछ भी नहीं भेजा जाता — ऑफ़लाइन जाँच पूरी तरह निजी रहती है।</li>
+            <li><strong data-i18n="ui.a55">क्या जाता है:</strong> जाँच का नतीजा, फसल का नाम, और पत्ती का छोटा फोटो।</li>
+            <li><strong data-i18n="ui.a56">क्या कभी नहीं जाता:</strong> आपका नाम और फ़ोन नंबर।</li>
+            <li data-i18n="ui.a57">जगह तभी जाती है जब आपने मौसम के लिए पहले से जगह दी हो।</li>
+            <li data-i18n="ui.a58">बिना इंटरनेट कुछ भी नहीं भेजा जाता — ऑफ़लाइन जाँच पूरी तरह निजी रहती है।</li>
           </ul>
           <button type="button" class="btn btn--ghost btn--block" id="reportToggle"
-                  aria-pressed="false">भेजना चालू करें</button>
+                  aria-pressed="false" data-i18n="ui.a59">भेजना चालू करें</button>
           <p class="muted-sm" id="reportNote"></p>
         </article>
 
         <!-- MERA DATA (js/privacy-tools.js) — privacy.html me likhi baat par amal -->
         <article class="card pv-card">
           <div class="card__head">
-            <h2>मेरा डेटा</h2>
-            <p>यह ऐप आपके फ़ोन पर क्या रखता है — और उसे उतारने या मिटाने का बटन</p>
+            <h2 data-i18n="ui.a60">मेरा डेटा</h2>
+            <p data-i18n="ui.a61">यह ऐप आपके फ़ोन पर क्या रखता है — और उसे उतारने या मिटाने का बटन</p>
           </div>
           <div id="privacyToolsBody"></div>
           <p class="muted-sm">
-            <a href="privacy.html">निजता नीति</a> · <a href="terms.html">शर्तें</a>
+            <a href="privacy.html" data-i18n="ui.a62">निजता नीति</a> · <a href="terms.html" data-i18n="ui.a63">शर्तें</a>
           </p>
         </article>
 
@@ -831,10 +831,10 @@
         <article class="card">
           <div class="card__head card__head--row">
             <div>
-              <h2>ऑफ़लाइन मॉडल</h2>
-              <p>खेत जाने से पहले वाई-फ़ाई पर मॉडल डाउनलोड कर लें — फिर बिना नेटवर्क भी जाँच चलेगी।</p>
+              <h2 data-i18n="ui.a64">ऑफ़लाइन मॉडल</h2>
+              <p data-i18n="ui.a65">खेत जाने से पहले वाई-फ़ाई पर मॉडल डाउनलोड कर लें — फिर बिना नेटवर्क भी जाँच चलेगी।</p>
             </div>
-            <button type="button" class="link-btn" id="downloadAllBtn">सभी डाउनलोड</button>
+            <button type="button" class="link-btn" id="downloadAllBtn" data-i18n="ui.a66">सभी डाउनलोड</button>
           </div>
           <ul class="dl-list" id="downloadList"></ul>
           <p class="muted-sm" id="storageLine"></p>
@@ -845,40 +845,40 @@
         <!-- Bina internet awaaz chalegi ya nahi — khet jaane se pehle jaanch lein -->
         <article class="card">
           <div class="card__head">
-            <h2>ऑफ़लाइन आवाज़</h2>
-            <p>सलाह सुनने के लिए फ़ोन में हिंदी वॉइस होनी चाहिए — तभी बिना नेटवर्क भी बोलेगी।</p>
+            <h2 data-i18n="ui.a67">ऑफ़लाइन आवाज़</h2>
+            <p data-i18n="ui.a68">सलाह सुनने के लिए फ़ोन में हिंदी वॉइस होनी चाहिए — तभी बिना नेटवर्क भी बोलेगी।</p>
           </div>
           <p class="muted-sm" id="voiceStatusLine"></p>
           <button type="button" class="btn btn--ghost btn--block" id="voiceTestBtn"
                   data-idle-label="आवाज़ जाँचें / Test voice">
             <svg class="ic"><use href="#i-speaker"/></svg>
-            <span>आवाज़ जाँचें / Test voice</span>
+            <span data-i18n="ui.a69">आवाज़ जाँचें / Test voice</span>
           </button>
           <ol class="install-steps" id="voiceSteps" hidden></ol>
         </article>
 
         <div class="grid grid--2">
           <article class="card">
-            <div class="card__head"><h2>यह ऐप कैसे काम करता है</h2></div>
+            <div class="card__head"><h2 data-i18n="ui.a70">यह ऐप कैसे काम करता है</h2></div>
             <ul class="bullets">
-              <li>फोटो आपके फ़ोन से कहीं नहीं जाती — मॉडल फ़ोन में ही चलता है (TensorFlow.js)।</li>
-              <li>पहली बार खुलने के बाद ऐप बिना इंटरनेट के भी चलता है।</li>
-              <li>75% से कम भरोसा होने पर ऐप कोई रोग नहीं बताता — दोबारा फोटो माँगता है।</li>
-              <li>सलाह हिंदी में सुनी भी जा सकती है (Speak बटन)।</li>
-              <li><strong>सिर्फ मौसम</strong> वाले हिस्से को इंटरनेट चाहिए — बाकी सब ऑफ़लाइन चलता है।</li>
-              <li>हर फसल का अलग मॉडल होता है — इसलिए सटीकता बेहतर रहती है।</li>
-              <li><strong>ऑटो मोड:</strong> नेटवर्क हो तो वही फोटो एक बड़े ऑनलाइन AI से भी जँचती है
+              <li data-i18n="ui.a71">फोटो आपके फ़ोन से कहीं नहीं जाती — मॉडल फ़ोन में ही चलता है (TensorFlow.js)।</li>
+              <li data-i18n="ui.a72">पहली बार खुलने के बाद ऐप बिना इंटरनेट के भी चलता है।</li>
+              <li data-i18n="ui.a73">75% से कम भरोसा होने पर ऐप कोई रोग नहीं बताता — दोबारा फोटो माँगता है।</li>
+              <li data-i18n="ui.a74">सलाह हिंदी में सुनी भी जा सकती है (Speak बटन)।</li>
+              <li><strong data-i18n="ui.a75">सिर्फ मौसम</strong> वाले हिस्से को इंटरनेट चाहिए — बाकी सब ऑफ़लाइन चलता है।</li>
+              <li data-i18n="ui.a76">हर फसल का अलग मॉडल होता है — इसलिए सटीकता बेहतर रहती है।</li>
+              <li><strong data-i18n="ui.a77">ऑटो मोड:</strong> नेटवर्क हो तो वही फोटो एक बड़े ऑनलाइन AI से भी जँचती है
                   और दोनों नतीजे मिलाए जाते हैं; नेटवर्क न हो तो फ��ोन का मॉडल अकेले काम करता है।</li>
-              <li>फोटो सिर्फ ऑनलाइन जाँच के समय भेजी जाती है — ऑफ़लाइन मोड में कहीं नहीं जाती।</li>
+              <li data-i18n="ui.a78">फोटो सिर्फ ऑनलाइन जाँच के समय भेजी जाती है — ऑफ़लाइन मोड में कहीं नहीं जाती।</li>
             </ul>
           </article>
           <article class="card">
-            <div class="card__head"><h2>ज़रूरी सावधानी</h2></div>
+            <div class="card__head"><h2 data-i18n="ui.a79">ज़रूरी सावधानी</h2></div>
             <ul class="bullets">
-              <li>यह सलाह मार्गदर्शन के लिए है, अंतिम निर्णय नहीं।</li>
-              <li>कोई भी छिड़काव करने से पहले अपने KVK / कृषि अधिकारी से मात्रा की पुष्टि करें।</li>
-              <li>दवा के डिब्बे पर लिखी सावधानियाँ ज़रूर पढ़ें; छिड़काव के समय मास्क व दस्ताने पहनें।</li>
-              <li>कटाई से पहले वाले दिनों में (PHI) छिड़काव न करें।</li>
+              <li data-i18n="ui.a80">यह सलाह मार्गदर्शन के लिए है, अंतिम निर्णय नहीं।</li>
+              <li data-i18n="ui.a81">कोई भी छिड़काव करने से पहले अपने KVK / कृषि अधिकारी से मात्रा की पुष्टि करें।</li>
+              <li data-i18n="ui.a82">दवा के डिब्बे पर लिखी सावधानियाँ ज़रूर पढ़ें; छिड़काव के समय मास्क व दस्ताने पहनें।</li>
+              <li data-i18n="ui.a83">कटाई से पहले वाले दिनों में (PHI) छिड़काव न करें।</li>
             </ul>
           </article>
         </div>
