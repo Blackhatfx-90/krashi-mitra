@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — MERA DATA (dekhо, le jao, mita do)
+ * VRIDHI AI — MERA DATA (dekhо, le jao, mita do)
  * js/privacy-tools.js
  *
  * KYUN
@@ -95,7 +95,7 @@
   /** Sab kuch ek file me — kisan apne paas rakh sake */
   function exportAll() {
     const out = {
-      app: 'Krashi Mitra',
+      app: 'Vridhi AI',
       banaya: new Date().toISOString(),
       note: 'Yeh aapke phone par rakha hua data hai. Server par bheji hui ' +
             'jaanch isme nahi hai.',
@@ -111,7 +111,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'krashi-mitra-mera-data-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.download = 'vridhi-ai-mera-data-' + new Date().toISOString().slice(0, 10) + '.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -286,7 +286,7 @@ export default function AdvisoryBroadcast({ initialData, currentLanguage }) {
                   onChange={(e) => setChannels({ ...channels, push: e.target.checked })}
                   className="rounded text-green-600 focus:ring-green-500 w-4 h-4"
                 />
-                <span>Krashi Mitra ऐप — घंटी, कंपन व नोटिफ़िकेशन</span>
+                <span>Vridhi AI ऐप — घंटी, कंपन व नोटिफ़िकेशन</span>
               </label>
 
               <span className="text-[11px] text-gray-400 font-medium">

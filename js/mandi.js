@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — MANDI BHAAV (aas-paas ki mandiyon ka rate)
+ * VRIDHI AI — MANDI BHAAV (aas-paas ki mandiyon ka rate)
  * js/mandi.js
  *
  * KYA KARTA HAI

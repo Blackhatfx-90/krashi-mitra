@@ -118,7 +118,7 @@ export default function ClusterDetailDrawer({
               <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
                 <span className="text-[10px] font-bold uppercase text-gray-400">प्रभावित किसान</span>
                 <p className="text-base font-black text-gray-900 mt-0.5">{cluster.farmersAffected}</p>
-                <span className="text-[10px] text-gray-500">Krishi Mitra Scans</span>
+                <span className="text-[10px] text-gray-500">Vridhi AI Scans</span>
               </div>
             </div>
 

@@ -73,7 +73,7 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = (window.KrashiMitraOffline && window.KrashiMitraOffline.language().code) || 'hi-IN'; u.rate = 0.92;
+        u.lang = (window.VridhiAIOffline && window.VridhiAIOffline.language().code) || 'hi-IN'; u.rate = 0.92;
         window.speechSynthesis.speak(u);
       }
     } catch (err) { console.warn('[voice] bol nahi paya:', err.message); }
@@ -406,8 +406,8 @@
    * ---------------------------------------------------------------- */
   function farmerFirstName() {
     try {
-      if (window.KrashiMitraOffline && window.KrashiMitraOffline.farmerName) {
-        return window.KrashiMitraOffline.farmerName();
+      if (window.VridhiAIOffline && window.VridhiAIOffline.farmerName) {
+        return window.VridhiAIOffline.farmerName();
       }
       const p = JSON.parse(localStorage.getItem('km.preferences.v1') || '{}');
       return String(p.name || '').trim().split(/\s+/)[0] || '';
@@ -596,7 +596,7 @@
         return;
       }
 
-      rec.lang            = (window.KrashiMitraOffline && window.KrashiMitraOffline.language().code) || 'hi-IN';
+      rec.lang            = (window.VridhiAIOffline && window.VridhiAIOffline.language().code) || 'hi-IN';
       rec.interimResults  = true;              // bolte-bolte caption me dikhe
       rec.continuous      = false;             // ek baar me ek hukm
       rec.maxAlternatives = 3;                 // teen anumaan — match ka mauka badhta hai
@@ -828,8 +828,8 @@
       /* Samajh nahi aaya */
       if (!cmd) {
         const isOnline = Boolean(navigator.onLine);
-        const answer = window.KrashiMitraOffline && window.KrashiMitraOffline.offlineAnswer(raw, isOnline);
-        const onlineAnswer = window.KrashiMitraOffline && window.KrashiMitraOffline.officialFallback;
+        const answer = window.VridhiAIOffline && window.VridhiAIOffline.offlineAnswer(raw, isOnline);
+        const onlineAnswer = window.VridhiAIOffline && window.VridhiAIOffline.officialFallback;
         if (answer && onlineAnswer) {
           const respond = (text, stale) => this._respond(text, {
             heard: '“' + raw + '”',

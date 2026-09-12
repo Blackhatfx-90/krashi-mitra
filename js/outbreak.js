@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — JILE KA PRAKOP (outbreak)
+ * VRIDHI AI — JILE KA PRAKOP (outbreak)
  * js/outbreak.js
  *
  * "Aapke jile me gehun me rattua phail raha hai — 8 kisan, 3 gaon."

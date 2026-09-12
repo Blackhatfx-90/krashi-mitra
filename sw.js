@@ -24,8 +24,18 @@
  * naya version le aati hai jab download dobara dabaya jaye.
  * ========================================================================= */
 
-const CACHE_VERSION = 'krashi-mitra-v62';
-const MODELS_CACHE  = 'krashi-mitra-models';   // naam sthir rahega — mat badlein
+const CACHE_VERSION = 'vridhi-ai-v63';
+/* ISKA NAAM JAAN-BOOJHKAR PURANA HAI — badalna MAT.
+ *
+ * App ka naam badal kar "Vridhi AI" ho gaya, par yeh naam waisa hi chhoda
+ * hai. Wajah: jin kisano ke phone me 22 MB ke fasal-model pehle se utre
+ * hue hain, wo isi naam ke cache me pade hain. Naam badalte hi browser
+ * unhe "kisi aur ka cache" maan kar mita dega, aur har kisan ko sab kuch
+ * DOBARA utarna padega — khet me, 2G par.
+ *
+ * Yeh naam kisan ko kabhi dikhta nahi. Sirf browser ke andar ka label hai.
+ */
+const MODELS_CACHE  = 'krashi-mitra-models';
 
 /* Sarkari officer ka Regional Admin dashboard (alag React app) yahan rehta hai.
    Yeh KISAN wali app se poori tarah alag hai — na iske page kisan ke shell me

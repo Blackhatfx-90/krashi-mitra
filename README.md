@@ -70,7 +70,7 @@ Local copy मिलते ही app CDN को हाथ नहीं लग�
 `file://` से app **नहीं** चलेगी (browser `model.json` fetch नहीं करने देता)।
 
 ```bash
-cd "/Users/gyan/Desktop/KRASHI MITRA" && python3 -m http.server 8000
+cd "/Users/gyan/Desktop/VRIDHI AI" && python3 -m http.server 8000
 ```
 
 Browser: **http://localhost:8000**
@@ -113,7 +113,7 @@ Key न डालने पर app crash नहीं होती — weather c
 ## 3. Project structure
 
 ```
-KRASHI MITRA/
+VRIDHI AI/
 ├── index.html            UI + SVG icon sprite
 ├── css/style.css         white-minimal theme (saare colors :root me)
 ├── js/
@@ -281,7 +281,7 @@ Bas — sidebar ka button ab seedha APK download karega, aur *Offline & Help* pa
 
 | Cache | Kya | Kab mitta hai |
 |---|---|---|
-| `krashi-mitra-v23` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
+| `vridhi-ai-v23` | app shell (html/css/js/tf.min.js) | jab `CACHE_VERSION` badhaate hain |
 | `krashi-mitra-models` | fasal ke models | **kabhi apne aap nahi** — kisan khud "हटाएँ" dabaye tabhi |
 
 Isi wajah se app update karne par kisan ke download kiye hue models dobara
@@ -719,7 +719,7 @@ demoWeather('off')      // wapas asli data
 | Theme के रंग | `css/style.css` | सबसे ऊपर `:root` |
 | Brand का नाम | `index.html` | `.brand__name` वाला `<span>` |
 
-> **ZAROORI:** HTML/CSS/JS या model बदलने के बाद `sw.js` में `CACHE_VERSION` का नंबर बढ़ा दें (`krashi-mitra-v2` → `v3`), वरना browser पुरानी cached file ही दिखाता रहेगा।
+> **ZAROORI:** HTML/CSS/JS या model बदलने के बाद `sw.js` में `CACHE_VERSION` का नंबर बढ़ा दें (`vridhi-ai-v2` → `v3`), वरना browser पुरानी cached file ही दिखाता रहेगा।
 
 ---
 

@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — BHASHA CHUNAV (language picker)
+ * VRIDHI AI — BHASHA CHUNAV (language picker)
  * js/language-picker.js
  *
  * KYA KARTA HAI

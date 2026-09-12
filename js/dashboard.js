@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — DASHBOARD (login ke baad ka ghar)
+ * VRIDHI AI — DASHBOARD (login ke baad ka ghar)
  * js/dashboard.js
  *
  * PEHLE KYA THA: login ke turant baad kisan seedha "fasal chunein" par

@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — FASAL KA CALENDAR
+ * VRIDHI AI — FASAL KA CALENDAR
  * js/calendar.js
  *
  * KYUN

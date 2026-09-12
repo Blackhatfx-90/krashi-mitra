@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 /* ============================================================================
  * Regional Admin Dashboard — build config
  *
- * Yeh dashboard Krashi Mitra ki MAIN PUBLIC SITE ke andar, ek alag folder me
+ * Yeh dashboard Vridhi AI ki MAIN PUBLIC SITE ke andar, ek alag folder me
  * chalta hai:  https://krashi-mitrasih.vercel.app/regional-admin
  *
  *   base      -> saare asset links '/regional-admin/...' se shuru honge

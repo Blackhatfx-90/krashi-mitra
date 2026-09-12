@@ -187,8 +187,8 @@ async function callModel(model, apiKey, imageDataUrl, prompt, referer, budgetMs)
       headers: {
         'Authorization': 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
-        'HTTP-Referer': referer || process.env.PUBLIC_SITE_URL || 'https://krashi-mitra.netlify.app',
-        'X-Title': 'Krashi Mitra - Crop Disease Detection',
+        'HTTP-Referer': referer || process.env.PUBLIC_SITE_URL || 'https://vridhi-ai.netlify.app',
+        'X-Title': 'Vridhi AI - Crop Disease Detection',
       },
       body: JSON.stringify({
         model: model,

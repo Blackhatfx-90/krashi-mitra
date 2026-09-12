@@ -23,7 +23,7 @@
     { words:['गेहूं','wheat','रस्ट','रतुआ'], answer:'गेहूँ में पीले या भूरे रतुआ के लक्षण पर खेत की नियमित निगरानी करें। दवा की मात्रा हमेशा उत्पाद के लेबल और स्थानीय कृषि सलाह के अनुसार रखें।' },
     { words:['कीटनाशक','pesticide','दवा','medicine','सुरक्षा','safety'], answer:'कीटनाशक को लेबल के अनुसार ही मिलाएँ। दस्ताने और मास्क पहनें, हवा की दिशा के विपरीत छिड़काव न करें और खाली डिब्बे दोबारा उपयोग न करें।' },
     { words:['खाद','fertilizer','urea','यूरिया'], answer:'खाद की मात्रा मिट्टी जाँच और फसल की अवस्था के अनुसार रखें। यूरिया को सूखी मिट्टी पर अधिक मात्रा में न डालें और सिंचाई से पहले कृषि सलाह लें।' },
-    { words:['भाव','price','मंडी','mandi','rate','रेट'], answer:'मंडी भाव बताने के लिए फसल, राज्य, जिला और चुनी हुई मंडी चाहिए। इंटरनेट उपलब्ध होने पर Krashi Mitra आधिकारिक स्रोत से ताज़ा भाव लाएगा; ऑफलाइन में आखिरी सेव डेटा दिखेगा।' },
+    { words:['भाव','price','मंडी','mandi','rate','रेट'], answer:'मंडी भाव बताने के लिए फसल, राज्य, जिला और चुनी हुई मंडी चाहिए। इंटरनेट उपलब्ध होने पर Vridhi AI आधिकारिक स्रोत से ताज़ा भाव लाएगा; ऑफलाइन में आखिरी सेव डेटा दिखेगा।' },
     { words:['नमस्ते','hello','help','मदद','क्या कर सकते'], answer:'मैं फसल, रोग, कीट, दवा-सुरक्षा, मौसम, मंडी भाव और खेती की देखभाल से जुड़े सवालों में मदद कर सकता हूँ।' }
   ];
 
@@ -79,7 +79,7 @@
       .catch(() => offlineAnswer(query));
   }
 
-  window.KrashiMitraOffline = { LANGUAGES, LOCATIONS, getPrefs, savePrefs, language, speak, offlineAnswer, officialFallback, farmerName };
+  window.VridhiAIOffline = { LANGUAGES, LOCATIONS, getPrefs, savePrefs, language, speak, offlineAnswer, officialFallback, farmerName };
 
   function addOnboarding() {
     const form = document.getElementById('signup-form');

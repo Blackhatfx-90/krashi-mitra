@@ -1,7 +1,7 @@
 'use strict';
 
 /* ============================================================================
- * KRASHI MITRA — mandi bhaav ka rasta (data.gov.in ka proxy)
+ * VRIDHI AI — mandi bhaav ka rasta (data.gov.in ka proxy)
  * api/mandi.js
  *
  * KYUN YEH BEECH ME KHADA HAI

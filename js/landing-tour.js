@@ -22,7 +22,7 @@
   const STEPS_BY_PAGE = {
     landing: [
       { sel: '.navbar__brand',
-        titleHi: 'कृषि मित्र में आपका स्वागत है',
+        titleHi: 'वृद्धि AI में आपका स्वागत है',
         bodyHi: 'यह ऐप आपकी फसल की पत्ती की फोटो से रोग पहचानती है और हिंदी में सलाह देती है — ' +
                 'वो भी बिना इंटरनेट के।' },
       { sel: '.navbar__cta .btn, .hero .btn--primary',

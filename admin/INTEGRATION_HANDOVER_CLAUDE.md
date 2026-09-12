@@ -1,4 +1,4 @@
-# 🌾 Krishi Mitra (AgriAI) — Admin Dashboard to Mobile App Integration Guide for Claude Code
+# 🌾 Vridhi AI (AgriAI) — Admin Dashboard to Mobile App Integration Guide for Claude Code
 
 > **Target Audience:** Claude Code / Full-Stack AI Engineer  
 > **Hackathon:** Smart India Hackathon (SIH 2026) | Problem Statement ID: **26131**  
@@ -11,7 +11,7 @@
 
 ## 🎯 Executive Summary & Mission
 
-This repository contains the **Official Government Regional Command Center (Admin Dashboard)** built to monitor, ground-truth, and contain crop epidemics reported by farmers using the **Krishi Mitra (AgriAI) Mobile Web App**.
+This repository contains the **Official Government Regional Command Center (Admin Dashboard)** built to monitor, ground-truth, and contain crop epidemics reported by farmers using the **Vridhi AI (AgriAI) Mobile Web App**.
 
 ### 🌟 Key Objectives for Claude Code:
 1. **Live Scan Ingestion:** When a farmer scans a diseased leaf on the web app, stream the diagnostic payload (Farmer Name, Phone, GPS Coordinates, Khasra Plot No, Sown Crop, Detected Pathogen, Confidence Score, Image Base64/URL) into the Admin Cadastral Map (`OutbreakMap.jsx`) and Field Validation Queue (`FieldValidationQueue.jsx`).
@@ -99,7 +99,7 @@ When a farmer scans a crop on `https://krashi-mitrasih.vercel.app/`, post this J
     "disease": "Bacterial Leaf Blight (जीवाणु झुलसा / BLB)",
     "confidence": 94.8,
     "severity": "critical",
-    "imageUrl": "https://storage.googleapis.com/krishi-mitra/scans/rice_blb_01.jpg"
+    "imageUrl": "https://storage.googleapis.com/vridhi-ai/scans/rice_blb_01.jpg"
   },
   "gps": {
     "lat": 28.3243,

@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — chetavni ki ghanti (notification + kampan + awaaz)
+ * VRIDHI AI — chetavni ki ghanti (notification + kampan + awaaz)
  * js/alerts.js
  *
  * KYUN

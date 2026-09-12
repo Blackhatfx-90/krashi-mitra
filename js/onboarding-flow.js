@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — awaaz se chalne wala pehla parichay (onboarding)
+ * VRIDHI AI — awaaz se chalne wala pehla parichay (onboarding)
  * js/onboarding-flow.js
  *
  * YEH KYA HAI
@@ -249,7 +249,7 @@
   function stepIntro() {
     const title = O.t('ob.introTitle', 'यह ऐप क्या करता है');
     const body  = O.t('ob.introBody',
-      'कृषि मित्र आपकी फसल की पत्ती की फोटो से रोग पहचानता है — बिना इंटरनेट के भी। ' +
+      'वृद्धि AI आपकी फसल की पत्ती की फोटो से रोग पहचानता है — बिना इंटरनेट के भी। ' +
       'यह आपको दवा और सही मात्रा बताता है, मौसम और छिड़काव की चेतावनी देता है, ' +
       'पास की मंडी का भाव दिखाता है, और कृषि विभाग की सूचनाएँ आप तक पहुँचाता है। ' +
       'सब कुछ आपकी अपनी भाषा में।');

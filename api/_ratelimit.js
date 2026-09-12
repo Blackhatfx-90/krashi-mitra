@@ -1,7 +1,7 @@
 'use strict';
 
 /* ============================================================================
- * KRASHI MITRA — ek IP se kitni baar (rate limit)
+ * VRIDHI AI — ek IP se kitni baar (rate limit)
  * api/_ratelimit.js
  *
  * KYUN

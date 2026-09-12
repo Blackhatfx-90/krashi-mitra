@@ -97,7 +97,7 @@ async function translateOne(text, targetCode) {
     const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method:'POST', signal: ctrl.signal,
       headers:{ 'Authorization':'Bearer '+orKey, 'Content-Type':'application/json',
-                'X-Title':'Krashi Mitra - Advisory Translation' },
+                'X-Title':'Vridhi AI - Advisory Translation' },
       body: JSON.stringify({
         model: (process.env.OPENROUTER_MODELS || 'google/gemma-4-31b-it:free').split(',')[0].trim(),
         max_tokens: 900, temperature: 0.1,

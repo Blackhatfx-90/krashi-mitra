@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — OFFLINE AAWAAZ PEHCHAN (Vosk)
+ * VRIDHI AI — OFFLINE AAWAAZ PEHCHAN (Vosk)
  * js/vosk-stt.js
  *
  * SAMASYA

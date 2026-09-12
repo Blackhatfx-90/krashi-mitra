@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — network ki halat ka sanket (wifi signal icon)
+ * VRIDHI AI — network ki halat ka sanket (wifi signal icon)
  * js/connectivity.js
  *
  * PEHLE KYA THA

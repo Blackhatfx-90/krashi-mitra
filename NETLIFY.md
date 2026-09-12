@@ -1,4 +1,4 @@
-# Netlify par Krashi Mitra
+# Netlify par Vridhi AI
 
 Site pehle Vercel par thi. Wahan free plan par **12 se zyada serverless
 function nahi chalte**, aur app me 14 API raste hain — isliye Netlify.

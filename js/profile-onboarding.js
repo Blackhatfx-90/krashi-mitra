@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — naye khate ka setup (password + kisan profile)
+ * VRIDHI AI — naye khate ka setup (password + kisan profile)
  * js/profile-onboarding.js
  *
  * KAB CHALTA HAI: sirf /app par, login ke turant baad.

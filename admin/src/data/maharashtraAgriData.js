@@ -346,7 +346,7 @@ export const DEMAND_SUPPLY_INVENTORY = [
   }
 ];
 
-// Live Field Verification Queue (Farmer Detections from Krishi Mitra App in UP)
+// Live Field Verification Queue (Farmer Detections from Vridhi AI App in UP)
 export const FIELD_VERIFICATION_QUEUE = [
   {
     id: 'VER-UP-801',

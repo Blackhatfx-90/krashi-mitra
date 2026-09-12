@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — KHETI SAHAYAK (khaad calculator + kheti ki salah + visheshagya)
+ * VRIDHI AI — KHETI SAHAYAK (khaad calculator + kheti ki salah + visheshagya)
  * js/farm-tools.js
  *
  * TEEN CHEEZEIN, TEENON POORI TARAH OFFLINE:

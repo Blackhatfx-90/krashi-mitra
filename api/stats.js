@@ -1,7 +1,7 @@
 'use strict';
 
 /* ============================================================================
- * KRASHI MITRA — Kshetriya dashboard ke ASLI aankde
+ * VRIDHI AI — Kshetriya dashboard ke ASLI aankde
  * api/stats.js   (GET, sirf logged-in adhikari)
  *
  * KYUN BANI

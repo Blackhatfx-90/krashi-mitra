@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — SOOCHNA SEVA (ek hi jagah se saari notification)
+ * VRIDHI AI — SOOCHNA SEVA (ek hi jagah se saari notification)
  * js/notify.js
  *
  * KYUN BANI

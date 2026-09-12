@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — KISAN CHAUPAL (samudaay)
+ * VRIDHI AI — KISAN CHAUPAL (samudaay)
  * js/community.js
  *
  * KYUN

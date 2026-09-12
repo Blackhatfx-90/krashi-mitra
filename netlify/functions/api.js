@@ -1,7 +1,7 @@
 'use strict';
 
 /* ============================================================================
- * KRASHI MITRA — saare /api/... ek hi Netlify function se
+ * VRIDHI AI — saare /api/... ek hi Netlify function se
  * netlify/functions/api.js
  *
  * KYUN EK HI FUNCTION

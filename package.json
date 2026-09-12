@@ -1,7 +1,7 @@
 {
-  "name": "v0-project",
+  "name": "vridhi-ai",
   "version": "1.0.0",
-  "description": "Offline-first, **multi-crop** web app. फसल की पत्ती की फोटो से रोग की पहचान **आपके फ़ोन पर ही** होती है — कोई सर्वर नहीं, कोई API नहीं।",
+  "description": "Vridhi AI - Offline-first, multi-crop AI Farming Assistant for Indian Farmers.",
   "main": "sw.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,16 +10,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Blackhatfx-90/krashi-mitra.git"
+    "url": "git+https://github.com/BENJAMIN9068/vridhi-ai.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["vridhi-ai", "kisan", "agriculture", "ai", "farming"],
+  "author": "BENJAMIN9068",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/Blackhatfx-90/krashi-mitra/issues"
+    "url": "https://github.com/BENJAMIN9068/vridhi-ai/issues"
   },
-  "homepage": "https://github.com/Blackhatfx-90/krashi-mitra#readme",
+  "homepage": "https://github.com/BENJAMIN9068/vridhi-ai#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "mongodb": "^7.6.0"

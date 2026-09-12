@@ -1,12 +1,12 @@
 'use strict';
 
 /* ============================================================================
- * KRASHI MITRA — sahayak ka jawab (general-purpose assistant)
+ * VRIDHI AI — sahayak ka jawab (general-purpose assistant)
  * api/agriculture.js
  *
  * PEHLE KYA THA
  *   Ek regex (ALLOWED) tha. Sawal me "fasal / rog / mandi" jaise shabd na hon
- *   to seedha 400 aur "Krashi Mitra sirf kheti ke sawal leta hai" ka jawab.
+ *   to seedha 400 aur "Vridhi AI sirf kheti ke sawal leta hai" ka jawab.
  *   Kisan "mera naam kya hai", "kal chhutti hai kya", "ye number kaise jodun"
  *   poochhta to app use thukra deti thi — aur wo maan leta ki app tooti hai.
  *
@@ -59,7 +59,7 @@ function systemPrompt(ctx) {
                  ctx.state && `state: ${ctx.state}`].filter(Boolean).join(', ');
 
   return [
-    'You are Krashi Mitra, a helpful assistant used by farmers in India.',
+    'You are Vridhi AI, a helpful assistant used by farmers in India.',
     'You are a GENERAL assistant: answer whatever is asked — farming, weather,',
     'government schemes, phone help, maths, health basics, or plain conversation.',
     'Farming is your strongest subject, not a restriction on what you may answer.',
@@ -114,8 +114,8 @@ async function ask(model, apiKey, sys, question, referer) {
       headers: {
         'Authorization': 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
-        'HTTP-Referer': referer || process.env.PUBLIC_SITE_URL || 'https://krashi-mitra.netlify.app',
-        'X-Title': 'Krashi Mitra',
+        'HTTP-Referer': referer || process.env.PUBLIC_SITE_URL || 'https://vridhi-ai.netlify.app',
+        'X-Title': 'Vridhi AI',
       },
       body: JSON.stringify({
         model, max_tokens: 400, temperature: 0.4,

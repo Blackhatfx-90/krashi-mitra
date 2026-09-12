@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — hukm ke shabd, har bhasha me
+ * VRIDHI AI — hukm ke shabd, har bhasha me
  * js/voice-commands-lang.js
  *
  * SAMASYA: js/voice-assistant.js ka COMMANDS table sirf Hindi (aur Hinglish)

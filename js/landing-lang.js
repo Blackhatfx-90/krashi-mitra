@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — landing page ki bhasha
+ * VRIDHI AI — landing page ki bhasha
  * js/landing-lang.js
  *
  * NIYAM (sirf landing page ke liye):
@@ -34,19 +34,19 @@
       'link.privacy':'निजता', 'link.terms':'शर्तें', 'link.admin':'विभाग लॉगिन',
 
       /* --- Hero --- */
-      'hero.title':'Krishi Mitra — आपकी फसल का साथी, रोग पहचानें और सही सलाह पाएँ',
-      'hero.desc':'Krishi Mitra (कृषि मित्र) भारत भर के किसानों के लिए मुफ़्त AI ऐप है। पत्ती की एक फोटो से फसल का रोग पहचानिए, खाद और इलाज की सलाह लीजिए, मौसम की चेतावनी और मंडी भाव देखिए — ज़्यादातर काम बिना इंटरनेट के।',
+      'hero.title':'Vridhi AI — आपकी फसल का साथी, रोग पहचानें और सही सलाह पाएँ',
+      'hero.desc':'Vridhi AI (वृद्धि AI) भारत भर के किसानों के लिए मुफ़्त AI ऐप है। पत्ती की एक फोटो से फसल का रोग पहचानिए, खाद और इलाज की सलाह लीजिए, मौसम की चेतावनी और मंडी भाव देखिए — ज़्यादातर काम बिना इंटरनेट के।',
       'faq.title':'आम सवाल',
-      'faq.sub':'Krishi Mitra (कृषि मित्र) के बारे में जो सबसे ज़्यादा पूछा जाता है',
-      'faq.q1':'Krishi Mitra क्या है?',
-      'faq.a1':'Krishi Mitra (जिसे Krashi Mitra भी लिखा जाता है) एक मुफ़्त AI ऐप है जो भारत के किसानों की मदद करती है — पत्ती की फोटो से रोग पहचानना, खाद की सलाह, और मौसम की चेतावनी — सब अपनी भाषा में।',
-      'faq.q2':'क्या Krishi Mitra हिंदी में है?',
-      'faq.a2':'हाँ। Krishi Mitra पूरी तरह हिंदी में चलती है, और बंगाली, मराठी, तेलुगु, तमिल, गुजराती, कन्नड़, मलयालम, पंजाबी व ओड़िया में भी। सलाह बोलकर भी सुनाई जाती है, ताकि पढ़ना न आता हो तो भी काम चले।',
-      'faq.q3':'क्या Krishi Mitra मुफ़्त है?',
+      'faq.sub':'Vridhi AI (वृद्धि AI) के बारे में जो सबसे ज़्यादा पूछा जाता है',
+      'faq.q1':'Vridhi AI क्या है?',
+      'faq.a1':'Vridhi AI (जिसे Vridhi AI भी लिखा जाता है) एक मुफ़्त AI ऐप है जो भारत के किसानों की मदद करती है — पत्ती की फोटो से रोग पहचानना, खाद की सलाह, और मौसम की चेतावनी — सब अपनी भाषा में।',
+      'faq.q2':'क्या Vridhi AI हिंदी में है?',
+      'faq.a2':'हाँ। Vridhi AI पूरी तरह हिंदी में चलती है, और बंगाली, मराठी, तेलुगु, तमिल, गुजराती, कन्नड़, मलयालम, पंजाबी व ओड़िया में भी। सलाह बोलकर भी सुनाई जाती है, ताकि पढ़ना न आता हो तो भी काम चले।',
+      'faq.q3':'क्या Vridhi AI मुफ़्त है?',
       'faq.a3':'हाँ, पूरी तरह मुफ़्त। कोई शुल्क नहीं, कोई सदस्यता नहीं, किसी सुविधा के लिए पैसे नहीं। मॉडल एक बार डाउनलोड करने में डेटा लगता है — उसके बाद जाँच आपके फ़ोन पर ही होती है और डेटा नहीं लगता।',
-      'faq.q4':'Krishi Mitra रोग कैसे पहचानती है?',
-      'faq.a4':'किसान प्रभावित पत्ती की फोटो खींचता या चुनता है, और Krishi Mitra का AI उसे देखकर रोग बताता है और इलाज सुझाता है। ऐप पहले यह जाँचती है कि फोटो सच में उसी फसल की पत्ती की है — ताकि किसी और फोटो पर गलत रोग का नाम न आ जाए।',
-      'faq.q5':'क्या Krishi Mitra बिना इंटरनेट चलती है?',
+      'faq.q4':'Vridhi AI रोग कैसे पहचानती है?',
+      'faq.a4':'किसान प्रभावित पत्ती की फोटो खींचता या चुनता है, और Vridhi AI का AI उसे देखकर रोग बताता है और इलाज सुझाता है। ऐप पहले यह जाँचती है कि फोटो सच में उसी फसल की पत्ती की है — ताकि किसी और फोटो पर गलत रोग का नाम न आ जाए।',
+      'faq.q5':'क्या Vridhi AI बिना इंटरनेट चलती है?',
       'faq.a5':'हाँ। एक बार वाई-फ़ाई पर अपनी फसल का मॉडल उतार लें, फिर रोग की जाँच, इलाज की सलाह, खाद का हिसाब, फसल कैलेंडर और आवाज़ — सब बिना इंटरनेट चलते हैं। सिर्फ़ मौसम, मंडी भाव, किसान चौपाल और ऑनलाइन दूसरी राय के लिए नेटवर्क चाहिए।',
       'faq.more1':'रोग पहचान कैसे काम करती है →',
       'faq.more2':'खाद की सलाह कैसे बनती है →',
@@ -94,10 +94,10 @@
       'footer.about':'हमारे बारे में',
       'footer.contact':'संपर्क',
       'footer.privacy':'गोपनीयता नीति',
-      'footer.copy':'© 2026 कृषि मित्र। सर्वाधिकार सुरक्षित।',
+      'footer.copy':'© 2026 वृद्धि AI। सर्वाधिकार सुरक्षित।',
 
       /* --- Disclaimer --- */
-      'disclaimer':'<strong>ज़रूरी सूचना:</strong> कृषि मित्र एक <strong>स्वतंत्र विद्यार्थी परियोजना</strong> है (Smart India Hackathon)। यह भारत सरकार या किसी सरकारी विभाग का आधिकारिक ऐप <strong>नहीं</strong> है और न ही इसे सरकार की मान्यता प्राप्त है। यहाँ दी गई रोग पहचान और दवा की सलाह केवल मार्गदर्शन के लिए है — किसी भी छिड़काव से पहले अपने <strong>कृषि विज्ञान केंद्र (KVK)</strong> या कृषि अधिकारी से दवा और मात्रा की पुष्टि अवश्य करें।',
+      'disclaimer':'<strong>ज़रूरी सूचना:</strong> वृद्धि AI एक <strong>स्वतंत्र विद्यार्थी परियोजना</strong> है (Smart India Hackathon)। यह भारत सरकार या किसी सरकारी विभाग का आधिकारिक ऐप <strong>नहीं</strong> है और न ही इसे सरकार की मान्यता प्राप्त है। यहाँ दी गई रोग पहचान और दवा की सलाह केवल मार्गदर्शन के लिए है — किसी भी छिड़काव से पहले अपने <strong>कृषि विज्ञान केंद्र (KVK)</strong> या कृषि अधिकारी से दवा और मात्रा की पुष्टि अवश्य करें।',
     },
     en: {
       /* --- Navbar & Gov bar --- */
@@ -110,19 +110,19 @@
       'link.privacy':'Privacy', 'link.terms':'Terms', 'link.admin':'Department Login',
 
       /* --- Hero --- */
-      'hero.title':'Krishi Mitra — AI farming assistant for Indian farmers',
-      'hero.desc':'Krishi Mitra (also written Krashi Mitra) is a free AI app for farmers across all India. Detect crop disease from a single leaf photo, get fertilizer and treatment advice, and check weather warnings and mandi prices — most of it works without internet.',
+      'hero.title':'Vridhi AI — AI farming assistant for Indian farmers',
+      'hero.desc':'Vridhi AI (also written Vridhi AI) is a free AI app for farmers across all India. Detect crop disease from a single leaf photo, get fertilizer and treatment advice, and check weather warnings and mandi prices — most of it works without internet.',
       'faq.title':'Common questions',
-      'faq.sub':'What people most often ask about Krishi Mitra',
-      'faq.q1':'What is Krishi Mitra?',
-      'faq.a1':'Krishi Mitra (also written as Krashi Mitra) is a free AI-powered assistant app that helps Indian farmers detect crop diseases from photos, get fertilizer recommendations, and receive weather updates — all in their own language.',
-      'faq.q2':'Is Krishi Mitra available in Hindi?',
-      'faq.a2':'Yes. Krishi Mitra works fully in Hindi and in other Indian languages including Bengali, Marathi, Telugu, Tamil, Gujarati, Kannada, Malayalam, Punjabi and Odia, with voice support that reads advice aloud.',
-      'faq.q3':'Is Krishi Mitra free to use?',
-      'faq.a3':'Yes, Krishi Mitra is completely free. There is no subscription, no paid plan and no charge for any feature. Downloading the crop models uses your data once, after which disease detection runs on your phone without using data.',
-      'faq.q4':'How does Krishi Mitra detect crop disease?',
-      'faq.a4':"Farmers take or upload a photo of the affected leaf, and Krishi Mitra's AI analyses it to identify the disease and suggest treatment. The app first checks that the photo really shows a leaf of the selected crop, so an unrelated photo is not given a wrong disease name.",
-      'faq.q5':'Does Krishi Mitra work offline?',
+      'faq.sub':'What people most often ask about Vridhi AI',
+      'faq.q1':'What is Vridhi AI?',
+      'faq.a1':'Vridhi AI (also written as Vridhi AI) is a free AI-powered assistant app that helps Indian farmers detect crop diseases from photos, get fertilizer recommendations, and receive weather updates — all in their own language.',
+      'faq.q2':'Is Vridhi AI available in Hindi?',
+      'faq.a2':'Yes. Vridhi AI works fully in Hindi and in other Indian languages including Bengali, Marathi, Telugu, Tamil, Gujarati, Kannada, Malayalam, Punjabi and Odia, with voice support that reads advice aloud.',
+      'faq.q3':'Is Vridhi AI free to use?',
+      'faq.a3':'Yes, Vridhi AI is completely free. There is no subscription, no paid plan and no charge for any feature. Downloading the crop models uses your data once, after which disease detection runs on your phone without using data.',
+      'faq.q4':'How does Vridhi AI detect crop disease?',
+      'faq.a4':"Farmers take or upload a photo of the affected leaf, and Vridhi AI's AI analyses it to identify the disease and suggest treatment. The app first checks that the photo really shows a leaf of the selected crop, so an unrelated photo is not given a wrong disease name.",
+      'faq.q5':'Does Vridhi AI work offline?',
       'faq.a5':"Yes. Once you download your crop's model over Wi-Fi, disease detection, treatment advice, the fertilizer calculator, the crop calendar and voice readout all work with no internet. Only weather, mandi prices, the farmer community and the online second opinion need a network.",
       'faq.more1':'How disease detection works →',
       'faq.more2':'How fertilizer advice is calculated →',
@@ -170,10 +170,10 @@
       'footer.about':'About Us',
       'footer.contact':'Contact',
       'footer.privacy':'Privacy Policy',
-      'footer.copy':'© 2026 Krashi Mitra. All rights reserved.',
+      'footer.copy':'© 2026 Vridhi AI. All rights reserved.',
 
       /* --- Disclaimer --- */
-      'disclaimer':'<strong>Important Notice:</strong> Krashi Mitra is an <strong>independent student project</strong> (Smart India Hackathon). It is <strong>not</strong> an official app of the Government of India or any government department, nor is it endorsed by the government. The disease identification and treatment advice provided here is for guidance only — always confirm the medicine and dosage with your <strong>Krishi Vigyan Kendra (KVK)</strong> or agriculture officer before spraying.',
+      'disclaimer':'<strong>Important Notice:</strong> Vridhi AI is an <strong>independent student project</strong> (Smart India Hackathon). It is <strong>not</strong> an official app of the Government of India or any government department, nor is it endorsed by the government. The disease identification and treatment advice provided here is for guidance only — always confirm the medicine and dosage with your <strong>Krishi Vigyan Kendra (KVK)</strong> or agriculture officer before spraying.',
     },
   };
 

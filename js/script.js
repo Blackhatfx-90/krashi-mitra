@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — AI/ML Crop Disease & Pest Detection + Smart Advisory System
+ * VRIDHI AI — AI/ML Crop Disease & Pest Detection + Smart Advisory System
  * js/script.js
  *
  * Sab kuch device par chalta hai (TensorFlow.js) — sirf WEATHER ke liye
@@ -6655,7 +6655,7 @@ function activeCrop() {
 
 /** Views ki heading — nav badalne par topbar bhi update hota hai. */
 const VIEW_META = {
-  home:     { title: 'कृषि मित्र',
+  home:     { title: 'वृद्धि AI',
               sub: 'आपका खेती सहायक — जाँच, सलाह, मंडी भाव और मौसम' },
   crops:    { title: 'फसल चुनें',
               sub: 'Which is your crop? — चुनते ही उसी का मॉडल लोड होगा' },
@@ -9800,7 +9800,7 @@ function renderInstallCard() {
     el.installSteps.innerHTML = stepsHtml([
       'नीचे पट्टी में Share बटन दबाएँ (ऊपर तीर वाला चौकोर निशान)',
       'सूची में नीचे जाकर "Add to Home Screen" चुनें',
-      '"Add" दबाएँ — होम स्क्रीन पर Krashi Mitra का आइकॉन बन जाएगा',
+      '"Add" दबाएँ — होम स्क्रीन पर Vridhi AI का आइकॉन बन जाएगा',
     ]);
     show(el.installSteps);
     return;

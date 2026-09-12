@@ -232,7 +232,7 @@ export default function FarmerPlotRegistrationModal({
               {/* Crop Selection (Strictly 7 Website Crops) */}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-600 block">
-                  Crop Sown (बोई गई फसल — Krishi Mitra AI Compatible) *
+                  Crop Sown (बोई गई फसल — Vridhi AI Compatible) *
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {WEBSITE_CROPS.map(c => {

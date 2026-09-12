@@ -1,7 +1,7 @@
 'use strict';
 
 /* ============================================================================
- * KRASHI MITRA — mausam ka rasta (OpenWeather ka proxy)
+ * VRIDHI AI — mausam ka rasta (OpenWeather ka proxy)
  * api/weather.js
  *
  * KYUN YEH BEECH ME KHADA HAI

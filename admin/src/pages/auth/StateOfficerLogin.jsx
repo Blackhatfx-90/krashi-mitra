@@ -87,7 +87,7 @@ export default function StateOfficerLogin({ onLoginSuccess }) {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold text-gray-900 tracking-tight">
-                  Agri<span className="text-green-600">AI</span> / Krishi Mitra
+                  Agri<span className="text-green-600">AI</span> / Vridhi AI
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800 border border-green-200">
                   SIH 2026 Problem ID: 26131
@@ -283,7 +283,7 @@ export default function StateOfficerLogin({ onLoginSuccess }) {
 
       {/* Footer */}
       <footer className="py-3 text-center text-xs text-gray-500 border-t border-gray-200 bg-white">
-        Department of Agriculture & Farmers Welfare • Krishi Mitra AI Regional Surveillance System
+        Department of Agriculture & Farmers Welfare • Vridhi AI Regional Surveillance System
       </footer>
 
     </div>

@@ -1,4 +1,4 @@
-# Krishi Mitra (Krashi Mitra) — https://krashi-mitrasih.vercel.app
+# Vridhi AI (Vridhi AI) — https://krashi-mitrasih.vercel.app
 User-agent: *
 Allow: /
 

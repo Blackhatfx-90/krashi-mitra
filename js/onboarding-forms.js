@@ -1,5 +1,5 @@
 /* ============================================================================
- * KRASHI MITRA — kadam 4 se 6: apni jankari, anumatiyan, zameen
+ * VRIDHI AI — kadam 4 se 6: apni jankari, anumatiyan, zameen
  * js/onboarding-forms.js
  *
  * Yeh js/onboarding-flow.js ke baad ka hissa hai — jo app ke ANDAR chalta

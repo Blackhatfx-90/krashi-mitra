@@ -1,7 +1,7 @@
 'use strict';
 
 /* ============================================================================
- * KRASHI MITRA — CIBRC protocol (dawa aur matra) ka database
+ * VRIDHI AI — CIBRC protocol (dawa aur matra) ka database
  * api/protocols.js
  *
  *   GET    /api/protocols            padhna — kisan app bhi padh sakti hai

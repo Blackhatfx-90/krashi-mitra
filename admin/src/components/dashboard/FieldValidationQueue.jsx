@@ -167,8 +167,8 @@ export default function FieldValidationQueue({
             </div>
             <p className="text-xs text-gray-500 mt-1">
               {currentLanguage === 'hi' 
-                ? 'कृषि मित्र मोबाइल ऐप से किसानों द्वारा भेजे गए पत्ती स्कैन, एआई निदान व विशेषज्ञ सत्यापन' 
-                : 'Real-time farmer submissions from Krishi Mitra App awaiting agronomist review across UP districts'}
+                ? 'वृद्धि AI मोबाइल ऐप से किसानों द्वारा भेजे गए पत्ती स्कैन, एआई निदान व विशेषज्ञ सत्यापन' 
+                : 'Real-time farmer submissions from Vridhi AI App awaiting agronomist review across UP districts'}
             </p>
           </div>
 
