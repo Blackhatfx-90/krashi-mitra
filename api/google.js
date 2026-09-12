@@ -116,13 +116,19 @@ module.exports = async function handler(req, res) {
   if (req.query && req.query.check) {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-store');
+    let mongoOk = false, mongoErr = '';
+    if (process.env.MONGODB_URI) {
+      try { await db(); mongoOk = true; } catch (e) { mongoErr = String(e && e.message || e).slice(0, 120); }
+    }
     return res.status(200).end(JSON.stringify({
       clientIdSet:     Boolean(CLIENT_ID),
       clientSecretSet: Boolean(CLIENT_SECRET),
       mongoSet:        Boolean(process.env.MONGODB_URI),
+      mongoOk:         mongoOk,
+      mongoErr:        mongoErr || undefined,
       // Google Console me BILKUL yahi URI daalna hai
       redirectUriToRegister: REDIRECT_URI,
-      ready: Boolean(CLIENT_ID && CLIENT_SECRET && process.env.MONGODB_URI),
+      ready: Boolean(CLIENT_ID && CLIENT_SECRET && mongoOk),
     }, null, 2));
   }
 
@@ -227,6 +233,11 @@ module.exports = async function handler(req, res) {
     return redirectTo(res, origin(req) + '/app');
 
   } catch (e) {
+    const emsg = String(e && e.message || '').toLowerCase();
+    console.error('[google-auth] catch:', e && e.stack ? e.stack : e);
+    if (emsg.includes('mongo') || emsg.includes('topology') || emsg.includes('econnrefused') || emsg.includes('authentication') || emsg.includes('auth')) {
+      return failBack(req, res, 'db_error');
+    }
     return failBack(req, res, 'server_error');
   }
 };

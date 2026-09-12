@@ -24,7 +24,9 @@ document.querySelectorAll('[id$="-google-btn"]').forEach(b=>b.addEventListener('
               state_mismatch:'सुरक्षा जाँच विफल — कृपया दोबारा कोशिश करें।',
               token_exchange_failed:'Google से बात नहीं हो पाई — दोबारा कोशिश करें।',
               email_not_verified:'इस Google खाते का ईमेल सत्यापित नहीं है।',
-              no_email:'Google खाते से ईमेल नहीं मिला।' }[why]
+              no_email:'Google खाते से ईमेल नहीं मिला।',
+              db_error:'डेटाबेस से जुड़ नहीं पाए — कृपया बाद में कोशिश करें।',
+              server_error:'सर्वर में कोई दिक्कत हुई — कृपया बाद में कोशिश करें।' }[why]
             || 'लॉगिन पूरा नहीं हो पाया — दोबारा कोशिश करें।';
   const form=document.getElementById('login-form')||document.getElementById('signup-form');
   if(form) showAuthMsg(form,msg,'error');
