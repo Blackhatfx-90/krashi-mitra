@@ -581,20 +581,34 @@
   }
 
   async function run() {
-    const step = O.current();
-
-    /* Form/permission wale kadam se pehle hi nahi hain to kuch mat karo —
-       wo landing page ka kaam hai. */
-    if (['mic', 'lang', 'intro', 'auth'].indexOf(step) >= 0) return;
+    let step = O.current();
     if (step === 'done') return;
 
+    const s = await session();
+    if (!s || !s.authenticated) return;        // abhi login hi nahi hua
+
+    const p = s.profile || {};
+    /* Purana kisan (profile pehle se poori) — form dobara mat dikhao.
+       Yeh spec ki saaf maang hai, aur Google se aane walon par bhi lagti
+       hai jinhone pehle kabhi form bhar diya tha. */
+    if (p.village && p.state && p.landAmount) {
+      if (step !== 'models' && !O.load().did_models) {
+        O.save({ step: 'models' });
+        return stepModels();
+      }
+      O.save({ step: 'done' });
+      return;
+    }
+
+    /* User authenticated hai aur app me hai, par profile adhoori hai.
+       Agar step abhi tak 'mic'/'lang'/'intro'/'auth' par tha,
+       to use turant 'form1' par le aayein taaki profile form dikhe. */
+    if (['mic', 'lang', 'intro', 'auth'].indexOf(step) >= 0) {
+      step = 'form1';
+      O.save({ step: 'form1', did_auth: true });
+    }
+
     if (step === 'form1') {
-      const s = await session();
-      if (!s || !s.authenticated) return;        // abhi login hi nahi hua
-      const p = s.profile || {};
-      /* Purana kisan (profile pehle se poori) — form dobara mat dikhao.
-         Yeh spec ki saaf maang hai, aur Google se aane walon par bhi lagti
-         hai jinhone pehle kabhi form bhar diya tha. */
       if (p.village && p.state) {
         O.save({ step: p.landAmount ? 'models' : 'form2' });
         return run();
