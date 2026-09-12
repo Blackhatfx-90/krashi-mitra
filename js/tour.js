@@ -26,10 +26,25 @@
   /* ==========================================================================
    * 1. TOUR STEPS — team yahi edit karti hai
    * ======================================================================= */
+  /* --------------------------------------------------------------------
+   * Bhasha ka rasta. Pehle tour poori tarah Hindi+English me chipka hua tha
+   * — har kadam ka sirhaana "हिंदी / English" dono me, aur button bhi
+   * ("छोड़ें / Skip", "मदद / Help"). Bhasha chun lene ke baad aisa mel nahi
+   * hona chahiye: Tamil chunne wale kisan ko Hindi tour bolta tha.
+   * ------------------------------------------------------------------ */
+  function tt(key, fallback) {
+    if (window.kmI18n && typeof window.kmI18n.t === 'function') {
+      const v = window.kmI18n.t(key);
+      if (v && v !== key) return v;
+    }
+    return fallback;
+  }
+
   const TOUR_STEPS = [
     {
       selector: '#cropGrid',
       view: 'crops',
+      key: 'crop',
       titleHi: 'पहले अपनी फसल चुनें',
       titleEn: 'Choose your crop',
       descHi: 'यहाँ अपनी फसल पर टैप करें — जैसे धान, गेहूँ या गन्ना। ' +
@@ -38,6 +53,7 @@
     },
     {
       selector: '#statusChip',
+      key: 'status',
       titleHi: 'ऊपर स्थिति दिखती है',
       titleEn: 'Status indicator',
       descHi: 'यहाँ दिखता है कि मॉडल तैयार है या अभी लोड हो रहा है। ' +
@@ -47,6 +63,7 @@
     {
       selector: '#weatherCard',
       view: 'scan',
+      key: 'weather',
       titleHi: 'आज का मौसम और छिड़काव की चेतावनी',
       titleEn: 'Weather & spray warning',
       descHi: 'यह कार्ड आपके इलाके का मौसम दिखाता है। अगर अगले कुछ घंटों में बारिश हो सकती है, ' +
@@ -56,6 +73,7 @@
     {
       selector: '#weatherSpeakBtn',
       view: 'scan',
+      key: 'weatherListen',
       titleHi: 'मौसम सुनने का बटन',
       titleEn: 'Listen to the weather',
       descHi: 'पढ़ना न आता हो तो कोई बात नहीं। इस बटन को दबाइए और पूरा मौसम तथा चेतावनी ' +
@@ -65,6 +83,7 @@
     {
       selector: '#dropzone',
       view: 'scan',
+      key: 'photo',
       titleHi: 'पत्ती की फोटो यहाँ लगाइए',
       titleEn: 'Add your leaf photo here',
       descHi: 'इस खाने पर टैप करके फोटो चुनें। एक ही पत्ती की साफ फोटो लें, ' +
@@ -74,6 +93,7 @@
     {
       selector: '#cameraBtn',
       view: 'scan',
+      key: 'camera',
       titleHi: 'कैमरा बटन',
       titleEn: 'Camera button',
       descHi: 'यह बटन सीधे आपके फ़ोन का कैमरा खोल देता है। खेत में खड़े होकर पत्ती की ' +
@@ -83,6 +103,7 @@
     {
       selector: '#batchScanBtn',
       view: 'scan',
+      key: 'scan',
       titleHi: 'जाँच शुरू करने का बटन',
       titleEn: 'Start the scan',
       descHi: 'फोटो चुनने के बाद यह बटन दबाइए। जाँच आपके फ़ोन के अंदर ही होती है, ' +
@@ -92,6 +113,7 @@
     {
       selector: '#scoresList',
       view: 'scan',
+      key: 'confidence',
       titleHi: 'भरोसे का प्रतिशत',
       titleEn: 'Confidence scores',
       descHi: 'यहाँ हर रोग की संभावना प्रतिशत में दिखती है। अगर सबसे ऊपर वाला ' +
@@ -102,6 +124,7 @@
     {
       selector: '#advisoryCard',
       view: 'scan',
+      key: 'advisory',
       titleHi: 'रोग की पूरी सलाह',
       titleEn: 'Full advisory',
       descHi: 'रोग पहचानने के बाद यहाँ पूरी सलाह आती है — क्या करना है, कौन सी जैविक दवा, ' +
@@ -112,6 +135,7 @@
     {
       selector: '#speakResult',
       view: 'scan',
+      key: 'advisoryListen',
       titleHi: 'सलाह सुनने का बटन',
       titleEn: 'Listen to the advisory',
       descHi: 'यह "सुनें" बटन पूरी सलाह हिंदी में ज़ोर से पढ़कर सुनाता है। ' +
@@ -121,6 +145,7 @@
     },
     {
       selector: '#kmVoiceFab',
+      key: 'voice',
       titleHi: 'बोलकर ऐप चलाइए',
       titleEn: 'Voice assistant',
       descHi: 'यह हरा माइक बटन दबाकर आप बोलकर ऐप चला सकते हैं। जैसे कहिए — ' +
@@ -130,6 +155,7 @@
     },
     {
       selector: '#kmTourHelp',
+      key: 'help',
       titleHi: 'यह मदद वाला बटन याद रखिए',
       titleEn: 'The help button',
       descHi: 'कभी भी भूल जाएँ तो इस मदद वाले बटन को दबाइए, यह पूरा तरीका फिर से ' +
@@ -360,7 +386,7 @@
               '<button type="button" class="km-tour-btn km-tour-btn--icon" id="kmTourMute" ',
                 'aria-label="आवाज़ बंद/चालू"></button>',
               '<button type="button" class="km-tour-btn km-tour-btn--ghost" id="kmTourSkip">',
-                'छोड़ें / Skip</button>',
+                esc(tt('tour.skip', 'छोड़ें')) + '</button>',
             '</div>',
           '</div>',
           '<h3 id="kmTourTitle"></h3>',
@@ -416,19 +442,21 @@
       if (step.view) this._gotoView(step.view);
 
       // Text bharo
-      this.$stepNo.textContent = 'चरण ' + (this.index + 1) + ' / ' + total +
-                                 '  ·  Step ' + (this.index + 1) + ' of ' + total;
-      this.$title.innerHTML  = esc(step.titleHi) +
-        (step.titleEn ? ' <span style="font-weight:600;opacity:.6">/ ' + esc(step.titleEn) + '</span>' : '');
-      this.$descHi.textContent = step.descHi || '';
-      this.$descEn.textContent = step.descEn || '';
-      this.$descEn.style.display = step.descEn ? '' : 'none';
+      /* Pehle yahan "चरण 1 / 4 · Step 1 of 4" dono bhasha me chipka tha. */
+      this.$stepNo.textContent = tt('tour.stepOf', 'चरण {n} / {total}')
+        .replace('{n}', this.index + 1).replace('{total}', total);
+      /* Ek hi bhasha — dono nahi. step.key se bundle me dekhte hain;
+         na mile to purana Hindi text hi chalta hai (kuch tootega nahi). */
+      this.$title.innerHTML  = esc(tt('tour.' + step.key + '.t', step.titleHi));
+      this.$descHi.textContent = tt('tour.' + step.key + '.d', step.descHi || '');
+      this.$descEn.textContent = '';
+      this.$descEn.style.display = 'none';
 
       this.$back.disabled  = this.index === 0;
-      this.$back.innerHTML = svgIcon('arrowLeft') + '<span>पीछे</span>';
+      this.$back.innerHTML = svgIcon('arrowLeft') + '<span>' + esc(tt('tour.back', 'पीछे')) + '</span>';
       this.$next.innerHTML = (this.index === total - 1)
-        ? svgIcon('check') + '<span>हो गया</span>'
-        : '<span>आगे</span>' + svgIcon('arrowRight');
+        ? svgIcon('check') + '<span>' + esc(tt('tour.done', 'हो गया')) + '</span>'
+        : '<span>' + esc(tt('tour.next', 'आगे')) + '</span>' + svgIcon('arrowRight');
 
       this.$dots.innerHTML = this.steps
         .map((_, i) => '<span class="km-tour-dot' + (i === this.index ? ' is-on' : '') + '"></span>')
@@ -559,9 +587,18 @@
     btn.type = 'button';
     btn.id = 'kmTourHelp';
     btn.className = 'km-tour-help';
-    btn.setAttribute('aria-label', 'मदद — तरीका दोबारा देखें / Replay tour');
-    btn.innerHTML = svgIcon('help') + '<span class="km-tour-help__txt">मदद / Help</span>';
+    btn.setAttribute('aria-label', tt('tour.helpAria', 'मदद — तरीका दोबारा देखें'));
+    btn.innerHTML = svgIcon('help') +
+      '<span class="km-tour-help__txt">' + esc(tt('tour.help', 'मदद')) + '</span>';
     btn.addEventListener('click', () => window.kmTour.start());
+
+    /* Yeh button ek hi baar banta hai, isliye bhasha badalne par uska text
+       purani bhasha me hi chipka reh jata tha. Ab wo bhi badalta hai. */
+    window.addEventListener('km:language', () => {
+      btn.setAttribute('aria-label', tt('tour.helpAria', 'मदद — तरीका दोबारा देखें'));
+      const txt = btn.querySelector('.km-tour-help__txt');
+      if (txt) txt.textContent = tt('tour.help', 'मदद');
+    });
     document.body.appendChild(btn);
   }
 
