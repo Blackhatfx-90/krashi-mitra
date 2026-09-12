@@ -100,7 +100,7 @@ export default function StateOfficerLogin({ onLoginSuccess }) {
           </div>
 
           <a
-            href="https://krashi-mitrasih.vercel.app/"
+            href="/"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-700 transition-colors"

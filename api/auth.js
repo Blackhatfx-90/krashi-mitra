@@ -4,8 +4,9 @@ const rateLimit = require('./_ratelimit');
 
 let clientPromise;
 function client() {
-  if (!process.env.MONGODB_URI) throw new Error('MONGODB_URI is not configured');
-  if (!clientPromise) clientPromise = new MongoClient(process.env.MONGODB_URI).connect();
+  const uri = process.env.MONGODB_URI || process.env.MONGODB_URL;
+  if (!uri) throw new Error('MONGODB_URI is not configured');
+  if (!clientPromise) clientPromise = new MongoClient(uri).connect();
   return clientPromise;
 }
 function cookies(req) { return Object.fromEntries((req.headers.cookie || '').split(';').filter(Boolean).map(v => { const i=v.indexOf('='); return [v.slice(0,i).trim(), decodeURIComponent(v.slice(i+1))]; })); }

@@ -32,8 +32,9 @@ const crypto = require('crypto');
 
 let clientPromise;
 function client() {
-  if (!process.env.MONGODB_URI) throw new Error('MONGODB_URI is not configured');
-  if (!clientPromise) clientPromise = new MongoClient(process.env.MONGODB_URI).connect();
+  const uri = process.env.MONGODB_URI || process.env.MONGODB_URL;
+  if (!uri) throw new Error('MONGODB_URI is not configured');
+  if (!clientPromise) clientPromise = new MongoClient(uri).connect();
   return clientPromise;
 }
 async function db() { return (await client()).db(process.env.MONGODB_DB || 'krashi_mitra'); }

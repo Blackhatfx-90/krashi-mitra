@@ -41,11 +41,12 @@ async function userFor(req) {
       return [v.slice(0, i).trim(), decodeURIComponent(v.slice(i + 1))];
     }));
     if (!c.krashi_session) return null;
-    if (!process.env.MONGODB_URI) return null;
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_URL;
+    if (!mongoUri) return null;
 
     const { MongoClient } = require('mongodb');
     if (!global.__kmCommunityClient) {
-      global.__kmCommunityClient = new MongoClient(process.env.MONGODB_URI).connect();
+      global.__kmCommunityClient = new MongoClient(mongoUri).connect();
     }
     const cl = await global.__kmCommunityClient;
     const d = cl.db(process.env.MONGODB_DB || 'krashi_mitra');

@@ -33,10 +33,15 @@ const crypto = require('crypto');
 const AUTH_URL  = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
+function getMongoUri() {
+  return process.env.MONGODB_URI || process.env.MONGODB_URL;
+}
+
 let clientPromise;
 function client() {
-  if (!process.env.MONGODB_URI) throw new Error('MONGODB_URI is not configured');
-  if (!clientPromise) clientPromise = new MongoClient(process.env.MONGODB_URI).connect();
+  const uri = getMongoUri();
+  if (!uri) throw new Error('MONGODB_URI is not configured');
+  if (!clientPromise) clientPromise = new MongoClient(uri).connect();
   return clientPromise;
 }
 async function db() { return (await client()).db(process.env.MONGODB_DB || 'krashi_mitra'); }
@@ -117,13 +122,14 @@ module.exports = async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-store');
     let mongoOk = false, mongoErr = '';
-    if (process.env.MONGODB_URI) {
+    const mUri = getMongoUri();
+    if (mUri) {
       try { await db(); mongoOk = true; } catch (e) { mongoErr = String(e && e.message || e).slice(0, 120); }
     }
     return res.status(200).end(JSON.stringify({
       clientIdSet:     Boolean(CLIENT_ID),
       clientSecretSet: Boolean(CLIENT_SECRET),
-      mongoSet:        Boolean(process.env.MONGODB_URI),
+      mongoSet:        Boolean(mUri),
       mongoOk:         mongoOk,
       mongoErr:        mongoErr || undefined,
       // Google Console me BILKUL yahi URI daalna hai

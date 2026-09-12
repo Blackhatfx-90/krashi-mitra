@@ -30,7 +30,7 @@
 
 const KV_URL = process.env.KV_REST_API_URL;
 const KV_TOKEN = process.env.KV_REST_API_TOKEN;
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGODB_URL;
 
 /** KV lagi hai ya hum demo memory par chal rahe hain. */
 function kvReady() {

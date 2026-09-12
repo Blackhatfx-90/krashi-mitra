@@ -180,7 +180,7 @@ export default function AdminSidebar({
               किसान फील्ड ऐप (LIVE)
             </p>
             <a
-              href="https://krashi-mitrasih.vercel.app/"
+              href="/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-green-50/80 hover:text-green-800 border border-gray-200 transition-colors"
