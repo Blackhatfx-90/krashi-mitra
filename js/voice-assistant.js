@@ -875,6 +875,22 @@ if (!cmd) {
       try { asked = localStorage.getItem(PERM_KEY); } catch (_) {}
       if (asked === '1') { resolve(false); return; }      // pehle poochh chuke hain
 
+      /* NAYA ONBOARDING mic aur baaki anumatiyan khud maangta hai — sabse
+         pehle, kaaran batakar, aur kisan ki chuni hui bhasha me.
+         Yeh purana parda uske BAAD dobara aa jata tha:
+           - ek hi cheez do baar maangna kisan ko lagta hai ki app kuch
+             chhupa rahi hai, aur doosri baar log aksar "Block" daba dete
+             hain — jiske baad browser kabhi nahi poochta;
+           - aur yeh parda hamesha Hindi+English dono me hai, jo bhasha
+             chun lene ke baad nahi hona chahiye.
+         Isliye onboarding chal raha ho ya poora ho chuka ho, to yeh chup
+         reh jaata hai. Onboarding load hi na ho (purana cache) to yeh
+         pehle jaisa kaam karta rehta hai. */
+      try {
+        const ob = JSON.parse(localStorage.getItem('km.onboarding.v1') || 'null');
+        if (ob && ob.step) { resolve(false); return; }
+      } catch (_) {}
+
       const wrap = document.createElement('div');
       wrap.className = 'km-perm';
       wrap.setAttribute('role', 'dialog');

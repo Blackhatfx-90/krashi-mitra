@@ -53,7 +53,64 @@ module.exports = async (req,res) => { res.setHeader('Content-Type','application/
   if(req.method==='POST' && action==='signup'){ const email=String(input.email||'').trim().toLowerCase(), phone=String(input.phone||'').replace(/\D/g,'').slice(-10), password=String(input.password||''); if(!email||phone.length!==10||password.length<8) return res.status(400).json({error:'नाम, ईमेल, 10 अंकों का मोबाइल और कम से कम 8 अक्षर का पासवर्ड जरूरी है।'}); const exists=await d.collection('users').findOne({$or:[{email},{phone}]}); if(exists) return res.status(409).json({error:'यह ईमेल या मोबाइल पहले से पंजीकृत है।'}); const now=new Date(), user={name:String(input.name).trim(),email,phone,passwordHash:await bcrypt.hash(password,12),authProvider:'password',profile:null,createdAt:now,updatedAt:now}; const r=await d.collection('users').insertOne(user); const t=token(); await d.collection('sessions').insertOne({token:t,userId:r.insertedId,expiresAt:new Date(Date.now()+2592000000)}); setCookie(res,t); await rateLimit.note(req,'signup',SIGNUP_WINDOW); return res.status(201).json({user:{name:user.name,email,phone},profileComplete:false}); }
   if(req.method==='POST' && action==='login'){ const email=String(input.email||'').trim().toLowerCase(), password=String(input.password||''); const user=await d.collection('users').findOne({email}); if(!user) { await rateLimit.note(req,'login',LOGIN_WINDOW); return res.status(401).json({error:'ईमेल या पासवर्ड गलत है।'}); } if(!user.passwordHash) return res.status(409).json({error:'यह खाता Google से बना है और अभी इसका पासवर्ड सेट नहीं हुआ। कृपया एक बार Google से लॉगिन करके पासवर्ड बनाएँ।',needsGoogle:true}); if(!(await bcrypt.compare(password,user.passwordHash))) { await rateLimit.note(req,'login',LOGIN_WINDOW); return res.status(401).json({error:'ईमेल या पासवर्ड गलत है।'}); } const t=token(); await d.collection('sessions').insertOne({token:t,userId:user._id,expiresAt:new Date(Date.now()+2592000000)}); setCookie(res,t); return res.json({user:{name:user.name,email:user.email,phone:user.phone},profileComplete:Boolean(user.profile)}); }
   if(req.method==='GET' && action==='session'){ const user=await userFor(req); if(!user) return res.status(401).json({authenticated:false}); return res.json({authenticated:true,user:{name:user.name,email:user.email,phone:user.phone},profile:user.profile||null,language:user.language||null,needsPassword:!user.passwordHash,authProvider:user.authProvider||'password'}); }
-  if(req.method==='POST' && action==='profile'){ const user=await userFor(req); if(!user) return res.status(401).json({error:'सत्र समाप्त हो गया।'}); const land=Number(input.landAmount); if(!input.village||!input.state||!/^[0-9]{6}$/.test(String(input.pin||''))||!Number.isFinite(land)||land<=0) return res.status(400).json({error:'कृपया गांव, राज्य, सही PIN और जमीन की मात्रा भरें।'}); const profile={village:String(input.village).trim(),state:String(input.state),pin:String(input.pin),landAmount:land,landUnit:String(input.landUnit||'acre'),updatedAt:new Date()}; await d.collection('users').updateOne({_id:user._id},{$set:{profile,updatedAt:new Date()}}); return res.json({profile}); }
+  /* PROFILE — ab do kisht me bhi bhara ja sakta hai.
+   *
+   * Pehle yeh sab kuch EK saath maangta tha (gaon + rajya + PIN + zameen).
+   * Naya onboarding ise do form me baantta hai — pehle apni jankari, phir
+   * anumatiyan, phir zameen — kyunki ek hi bar 8 khane dikhne par kisan
+   * wahin chhod deta hai. Isliye `step` aaya:
+   *     step:'personal'  -> gaon/zila/rajya (zameen nahi maangte)
+   *     step:'land'      -> sirf zameen
+   *     step nadarad     -> purana vyavhaar, sab ek saath (kuch nahi toota)
+   * Har kisht purani profile ke UPAR likhi jati hai, use mitati nahi.
+   */
+  if(req.method==='POST' && action==='profile'){
+    const user=await userFor(req); if(!user) return res.status(401).json({error:'सत्र समाप्त हो गया।'});
+    const old=user.profile||{};
+    const step=String(input.step||'');
+    const str=(v,n)=>String(v==null?'':v).trim().slice(0,n||80);
+    const land=Number(input.landAmount);
+    const pin=String(input.pin||'');
+
+    if(step==='personal'){
+      if(!input.village||!input.state) return res.status(400).json({error:'कृपया गाँव और राज्य भरें।'});
+      if(pin && !/^[0-9]{6}$/.test(pin)) return res.status(400).json({error:'PIN 6 अंकों का होना चाहिए।'});
+    } else if(step==='land'){
+      if(!Number.isFinite(land)||land<=0) return res.status(400).json({error:'कृपया ज़मीन की मात्रा भरें।'});
+    } else {
+      if(!input.village||!input.state||!/^[0-9]{6}$/.test(pin)||!Number.isFinite(land)||land<=0)
+        return res.status(400).json({error:'कृपया गांव, राज्य, सही PIN और जमीन की मात्रा भरें।'});
+    }
+
+    const profile=Object.assign({},old,{updatedAt:new Date()});
+    if(step!=='land'){
+      if(input.village!=null)  profile.village=str(input.village);
+      if(input.district!=null) profile.district=str(input.district);
+      if(input.state!=null)    profile.state=str(input.state,60);
+      if(pin)                  profile.pin=pin;
+      if(input.firstName!=null) profile.firstName=str(input.firstName,60);
+      if(input.surname!=null)   profile.surname=str(input.surname,60);
+    }
+    if(step!=='personal'){
+      if(Number.isFinite(land)&&land>0){ profile.landAmount=land; profile.landUnit=str(input.landUnit||'acre',20); }
+    }
+
+    const set={profile,updatedAt:new Date()};
+    /* Naam Form 1 se aata hai. Google wale khate me Google ka naam hota hai,
+       par kisan apna naam badal sakta hai — isliye user.name bhi update. */
+    const full=[str(input.firstName,60),str(input.surname,60)].filter(Boolean).join(' ');
+    if(full) set.name=full;
+    /* Phone: 10 ank. Pehle se kisi aur ka ho to chhupke se nahi badalte. */
+    const ph=String(input.phone||'').replace(/\D/g,'').slice(-10);
+    if(ph.length===10 && ph!==user.phone){
+      const taken=await d.collection('users').findOne({phone:ph,_id:{$ne:user._id}});
+      if(taken) return res.status(409).json({error:'यह मोबाइल नंबर पहले से किसी और खाते पर है।'});
+      set.phone=ph;
+    }
+
+    await d.collection('users').updateOne({_id:user._id},{$set:set});
+    return res.json({profile,name:set.name||user.name,phone:set.phone||user.phone});
+  }
   /* Chuni hui bhasha account ke saath sambhal lete hain, taaki naya phone
      ya dobara login karne par kisan ko phir se na chunni pade. */
   if(req.method==='POST' && action==='language'){ const user=await userFor(req); if(!user) return res.status(401).json({error:'सत्र समाप्त हो गया।'}); const lang=String(input.language||'').trim(); if(!/^[a-z]{2,3}(-[A-Z]{2})?$/.test(lang)) return res.status(400).json({error:'भाषा कोड सही नहीं है।'}); await d.collection('users').updateOne({_id:user._id},{$set:{language:lang,updatedAt:new Date()}}); return res.json({language:lang}); }

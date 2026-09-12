@@ -22,6 +22,16 @@
   // Sirf app wale page par
   if (!/\/app(?:\.html)?$/.test(location.pathname)) return;
 
+  /* NAYA ONBOARDING AA GAYA HAI (js/onboarding-forms.js).
+     Wo wahi kaam karta hai — profile bharwana, password lagwana — par
+     kadam-dar-kadam aur awaaz ke saath. Dono ek saath chalein to kisan ko
+     do form ek ke upar ek dikhte hain.
+     Isliye jab naya flow maujood ho, yeh file chup-chaap hat jaati hai.
+     Hataya isliye nahi gaya ki agar naya flow kisi wajah se load na ho
+     (purana cache, script fail), to yeh purana rasta abhi bhi kaam karta
+     hai — kisan bina profile ke phansa na rahe. */
+  if (window.kmObForms) return;
+
   const STATES = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa',
     'Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh',
     'Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan',
