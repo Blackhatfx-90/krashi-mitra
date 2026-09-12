@@ -58,7 +58,7 @@ if [ -n "$NEW_URL" ] && [ "$NEW_URL" != "$OLD_URL" ]; then
   find "$OUT" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.txt' -o -name '*.webmanifest' -o -name '*.json' \) \
     -exec sed -i.bak "s|${OLD_URL}|${NEW_URL}|g" {} +
   find "$OUT" -name '*.bak' -delete
-  LEFT=$(grep -rl "$OLD_URL" "$OUT" 2>/dev/null | wc -l | tr -d ' ')
+  LEFT=$(grep -rl "$OLD_URL" "$OUT" 2>/dev/null | wc -l | tr -d ' ') || LEFT=0
   echo "  purana pata ab $LEFT file me bacha"
 else
   echo "URL set nahi hai — pata waisa hi rehne diya ($OLD_URL)"
