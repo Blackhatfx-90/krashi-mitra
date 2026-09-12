@@ -324,13 +324,28 @@
   }
 
   O.run = run;
+  O.stepAuth = stepAuth;
+
+  /* Landing page par 'Get Started' / 'शुरू करें' बटन दबाने पर
+     khata chunne wala popup (stepAuth) dikhana */
+  function wireCtaButtons() {
+    if (/\/app(?:\.html)?$/.test(location.pathname)) return;
+    const ctas = document.querySelectorAll('a[data-ll="cta.start"], a[data-ll="cta.free"], a[href="/login"]');
+    ctas.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        stepAuth();
+      });
+    });
+  }
 
   /* Landing par apne aap shuru — par sirf tab jab yeh kisan naya ho.
-     4 second ka intezaar jaan-boojhkar: page theek se khul jaye, aur
-     kisan ek nazar dekh le ki wo kahan aaya hai, tab baat shuru ho. */
+     'auth' kadam apne aap screen par beech me nahi aayega — kisan pehle
+     landing page aaram se dekhega, aur jab 'Get Started' / shuru karega tabhi aayega. */
   function autostart() {
+    wireCtaButtons();
     if (O.finished()) return;
-    if (['form1', 'perms', 'form2', 'models'].indexOf(O.current()) >= 0) return;  // wo app ke andar hain
+    if (['auth', 'form1', 'perms', 'form2', 'models'].indexOf(O.current()) >= 0) return;
     setTimeout(run, 1200);
   }
 
