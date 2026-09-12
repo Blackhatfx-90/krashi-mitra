@@ -287,17 +287,16 @@
 
     O.say(q);
 
-    /* Purana khata -> seedha login. */
+    /* Purana khata -> seedha login. Form 1 aur 2 ab kabhi nahi dikhenge —
+       wo pehle hi bhare ja chuke hain. */
     card.querySelector('#kmobOld').addEventListener('click', () => {
       O.hush();
-      O.markDone('auth');
       O.save({ path: 'login' });
       location.href = '/login';
     });
 
     card.querySelector('#kmobNew').addEventListener('click', () => {
       O.hush();
-      O.markDone('auth');
       O.save({ path: 'signup' });
       location.href = '/signup';
     });
@@ -305,12 +304,6 @@
 
   /* ------------------------------------------------------------ chalao */
   function run() {
-    if (/\/app(?:\.html)?$/.test(location.pathname)) {
-      if (window.kmObForms && typeof window.kmObForms.run === 'function') {
-        return window.kmObForms.run();
-      }
-      return O.close();
-    }
     switch (O.current()) {
       case 'mic':   return stepMic();
       case 'lang':  return stepLang();
@@ -323,10 +316,9 @@
   O.run = run;
 
   /* Landing par apne aap shuru — par sirf tab jab yeh kisan naya ho.
-     App ke dashboard (/app) par landing onboarding kadam (mic, lang, intro, auth)
-     kabhi nahi chalenge — wahan onboarding-forms.js chalega. */
+     4 second ka intezaar jaan-boojhkar: page theek se khul jaye, aur
+     kisan ek nazar dekh le ki wo kahan aaya hai, tab baat shuru ho. */
   function autostart() {
-    if (/\/app(?:\.html)?$/.test(location.pathname)) return;
     if (O.finished()) return;
     if (['form1', 'perms', 'form2', 'models'].indexOf(O.current()) >= 0) return;  // wo app ke andar hain
     setTimeout(run, 1200);
