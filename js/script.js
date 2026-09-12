@@ -4051,6 +4051,7 @@ const CROPS = {
     icon: 'crop-maize',
     seasonHi: 'खरीफ',
     photoHintHi: 'मक्का की पत्ती या भुट्टे की साफ फोटो अपलोड करें',
+    photoHintKey: 'ui.hint.maize',
     labels: [
       'Maize_Blight',          // 0
       'Maize_Common_Rust',     // 1
@@ -4413,6 +4414,7 @@ const CROPS = {
     icon: 'crop-potato',
     seasonHi: 'रबी',
     photoHintHi: 'आलू (कंद) की साफ फोटो अपलोड करें — कटा हुआ आलू हो तो और अच्छा',
+    photoHintKey: 'ui.hint.potato',
     labels: [
       'Potato_Black_Scurf',      // 0
       'Potato_Blackleg',         // 1
@@ -5465,6 +5467,7 @@ const CROPS = {
     icon: 'crop-mango',
     seasonHi: 'बागवानी (बारहमासी पेड़)',
     photoHintHi: 'आम की पत्ती या रोगग्रस्त टहनी की साफ फोटो अपलोड करें',
+    photoHintKey: 'ui.hint.mango',
     labels: [
       'Mango_Anthracnose',       // 0
       'Mango_Bacterial_Canker',  // 1
@@ -5925,6 +5928,7 @@ const CROPS = {
     icon: 'crop-apple',
     seasonHi: 'बागवानी (पहाड़ी क्षेत्र)',
     photoHintHi: 'सेब की पत्ती या रोगग्रस्त फल की साफ फोटो अपलोड करें',
+    photoHintKey: 'ui.hint.apple',
     labels: [
       'Apple_Alternaria_Leaf_Spot',  // 0
       'Apple_Brown_Spot',           // 1
@@ -9471,11 +9475,19 @@ function updateCropChip() {
   }
   // Scan card ka hint bhi chuni hui fasal ke hisaab se badle (pehle "धान" fix tha).
   if (el.scanCropHint) {
-    // Har fasal apna hint de sakti hai (photoHintHi). Aloo jaise crop me model
-    // KAND ka hai, patti ka nahi — wahan "patti ki photo" likhna galat hoga.
+    /* Yeh line pehle Hindi text SEEDHE likh deti thi, jisse HTML ka
+       data-i18n bekaar ho jata tha — Tamil chunne par bhi yahi ek vaakya
+       Hindi me chamakta rehta. Ab bhasha ke bundle se aata hai.
+
+       Kuch fasalon ka apna hint hota hai (photoHintKey): aloo me model
+       KAND ka hai, patti ka nahi — wahan "patti ki photo" likhna galat
+       hoga. Wo bhi ab bundle me hai. */
     el.scanCropHint.textContent = crop
-      ? (crop.photoHintHi || (cropName(crop.id) + ' की पत्ती की साफ फोटो अपलोड करें'))
-      : 'चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें';
+      ? (crop.photoHintKey
+          ? tr(crop.photoHintKey, crop.photoHintHi || '')
+          : tr('ui.photoHintCrop', '{crop} की पत्ती की साफ फोटो अपलोड करें')
+              .replace('{crop}', cropName(crop.id)))
+      : tr('ui.a22', 'चुनी हुई फसल की पत्ती की साफ फोटो अपलोड करें');
   }
 }
 
