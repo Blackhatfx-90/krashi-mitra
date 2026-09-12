@@ -798,11 +798,17 @@
           ic    = 'micOff';
           break;
         case 'network':
-          heard = 'इंटरनेट नहीं है';
-          speak = 'आवाज़ पहचानने के लिए इंटरनेट चाहिए। रोग पहचान बिना इंटरनेट के चलती रहेगी।';
-          note  = 'Browser ki speech-to-text service internet se chalti hai. ' +
-                  'Baaki app (rog pehchan, salah, awaaz) offline kaam karti hai.';
-          ic    = 'wifiOff';
+          if (!navigator.onLine) {
+            heard = 'इंटरनेट नहीं है';
+            speak = 'इंटरनेट कनेक्टेड नहीं है। आवाज़ पहचानने के लिए इंटरनेट चालू कीजिए।';
+            note  = 'कृपया अपने फ़ोन का इंटरनेट (Wi-Fi या मोबाइल डेटा) चेक करें।';
+            ic    = 'wifiOff';
+          } else {
+            heard = 'आवाज़ कनेक्ट नहीं हुई';
+            speak = 'आवाज़ सर्वर से कनेक्ट नहीं हो पाई। कृपया दोबारा बोलिए।';
+            note  = 'इंटरनेट चालू है, आवाज़ सेवा में क्षणिक रुकावट आई।';
+            ic    = 'mic';
+          }
           break;
         case 'aborted':
           return;                                   // user ne khud roka — chup raho
@@ -820,23 +826,32 @@
       const cmd = matchCommand(normalized);
 
       /* Samajh nahi aaya */
-if (!cmd) {
-      const answer = window.KrashiMitraOffline && window.KrashiMitraOffline.offlineAnswer(raw);
-      const onlineAnswer = window.KrashiMitraOffline && window.KrashiMitraOffline.officialFallback;
-      if (answer && onlineAnswer) {
-        const respond = (text, stale) => this._respond(text, { heard: '“' + raw + '”', action: stale ? 'ऑफलाइन कृषि सहायक' : 'ताज़ा कृषि जानकारी', kind: 'ok', note: stale ? 'नेट नहीं है — आखिरी स्थानीय ज्ञान से जवाब दिया गया।' : null, hold: 10000 });
-        if (navigator.onLine) onlineAnswer(raw).then(text => respond(text, false)).catch(() => respond(answer, true));
-        else respond(answer, true);
-      } else {
-        /* Pehle yahan sawal thukra diya jata tha ("kheti ka sawal poochiye").
-           Sahayak ab har vishay par jawab deta hai, isliye ab hum sirf itna
-           kehte hain ki abhi jawab nahi mil paya. */
-        this._respond(greetPrefix() + 'अभी इसका जवाब नहीं मिल पाया। ज़रा दोबारा पूछिए।', {
-          heard: '“' + raw + '”', action: 'दोबारा पूछिए', kind: 'error', hold: 8000,
-        });
+      if (!cmd) {
+        const isOnline = Boolean(navigator.onLine);
+        const answer = window.KrashiMitraOffline && window.KrashiMitraOffline.offlineAnswer(raw, isOnline);
+        const onlineAnswer = window.KrashiMitraOffline && window.KrashiMitraOffline.officialFallback;
+        if (answer && onlineAnswer) {
+          const respond = (text, stale) => this._respond(text, {
+            heard: '“' + raw + '”',
+            action: (!isOnline ? 'ऑफ़लाइन कृषि सहायक' : 'कृषि AI सहायक'),
+            kind: 'ok',
+            note: (!isOnline ? 'इंटरनेट कनेक्टेड नहीं है — ऑफ़लाइन जानकारी दी गई है।' : null),
+            hold: 10000
+          });
+          if (isOnline) {
+            onlineAnswer(raw)
+              .then(text => respond(text, false))
+              .catch(() => respond(answer, true));
+          } else {
+            respond(answer, true);
+          }
+        } else {
+          this._respond(greetPrefix() + 'अभी इसका जवाब नहीं मिल पाया। ज़रा दोबारा पूछिए।', {
+            heard: '“' + raw + '”', action: 'दोबारा पूछिए', kind: 'error', hold: 8000,
+          });
+        }
+        return;
       }
-      return;
-    }
 
       this._setState('working');
 

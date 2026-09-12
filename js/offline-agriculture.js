@@ -44,15 +44,18 @@
     return n ? n.split(/\s+/)[0] : '';
   }
 
-  function offlineAnswer(query) {
+  function offlineAnswer(query, isOnline) {
     const text = String(query || '').toLowerCase();
     const hit = KNOWLEDGE.find(item => item.words.some(word => text.includes(word.toLowerCase())));
     if (hit) return hit.answer;
-    /* Pehle yahan "ye mere gyaan-kshetra me nahi hai" likha tha — yani app
-       sawal thukra deti thi. Ab hum sirf itna kehte hain ki net chahiye,
-       kyunki sahayak ab har vishay par jawab de sakta hai. */
+
     const n = farmerName();
-    return (n ? n + ' जी, ' : '') + 'इसका पूरा जवाब देने के लिए इंटरनेट चाहिए। नेट आने पर यही सवाल दोबारा पूछिए।';
+    const prefix = n ? (n + ' जी, ') : '';
+    const online = (typeof isOnline === 'boolean') ? isOnline : (typeof navigator !== 'undefined' && Boolean(navigator.onLine));
+    if (!online) {
+      return prefix + 'इंटरनेट कनेक्टेड नहीं है। कृपया इंटरनेट चालू करें।';
+    }
+    return prefix + 'मैं फसल, रोग, खाद, मौसम, मंडी भाव और खेती से जुड़े सवालों में आपकी पूरी मदद कर सकता हूँ। कृपया अपना सवाल पूछिए।';
   }
   function officialFallback(query) {
     const p = getPrefs();
