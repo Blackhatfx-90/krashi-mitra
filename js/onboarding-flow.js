@@ -287,16 +287,17 @@
 
     O.say(q);
 
-    /* Purana khata -> seedha login. Form 1 aur 2 ab kabhi nahi dikhenge —
-       wo pehle hi bhare ja chuke hain. */
+    /* Purana khata -> seedha login. */
     card.querySelector('#kmobOld').addEventListener('click', () => {
       O.hush();
+      O.markDone('auth');
       O.save({ path: 'login' });
       location.href = '/login';
     });
 
     card.querySelector('#kmobNew').addEventListener('click', () => {
       O.hush();
+      O.markDone('auth');
       O.save({ path: 'signup' });
       location.href = '/signup';
     });
@@ -304,6 +305,15 @@
 
   /* ------------------------------------------------------------ chalao */
   function run() {
+    if (/\/app(?:\.html)?$/.test(location.pathname)) {
+      if (['mic', 'lang', 'intro', 'auth'].indexOf(O.current()) >= 0) {
+        O.save({ step: 'form1', did_auth: true });
+      }
+      if (window.kmObForms && typeof window.kmObForms.run === 'function') {
+        return window.kmObForms.run();
+      }
+      return O.close();
+    }
     switch (O.current()) {
       case 'mic':   return stepMic();
       case 'lang':  return stepLang();
