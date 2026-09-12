@@ -7869,6 +7869,130 @@ function analyzeImageContent(sourceCanvas) {
  * Faisla: photo aage bhejein ya kisan ko roken.
  * @returns {object} { ok, reasonHi, tipsHi, features }
  */
+/* ---------------------------------------------------------------------------
+ * DHUNDHLI PHOTO KI JAANCH  (blur gate)
+ *
+ * KYUN
+ *   Kisan ek haath se phone pakadta hai, doosre se patti — aur khet me
+ *   hawa chalti hai. Photo hil jaati hai. Model phir bhi ek jawab de deta
+ *   hai, aksar 80-90% "bharose" ke saath, kyunki dhundhli photo me wo
+ *   dhabbe dhoondhta hai jo hain hi nahi. Kisan us jawab par dawa khareed
+ *   leta hai.
+ *
+ *   Yeh leaf-gate se PEHLE chalti hai — dhundhli photo par leaf-gate bhi
+ *   galat faisla deta hai (kinare gayab ho jate hain, sab kuch "flat"
+ *   lagta hai).
+ *
+ * KAISE (bina kisi model ke, poori tarah offline)
+ *   Laplacian ka variance. Saaf photo me pixel apne padosi se tez badalta
+ *   hai (patti ki nas, dhabbe ka kinara); dhundhli me sab dheere-dheere
+ *   badalta hai. Us badlav ka bikhraav (variance) hi teekhepan ka maap hai.
+ *   Yeh computer vision ka jaana-mana tarika hai (Pech et-al ka
+ *   "variance of Laplacian"), aur ek chhote canvas par milliseconds me
+ *   chal jaata hai.
+ *
+ * DEHLEEZ (threshold) JAAN-BOOJHKAR DHEELI HAI
+ *   Galat rokna bhi nuksan hai — kisan ki patti sach me halki dhundhli ho
+ *   sakti hai aur wo phir bhi jaanch chahta hai. Isliye hum sirf SAAF-SAAF
+ *   dhundhli photo rokte hain, aur wahan bhi "फिर भी जाँचें" ka rasta khula
+ *   rehta hai.
+ *
+ * BAHUT ANDHERI PHOTO
+ *   Andheri photo apne aap "dhundhli" nikal aati hai (kuch dikhta hi
+ *   nahi), par kisan ko kaaran alag batana chahiye — use light chahiye,
+ *   sthir haath nahi. Isliye dono alag-alag batate hain.
+ * ------------------------------------------------------------------------- */
+
+/* i18n ka chhota rasta. `T` switchView ke ANDAR bana hai, isliye yahan nahi
+   milta — pehle ye code T() bulakar crash kar sakta tha. */
+function tr(key, fallback) {
+  if (window.kmI18n && typeof window.kmI18n.t === 'function') {
+    const v = window.kmI18n.t(key);
+    if (v && v !== key) return v;
+  }
+  return fallback;
+}
+
+const BLUR_GATE = {
+  ENABLED: true,
+  SIZE: 160,          // isi par Laplacian — 160x160 kaafi hai aur tez hai
+  MIN_VARIANCE: 45,   // isse neeche = saaf-saaf dhundhli
+  MIN_BRIGHTNESS: 32, // 0-255. isse neeche = bahut andhera
+};
+
+function measureSharpness(sourceCanvas) {
+  try {
+    const n = BLUR_GATE.SIZE;
+    const c = document.createElement('canvas');
+    c.width = n; c.height = n;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return null;
+    ctx.drawImage(sourceCanvas, 0, 0, n, n);
+    const d = ctx.getImageData(0, 0, n, n).data;
+
+    /* Grayscale — aankh ke hisaab se (hara sabse jyada dikhta hai) */
+    const g = new Float32Array(n * n);
+    let sum = 0;
+    for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+      const v = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      g[p] = v; sum += v;
+    }
+    const brightness = sum / (n * n);
+
+    /* Laplacian kernel:  0 1 0 / 1 -4 1 / 0 1 0 — kinare se pehle wali
+       ek pixel ki patti chhod dete hain. */
+    let lSum = 0, lSq = 0, count = 0;
+    for (let y = 1; y < n - 1; y++) {
+      for (let x = 1; x < n - 1; x++) {
+        const i = y * n + x;
+        const lap = g[i - n] + g[i + n] + g[i - 1] + g[i + 1] - 4 * g[i];
+        lSum += lap; lSq += lap * lap; count++;
+      }
+    }
+    if (!count) return null;
+    const mean = lSum / count;
+    const variance = (lSq / count) - (mean * mean);
+    return { variance: variance, brightness: brightness };
+  } catch (_) {
+    return null;                                  // jaanch na ho paye to rokte nahi
+  }
+}
+
+/** Photo saaf hai? { ok } ya { ok:false, reason, titleHi, bodyHi } */
+function checkPhotoQuality(canvas) {
+  if (!BLUR_GATE.ENABLED) return { ok: true, skipped: true };
+  const m = measureSharpness(canvas);
+  if (!m) return { ok: true, skipped: true };
+
+  console.info('[blur-gate]', { variance: m.variance.toFixed(1), brightness: m.brightness.toFixed(1) });
+
+  if (m.brightness < BLUR_GATE.MIN_BRIGHTNESS) {
+    return {
+      ok: false, reason: 'dark', measure: m,
+      titleHi:  tr('photo.darkTitle', 'फोटो बहुत अँधेरी है'),
+      reasonHi: tr('photo.darkBody',  'इतने अँधेरे में पत्ती के धब्बे दिखते ही नहीं।'),
+      tipsHi: [
+        tr('photo.darkTip1', 'दिन की रोशनी में खींचिए — तेज़ धूप में नहीं, छाँव में।'),
+        tr('photo.darkTip2', 'सूरज आपके पीछे हो, पत्ती पर रोशनी पड़े।'),
+        tr('photo.darkTip3', 'फ़्लैश से बचिए — वह पत्ती पर सफ़ेद चमक बना देता है।'),
+      ],
+    };
+  }
+  if (m.variance < BLUR_GATE.MIN_VARIANCE) {
+    return {
+      ok: false, reason: 'blur', measure: m,
+      titleHi:  tr('photo.blurTitle', 'फोटो धुँधली है'),
+      reasonHi: tr('photo.blurBody',  'फोटो हिल गई है, इसलिए धब्बे साफ़ नहीं दिख रहे।'),
+      tipsHi: [
+        tr('photo.blurTip1', 'पत्ती को एक हाथ से पकड़कर स्थिर कीजिए।'),
+        tr('photo.blurTip2', 'फ़ोन को पत्ती से लगभग एक बालिश्त दूर रखिए।'),
+        tr('photo.blurTip3', 'खींचने से पहले एक पल रुकिए, फिर बटन दबाइए।'),
+      ],
+    };
+  }
+  return { ok: true, measure: m };
+}
+
 function checkIsPlantPhoto(canvas, precomputed) {
   if (!CONFIG.LEAF_GATE.ENABLED) return { ok: true, skipped: true };
 
@@ -8012,9 +8136,23 @@ async function runPrediction() {
      * Model closed-set hai — bina is jaanch ke wo deewar par bhi "rog" bata
      * dega. Kisan ne "फिर भी जाँचें" dabaya ho to yeh jaanch chhod dete hain. */
     if (!state.forceScan) {
+      /* ---- SABSE PEHLE: photo saaf bhi hai? ----------------------------
+       * Dhundhli ya andheri photo par leaf-gate bhi galat faisla deta hai
+       * (kinare gayab, sab kuch "flat"), aur model to 85% bharose ke saath
+       * koi bhi rog bata deta hai. Isliye jaanch yahin, sabse upar. */
+      const q = checkPhotoQuality(canvas);
+      if (!q.ok) {
+        showNotPlant(q);
+        /* Kisan aksar padhta nahi — isliye kaaran bola bhi jata hai, usi
+           bhasha me jo usne chuni hai. */
+        try { speakText(q.reasonHi + ' ' + (q.tipsHi || [])[0], null, null); } catch (_) {}
+        return;
+      }
+
       const gate = checkIsPlantPhoto(canvas, state.imageFeatures);
       if (!gate.ok) {
         showNotPlant(gate);
+        try { speakText(gate.titleHi + '. ' + (gate.reasonHi || ''), null, null); } catch (_) {}
         return;                                  // finally saaf-safai kar dega
       }
 
