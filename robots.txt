@@ -1,0 +1,11 @@
+# Krishi Mitra (Krashi Mitra) — https://krashi-mitrasih.vercel.app
+User-agent: *
+Allow: /
+
+# Adhikari ka dashboard aur API index nahi hone chahiye — wo kisi ke
+# khojne ki cheez nahi hai, aur search me aane se sirf uljhan hoti hai.
+Disallow: /regional-admin
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://krashi-mitrasih.vercel.app/sitemap.xml

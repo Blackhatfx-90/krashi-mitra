@@ -27,6 +27,8 @@
  *   badalne se wo chuup-chaap toot jaati.
  * ========================================================================= */
 
+const rateLimit = require('./_ratelimit');
+
 const BASE = 'https://api.openweathermap.org';
 
 /* Sirf yahi chaar. Aur kuch nahi. */
@@ -46,6 +48,14 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'method_not_allowed' });
   }
+
+  /* OpenWeather ka apna quota hai. 10 minute ka cache pehle se lagaya hua
+     hai, isliye ek asli kisan is seema ke aas-paas bhi nahi phatakta —
+     par ek script cache se bach kar (alag-alag lat/lon bhej kar) quota
+     uda sakti thi. 120/ghanta us raaste ko band karta hai. */
+  const stop = await rateLimit.blocked(req, res, 'weather', 120, 3600,
+    'मौसम की जानकारी अभी बहुत बार माँगी गई है। थोड़ी देर बाद कोशिश कीजिए।');
+  if (stop) return;
 
   const key = process.env.OPENWEATHER_API_KEY;
   if (!key) {

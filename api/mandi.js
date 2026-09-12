@@ -23,6 +23,8 @@
  *   `records` ko isi shakl me padhta hai.
  * ========================================================================= */
 
+const rateLimit = require('./_ratelimit');
+
 const HOST = 'https://api.data.gov.in/resource/';
 
 /* Agmarknet ka "Variety-wise Daily Market Prices" dataset. Yahi ek. */
@@ -42,6 +44,13 @@ module.exports = async function handler(req, res) {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'method_not_allowed' });
   }
+
+  /* data.gov.in ki bhi apni seema hai, aur har call 2000 tak record
+     kheenchta hai — mehnga jawab. 60/ghanta kaafi khula hai (kisan din me
+     chand baar bhaav dekhta hai) par script ko rok deta hai. */
+  const stop = await rateLimit.blocked(req, res, 'mandi', 60, 3600,
+    'मंडी भाव अभी बहुत बार माँगे गए हैं। थोड़ी देर बाद कोशिश कीजिए।');
+  if (stop) return;
 
   const key = process.env.DATAGOV_API_KEY;
   if (!key) {

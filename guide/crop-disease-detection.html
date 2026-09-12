@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How Krishi Mitra Detects Crop Disease from a Photo | Krashi Mitra</title>
+  <meta name="description"
+    content="How Krishi Mitra (Krashi Mitra) identifies crop disease from one leaf photo — the checks it runs before answering, why it works offline, and what it will not guess.">
+  <link rel="canonical" href="https://krashi-mitrasih.vercel.app/guide/crop-disease-detection">
+  <meta name="theme-color" content="#168A3A">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Krishi Mitra">
+  <meta property="og:title" content="How Krishi Mitra Detects Crop Disease from a Photo">
+  <meta property="og:description"
+    content="One leaf photo, three checks, and an answer that works without internet. How Krishi Mitra reads crop disease.">
+  <meta property="og:url" content="https://krashi-mitrasih.vercel.app/guide/crop-disease-detection">
+  <meta property="og:image" content="https://krashi-mitrasih.vercel.app/assets/hero-farmer.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/landing.css">
+  <link rel="stylesheet" href="/css/seo.css?v=1">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "How Krishi Mitra Detects Crop Disease from a Photo",
+    "description": "How Krishi Mitra (Krashi Mitra) identifies crop disease from one leaf photo, the checks it runs before answering, and why it works offline.",
+    "inLanguage": "en",
+    "datePublished": "2026-09-12",
+    "dateModified": "2026-09-12",
+    "mainEntityOfPage": "https://krashi-mitrasih.vercel.app/guide/crop-disease-detection",
+    "author": { "@type": "Organization", "name": "Krishi Mitra" },
+    "publisher": { "@type": "Organization", "name": "Krishi Mitra", "url": "https://krashi-mitrasih.vercel.app" },
+    "about": { "@type": "SoftwareApplication", "name": "Krishi Mitra", "alternateName": ["Krashi Mitra", "Krishi Mitra App"] }
+  }
+  </script>
+</head>
+<body>
+  <article class="guide">
+    <a class="guide__back" href="/">&larr; Krishi Mitra home</a>
+
+    <h1>How Krishi Mitra Detects Crop Disease from a Photo</h1>
+    <p class="guide__meta">Krishi Mitra (also written Krashi Mitra) &middot; crop disease detection</p>
+
+    <p>A farmer notices a patch of yellowing leaves and wants to know what it is before spending
+      money on medicine. In <strong>Krishi Mitra</strong>, that takes one photo. You pick your crop,
+      take a picture of the affected leaf, and the app names the disease and tells you what to do
+      about it — organically first, chemically if that is not enough.</p>
+
+    <h2>What happens after you press the button</h2>
+    <p>The photo never has to leave your phone. Krishi Mitra downloads a small AI model for each
+      crop, and that model runs on the phone itself. This is why disease detection keeps working
+      in a field with no signal, and why the scan does not use your data once the model is
+      downloaded.</p>
+
+    <h2>Three checks before it answers</h2>
+    <p>An AI model that only knows ten wheat diseases will confidently name a wheat disease for a
+      photo of a wall, a hand, or a sugarcane field. That is how these models are built — they
+      always pick the closest label they know. Krishi Mitra therefore checks three things before
+      it will answer at all:</p>
+    <ul>
+      <li><strong>Is this a plant?</strong> The app looks at the greenness, texture and edges in the
+        photo. A photo of a face or a floor is refused instead of being given a disease name.</li>
+      <li><strong>Is this the crop you selected?</strong> Grass-family crops like wheat, rice and
+        sugarcane have long parallel-veined leaves; cotton, tomato and mango have broad ones. If you
+        selected apple and photographed sugarcane, the app says so rather than inventing an answer.</li>
+      <li><strong>Is the plant actually damaged?</strong> If the leaf looks healthy, Krishi Mitra
+        says it is healthy and gives advice on keeping it that way. It does not hunt for a disease
+        that is not there.</li>
+    </ul>
+
+    <h2>When you have internet</h2>
+    <p>With a network available, Krishi Mitra can also send the photo for a second opinion from a
+      larger online model and compare the two answers. This is optional. Offline, the on-phone
+      model answers alone.</p>
+
+    <h2>Why it sometimes says "not sure"</h2>
+    <p>An app that always gives an answer is not more useful — it is less trustworthy. If the
+      photo is blurred, too dark, or shows something the model has not seen, Krishi Mitra says it
+      is unsure and asks for a clearer photo. Spraying the wrong medicine costs a farmer money and
+      can damage the crop, so a plain "I do not know" is the honest answer.</p>
+
+    <h2>Getting a good photo</h2>
+    <ul>
+      <li>Fill the frame with one leaf, not the whole field.</li>
+      <li>Take it in daylight, but not in harsh midday shadow.</li>
+      <li>Include the damaged part — spots, edges, or discoloured patches.</li>
+      <li>Hold steady; a sharp photo gives a far better answer than a close one that is blurred.</li>
+    </ul>
+
+    <div class="guide__links">
+      <a href="/guide/fertilizer-advice">How Krishi Mitra gives fertilizer recommendations &rarr;</a>
+      <a href="/guide/hindi-voice-assistant">Krishi Mitra as a Hindi voice assistant &rarr;</a>
+      <a href="/">Open Krishi Mitra &rarr;</a>
+    </div>
+  </article>
+</body>
+</html>
